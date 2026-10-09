@@ -1,0 +1,1407 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover, user-scalable=no">
+<title>猫咪三消养成 V0.4</title>
+<style>
+  * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+  html, body {
+    margin: 0; padding: 0; height: 100%; overflow: hidden;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "PingFang SC", "Microsoft YaHei", sans-serif;
+    background: #f7e8cf; color: #4a3524; user-select: none;
+  }
+  #game {
+    height: 100vh; height: 100dvh;
+    max-width: 520px; margin: 0 auto;
+    display: flex; flex-direction: column;
+    position: relative; background: #f7e8cf; overflow: hidden;
+  }
+
+  /* ============================================================
+     上部：猫咪展示区
+     ============================================================ */
+  #topArea {
+    flex: 0 0 auto;
+    height: 47vh; height: 47dvh;
+    min-height: 300px;
+    max-height: 52vh;
+    position: relative; overflow: hidden;
+    border-bottom-left-radius: 24px;
+    border-bottom-right-radius: 24px;
+    box-shadow: 0 6px 16px rgba(90, 120, 70, 0.18);
+    background: linear-gradient(180deg, #cfe9f7 0%, #e6f2dc 40%, #d4ecc0 65%, #a8d68e 100%);
+  }
+
+  .cloud {
+    position: absolute; background: rgba(255,255,255,.9);
+    border-radius: 999px; pointer-events: none;
+  }
+  .cloud::before, .cloud::after {
+    content: ""; position: absolute; background: inherit; border-radius: 50%;
+  }
+  .cloud.c1 { top: 62px; left: 6%; width: 42px; height: 14px; }
+  .cloud.c1::before { width: 20px; height: 20px; top: -10px; left: 5px; }
+  .cloud.c1::after { width: 14px; height: 14px; top: -7px; left: 22px; }
+  .cloud.c2 { top: 86px; left: 42%; width: 34px; height: 12px; opacity: .65; }
+  .cloud.c2::before { width: 16px; height: 16px; top: -8px; left: 4px; }
+  .cloud.c2::after { width: 12px; height: 12px; top: -5px; left: 18px; }
+
+  #sun {
+    position: absolute; top: 58px; right: 14px;
+    width: 28px; height: 28px; border-radius: 50%;
+    background: radial-gradient(circle at 35% 30%, #fff3b0, #ffd54f 60%, #f7b733);
+    box-shadow: 0 0 20px rgba(255, 213, 79, .7);
+    pointer-events: none; z-index: 2;
+  }
+
+  #grass {
+    position: absolute; left: 0; right: 0; bottom: 0;
+    height: 44%;
+    background: linear-gradient(180deg, rgba(168, 214, 142, 0) 0%, #a8d68e 30%, #86c269 100%);
+    z-index: 1; pointer-events: none;
+  }
+  #grass::before {
+    content: "";
+    position: absolute; left: 0; right: 0; top: 6px; height: 8px;
+    background:
+      radial-gradient(circle at 8% 50%, #7dba63 0 4px, transparent 5px),
+      radial-gradient(circle at 24% 50%, #7dba63 0 4px, transparent 5px),
+      radial-gradient(circle at 42% 50%, #7dba63 0 4px, transparent 5px),
+      radial-gradient(circle at 60% 50%, #7dba63 0 4px, transparent 5px),
+      radial-gradient(circle at 78% 50%, #7dba63 0 4px, transparent 5px),
+      radial-gradient(circle at 94% 50%, #7dba63 0 4px, transparent 5px);
+    background-repeat: no-repeat; opacity: 0.55;
+  }
+
+  /* HUD */
+  #hud {
+    position: absolute; top: 0; left: 0; right: 0; height: 54px;
+    display: flex; justify-content: space-between; align-items: flex-start;
+    padding: 6px 12px; z-index: 22; pointer-events: none;
+  }
+  .hud-item {
+    background: rgba(255, 255, 255, 0.94);
+    border-radius: 16px; padding: 4px 12px 5px;
+    min-width: 100px; text-align: center;
+    box-shadow: 0 3px 8px rgba(0,0,0,.10), inset 0 0 0 1px rgba(255,255,255,.7);
+  }
+  .hud-item span {
+    display: block; font-size: 11px; color: #7a6a55;
+    line-height: 1.15; letter-spacing: .5px;
+  }
+  .hud-item strong {
+    display: block; font-size: 25px; line-height: 1.05;
+    color: #2f7a3e; font-weight: 800; font-variant-numeric: tabular-nums;
+  }
+  #returnText { color: #e67e22; }
+
+  /* 场景容器 */
+  #scene { position: absolute; inset: 0; padding-top: 54px; z-index: 2; }
+
+  /* 猫粮机（居中，位于猫粮槽上方） */
+  #foodMachine {
+    position: absolute; z-index: 9;
+    width: 62px; height: 62px;
+    filter: drop-shadow(0 4px 5px rgba(60, 90, 120, .3));
+    transition: left .3s;
+  }
+  .machine-body {
+    position: absolute; inset: 0 0 20px 0;
+    background: linear-gradient(180deg, #b8d4f2 0%, #7aa5d8 55%, #5b88c0 100%);
+    border-radius: 12px;
+    box-shadow: inset 0 2px 0 rgba(255,255,255,.6), inset 0 -3px 6px rgba(0,0,0,.12);
+  }
+  .mach-slot {
+    position: absolute; top: 12px; left: 10px; right: 10px;
+    height: 8px; border-radius: 4px;
+    background: rgba(30, 50, 80, .38);
+    box-shadow: inset 0 1px 2px rgba(0,0,0,.4);
+  }
+  .mach-light {
+    position: absolute; top: 26px; right: 10px;
+    width: 8px; height: 8px; border-radius: 50%;
+    background: #ffe082;
+    box-shadow: 0 0 8px #ffd54f, inset 0 0 3px #fff;
+    animation: machBlink 1.6s ease-in-out infinite;
+  }
+  @keyframes machBlink { 0%, 100% { opacity: 1; } 50% { opacity: .35; } }
+  .mach-funnel {
+    position: absolute; bottom: 6px; left: 12px; right: 12px; height: 18px;
+    background: linear-gradient(180deg, #d7dde3, #99a3ac);
+    clip-path: polygon(0 0, 100% 0, 74% 100%, 26% 100%);
+    border-radius: 2px;
+  }
+  .mach-drip {
+    position: absolute; bottom: -4px; left: 50%;
+    width: 5px; height: 5px; margin-left: -2.5px;
+    background: #f2b544; border-radius: 50%; opacity: 0;
+    animation: drip 2.4s ease-in infinite;
+  }
+  @keyframes drip {
+    0%, 70% { opacity: 0; transform: translateY(0); }
+    80% { opacity: 1; transform: translateY(2px); }
+    95% { opacity: 0; transform: translateY(12px); }
+    100% { opacity: 0; }
+  }
+  .mach-label {
+    position: absolute; top: 3px; left: 0; right: 0; text-align: center;
+    font-size: 8px; font-weight: 800; color: rgba(255,255,255,.95);
+    letter-spacing: .5px; text-shadow: 0 1px 1px rgba(0,0,0,.3);
+  }
+
+  /* 食槽（位于猫粮机正下方） */
+  #trough {
+    position: absolute; z-index: 9;
+    height: 32px;
+    border-radius: 18px;
+    background: linear-gradient(180deg, #d8a97a 0%, #b78656 55%, #94673c 100%);
+    padding: 3px;
+    box-shadow: 0 3px 6px rgba(90, 60, 30, .28), inset 0 1px 0 rgba(255,255,255,.35);
+  }
+  #troughInner {
+    position: relative; width: 100%; height: 100%;
+    border-radius: 15px;
+    background: linear-gradient(180deg, #4a3826, #2f2318);
+    overflow: hidden;
+    box-shadow: inset 0 2px 4px rgba(0,0,0,.45);
+  }
+  #troughInner::before {
+    content: ""; position: absolute; left: 6px; right: 6px; top: 3px;
+    height: 3px; border-radius: 3px; background: rgba(255,255,255,.08);
+  }
+  #troughFill {
+    position: absolute; left: 0; top: 0; bottom: 0; width: 0%;
+    background: linear-gradient(180deg, #f6c34a 0%, #e29a25 70%, #b8791a 100%);
+    transition: width .45s ease;
+    border-top-right-radius: 6px; border-bottom-right-radius: 6px;
+  }
+  #troughKibbles { position: absolute; inset: 0; pointer-events: none; }
+  .kibble {
+    position: absolute; width: 6px; height: 5px;
+    background: radial-gradient(circle at 35% 30%, #ffd977, #c98a20 75%, #8d5a10);
+    border-radius: 45% 55% 50% 50%;
+    box-shadow: inset 0 -1px 0 rgba(0,0,0,.25);
+  }
+
+  /* 大猫窝（右侧） */
+  #bigHome {
+    position: absolute; z-index: 5;
+    border-radius: 50% / 38%;
+    background:
+      radial-gradient(ellipse at 50% 18%, #ffd8a4 0%, #f0a860 45%, #c98840 78%, #a86b30 100%);
+    box-shadow:
+      inset 0 10px 18px rgba(255, 255, 255, 0.45),
+      inset 0 -12px 22px rgba(0, 0, 0, 0.28),
+      0 8px 22px rgba(90, 60, 30, .4);
+    transition: left .3s, top .3s, width .3s, height .3s;
+  }
+  #bigHomeInner {
+    position: absolute;
+    left: 9%; right: 9%; top: 16%; bottom: 22%;
+    border-radius: 50% / 34%;
+    background: radial-gradient(ellipse at 50% 28%, #3d2e1e, #1f1710);
+    box-shadow: inset 0 6px 14px rgba(0,0,0,.65);
+    overflow: hidden;
+  }
+  #bigHomeCushion {
+    position: absolute;
+    left: 10%; right: 10%; top: 20%; bottom: 26%;
+    border-radius: 50% / 40%;
+    background: radial-gradient(ellipse at 50% 25%, #ffd7a0 0%, #e8a860 70%, #cf8f4a 100%);
+    box-shadow: inset 0 -3px 8px rgba(150, 90, 30, .35);
+  }
+  #bigHomeLabel {
+    position: absolute;
+    top: 6%; left: 0; right: 0;
+    text-align: center; font-size: 10px; font-weight: 800;
+    color: #7a4d1f; opacity: .75; letter-spacing: 1px;
+    text-shadow: 0 1px 0 rgba(255,255,255,.5);
+  }
+
+  /* 猫咪 */
+  .cat {
+    position: absolute;
+    width: 60px; height: 74px;
+    display: flex; flex-direction: column; align-items: center;
+    transition: left 1.05s cubic-bezier(.45,.05,.55,.95),
+                top  1.05s cubic-bezier(.45,.05,.55,.95),
+                opacity .55s ease, transform .45s ease;
+    z-index: 10;
+    pointer-events: none;
+  }
+  .cat-svg-wrap {
+    width: 60px; height: 60px;
+    display: flex; align-items: flex-end; justify-content: center;
+    position: relative;
+  }
+  .cat-svg-wrap svg {
+    width: 58px; height: 58px;
+    overflow: visible;
+    filter: drop-shadow(0 2px 3px rgba(0,0,0,.18));
+  }
+  .cat-chip {
+    font-size: 9px; font-weight: 800;
+    padding: 1px 7px; border-radius: 8px;
+    background: rgba(255,255,255,.9);
+    color: #4a3524;
+    box-shadow: 0 1px 2px rgba(0,0,0,.12);
+    letter-spacing: .3px;
+    margin-top: -4px;
+    white-space: nowrap;
+  }
+  .cat.state-waiting .cat-chip { background: #ece0c8; color: #7a6a55; }
+  .cat.state-walking_to_food .cat-chip,
+  .cat.state-walking_to_home .cat-chip { background: #d6f5cf; color: #2f7a3e; }
+  .cat.state-eating .cat-chip { background: #ffe0b0; color: #a15a1a; }
+  .cat.state-cleaning .cat-chip { background: #cfe9ff; color: #25628f; }
+  .cat.state-happy .cat-chip { background: #ffe2ef; color: #b8456f; }
+  .cat.state-sleeping .cat-chip { background: #dcd6f5; color: #4a3d8a; }
+
+  .cat.state-walking_to_food .cat-svg-wrap svg,
+  .cat.state-walking_to_home .cat-svg-wrap svg {
+    animation: walkBob .42s ease-in-out infinite;
+  }
+  @keyframes walkBob {
+    0%, 100% { transform: translateY(0) rotate(-2deg); }
+    50% { transform: translateY(-3px) rotate(2deg); }
+  }
+  .cat.state-eating .cat-svg-wrap svg { animation: eatBob .5s ease-in-out infinite; }
+  @keyframes eatBob {
+    0%, 100% { transform: translateY(0) rotate(0); }
+    50% { transform: translateY(-2px) rotate(-3deg); }
+  }
+  .cat.state-cleaning .cat-svg-wrap svg { animation: cleanSway .9s ease-in-out infinite; }
+  @keyframes cleanSway {
+    0%, 100% { transform: rotate(-5deg); }
+    50% { transform: rotate(5deg); }
+  }
+  .cat.state-happy .cat-svg-wrap svg { animation: happyHop .52s ease-in-out infinite; }
+  @keyframes happyHop {
+    0%, 100% { transform: translateY(0) scale(1); }
+    50% { transform: translateY(-5px) scale(1.05); }
+  }
+  .cat.state-sleeping .cat-svg-wrap svg { animation: sleepBreathe 2.4s ease-in-out infinite; }
+  @keyframes sleepBreathe {
+    0%, 100% { transform: scale(1); }
+    50% { transform: scale(1.04); }
+  }
+
+  /* 提示文本 */
+  .hint {
+    position: absolute;
+    left: 8px; right: 8px;
+    font-size: 10px;
+    line-height: 1.35;
+    color: #5a4a38;
+    background: rgba(255, 255, 255, .72);
+    padding: 3px 8px;
+    border-radius: 9px;
+    text-align: center;
+    pointer-events: none;
+    box-shadow: 0 1px 3px rgba(0,0,0,.06);
+    z-index: 12;
+    font-weight: 600;
+    letter-spacing: .2px;
+  }
+  #hintTop { bottom: 4px; }
+  #hintBottom { position: static; margin-bottom: 2px; }
+
+  /* ============================================================
+     下部：三消棋盘
+     ============================================================ */
+  #boardArea {
+    flex: 1 1 auto; min-height: 0;
+    display: flex; flex-direction: column;
+    align-items: center; justify-content: center;
+    padding: 6px 8px 8px;
+    position: relative;
+    background: radial-gradient(circle at 50% 0%, #fff6e4 0%, #ffeecf 60%, #fbe1b5 100%);
+    gap: 4px;
+  }
+  #board {
+    display: grid;
+    grid-template-columns: repeat(8, 1fr);
+    grid-template-rows: repeat(8, 1fr);
+    gap: 2px; padding: 5px;
+    background: linear-gradient(180deg, #d8b78e, #b79065);
+    border-radius: 16px;
+    box-shadow: 0 8px 18px rgba(120, 80, 40, .22), inset 0 1px 0 rgba(255,255,255,.5);
+    touch-action: none;
+    flex: 0 0 auto;
+  }
+  .tile {
+    display: flex; align-items: center; justify-content: center;
+    background: linear-gradient(180deg, #fffaf0, #f6e7cd);
+    border-radius: 9px;
+    font-size: calc(var(--tile-size, 40px) * 0.55);
+    line-height: 1;
+    border: 2px solid transparent;
+    cursor: pointer;
+    transition: transform .12s ease, border-color .12s ease, box-shadow .12s ease;
+    will-change: transform;
+    box-shadow: inset 0 1px 0 rgba(255,255,255,.9), 0 1px 2px rgba(140, 100, 60, .12);
+  }
+  .tile.selected {
+    transform: scale(1.10);
+    border-color: #ff9f43;
+    box-shadow: 0 0 0 2px #ff9f43 inset, 0 0 12px rgba(255, 159, 67, .6);
+  }
+  .tile.invalid { animation: shake .3s ease; }
+  .tile.pop { animation: pop .18s ease forwards; }
+  @keyframes shake {
+    0%, 100% { transform: translateX(0); }
+    25% { transform: translateX(-4px); }
+    75% { transform: translateX(4px); }
+  }
+  @keyframes pop { to { transform: scale(.15); opacity: 0; } }
+
+  #bottomBar {
+    height: 30px; flex: 0 0 auto;
+    display: flex; gap: 14px; align-items: center; justify-content: center;
+    font-size: 13px; color: #6b5a44; white-space: nowrap;
+  }
+  #bottomBar > div {
+    background: rgba(255, 255, 255, .78);
+    padding: 3px 10px; border-radius: 10px;
+    box-shadow: 0 1px 3px rgba(120, 80, 40, .12);
+  }
+  #bottomBar strong {
+    color: #2f7a3e; font-size: 15px; font-variant-numeric: tabular-nums;
+  }
+
+  /* 浮字 / 提示 / 结果 */
+  .floating-score {
+    position: fixed; transform: translate(-50%, -50%);
+    color: #ff8c00; font-weight: 900; font-size: 18px;
+    pointer-events: none;
+    animation: floatUp .85s ease-out forwards;
+    z-index: 90;
+    text-shadow: 0 1px 2px #fff, 0 0 6px #fff, 0 2px 4px rgba(255, 140, 0, .35);
+  }
+  @keyframes floatUp { to { transform: translate(-50%, -140%); opacity: 0; } }
+  .toast {
+    position: fixed; left: 50%; top: 58%;
+    transform: translate(-50%, -50%);
+    background: rgba(45, 35, 25, .84); color: #fff;
+    padding: 9px 16px; border-radius: 22px; font-size: 13px;
+    z-index: 120; pointer-events: none;
+    animation: toastFade 1.9s ease forwards;
+    box-shadow: 0 6px 18px rgba(0,0,0,.22);
+  }
+  @keyframes toastFade {
+    0% { opacity: 0; transform: translate(-50%, -40%); }
+    15%, 70% { opacity: 1; transform: translate(-50%, -50%); }
+    100% { opacity: 0; transform: translate(-50%, -62%); }
+  }
+
+  #resultOverlay {
+    position: fixed; inset: 0;
+    background: rgba(40, 30, 20, .5);
+    display: flex; align-items: center; justify-content: center;
+    z-index: 200; backdrop-filter: blur(3px);
+  }
+  .result-card {
+    background: linear-gradient(180deg, #fff9ec, #ffefd3);
+    border-radius: 24px; padding: 26px 22px 22px;
+    width: min(86vw, 330px); text-align: center;
+    box-shadow: 0 16px 40px rgba(0,0,0,.28), inset 0 0 0 1px rgba(255,255,255,.8);
+  }
+  .result-card h2 {
+    margin: 0 0 12px; font-size: 22px; color: #e67e22; letter-spacing: 1px;
+  }
+  .result-card .big-number {
+    font-size: 44px; font-weight: 900; color: #2f7a3e; line-height: 1; margin: 4px 0 6px;
+  }
+  .result-card p { margin: 6px 0; font-size: 14px; color: #6b5a44; }
+  .result-card p span { font-weight: 800; color: #4a3524; }
+  .result-card button {
+    margin-top: 18px; padding: 12px 32px;
+    border: none; border-radius: 999px;
+    background: linear-gradient(180deg, #ffb257, #ff9f43);
+    color: #fff; font-size: 16px; font-weight: 800;
+    box-shadow: 0 4px 0 #d97d1f, 0 6px 14px rgba(217, 125, 31, .35);
+    cursor: pointer; letter-spacing: 1px;
+  }
+  .result-card button:active { transform: translateY(2px); box-shadow: 0 2px 0 #d97d1f; }
+  .hidden { display: none !important; }
+</style>
+</head>
+<body>
+<div id="game">
+  <div id="topArea">
+    <div id="grass"></div>
+    <div class="cloud c1"></div>
+    <div class="cloud c2"></div>
+    <div id="sun"></div>
+
+    <div id="hud">
+      <div class="hud-item">
+        <span>剩余时间</span>
+        <strong id="timeText">90</strong>
+      </div>
+      <div class="hud-item">
+        <span>开心回窝</span>
+        <strong id="returnText">0</strong>
+      </div>
+    </div>
+
+    <div id="scene">
+      <div id="foodMachine">
+        <div class="machine-body">
+          <div class="mach-slot"></div>
+          <div class="mach-light"></div>
+          <div class="mach-label">猫粮机</div>
+        </div>
+        <div class="mach-funnel"></div>
+        <div class="mach-drip"></div>
+      </div>
+
+      <div id="trough">
+        <div id="troughInner">
+          <div id="troughFill"></div>
+          <div id="troughKibbles"></div>
+        </div>
+      </div>
+
+      <div id="bigHome">
+        <div id="bigHomeInner"></div>
+        <div id="bigHomeCushion"></div>
+        <div id="bigHomeLabel">猫窝</div>
+      </div>
+
+      <div id="catsLayer" style="position:absolute;inset:0;z-index:10;pointer-events:none;"></div>
+      <div class="hint" id="hintTop">猫咪吃饱后会清洁自己、变得开心，再回到猫窝休息</div>
+    </div>
+  </div>
+
+  <div id="boardArea">
+    <div class="hint" id="hintBottom">连成 3 个或更多相同图案即可消除，连锁和连续消除会获得额外积分</div>
+    <div id="board"></div>
+    <div id="bottomBar">
+      <div>积分 <strong id="scoreText">0</strong></div>
+      <div>猫粮 <strong id="foodText">0</strong></div>
+      <div>连击 <strong id="comboText">x0</strong></div>
+    </div>
+  </div>
+
+  <div id="resultOverlay" class="hidden">
+    <div class="result-card">
+      <h2>本局结束</h2>
+      <div class="big-number" id="resultReturns">0</div>
+      <p>只猫咪开心回窝</p>
+      <p>积分 <span id="resultScore">0</span></p>
+      <p>最高连击 <span id="resultCombo">0</span></p>
+      <p>吸引猫咪 <span id="resultCats">0</span></p>
+      <button id="restartBtn">再玩一局</button>
+    </div>
+  </div>
+</div>
+
+<script>
+(function () {
+  "use strict";
+
+  // ===================== 配置 =====================
+  const CONFIG = {
+    roundTime: 90,
+    boardSize: 8,
+    tileTypes: ["paw", "fish", "yarn", "cookie", "milk"],
+    tileEmoji: { paw: "🐾", fish: "🐟", yarn: "🧶", cookie: "🍪", milk: "🥛" },
+    scoreTable: { 3: 30, 4: 45, 5: 60 },
+    score6Base: 60, score6Extra: 10,
+    chainBonusStep: 0.25, chainBonusMax: 0.75,
+    comboWindow: 4000, comboStep: 0.10, comboMax: 0.50,
+    foodPerScore: 120,
+    troughCap: 24,
+    catPhases: {
+      walkingToFood: 1100,
+      eating: 4500,
+      cleaning: 4500,
+      happy: 4500,
+      walkingToHome: 1500,
+      sleeping: 6000,
+      fading: 600
+    },
+    maxEating: 6,
+    initialWaitingCats: 4,
+    maxWaitingCats: 5,
+    maxTotalCats: 12,
+    catSpawnInterval: 3000,
+    lastPhaseCutoff: 18,
+    troughConcurrency: [
+      { min: 1, max: 3, maxCats: 1 },
+      { min: 4, max: 6, maxCats: 2 },
+      { min: 7, max: 10, maxCats: 3 },
+      { min: 11, max: 15, maxCats: 4 },
+      { min: 16, max: 20, maxCats: 5 },
+      { min: 21, max: 24, maxCats: 6 }
+    ]
+  };
+
+  // ===================== DOM =====================
+  const boardEl = document.getElementById("board");
+  const catsLayer = document.getElementById("catsLayer");
+  const topArea = document.getElementById("topArea");
+  const scene = document.getElementById("scene");
+  const foodMachine = document.getElementById("foodMachine");
+  const trough = document.getElementById("trough");
+  const bigHome = document.getElementById("bigHome");
+  const timeText = document.getElementById("timeText");
+  const returnText = document.getElementById("returnText");
+  const scoreText = document.getElementById("scoreText");
+  const foodText = document.getElementById("foodText");
+  const comboText = document.getElementById("comboText");
+  const troughFill = document.getElementById("troughFill");
+  const troughKibbles = document.getElementById("troughKibbles");
+  const resultOverlay = document.getElementById("resultOverlay");
+  const resultReturns = document.getElementById("resultReturns");
+  const resultScore = document.getElementById("resultScore");
+  const resultCombo = document.getElementById("resultCombo");
+  const resultCats = document.getElementById("resultCats");
+  const restartBtn = document.getElementById("restartBtn");
+
+  // ===================== 状态 =====================
+  let board = [];
+  let selected = null;
+  let isAnimating = false;
+
+  let score = 0;
+  let foodStock = 0;
+  let foodProgress = 0;
+
+  let comboLevel = 0;
+  let maxCombo = 0;
+  let lastMatchTime = 0;
+
+  let timeLeft = CONFIG.roundTime;
+  let returnedCats = 0;
+  let attractedCats = 0;
+
+  let cats = [];
+  let catIdSeq = 1;
+  let gameActive = false;
+
+  const timers = { countdown: null, gameTick: null, catSpawn: null };
+
+  // 位置
+  const POS = { W: 0, H: 0, eating: [], waiting: [], sleepSpots: [], home: null };
+
+  // ===================== 猫咪调色板 =====================
+  const CAT_PALETTES = [
+    { body: "#f5a352", dark: "#d97d2e", belly: "#ffe8c7", inner: "#f5a8b8" },
+    { body: "#c5cdd6", dark: "#96a1ad", belly: "#f2f5f8", inner: "#f0a6b8" },
+    { body: "#a87b5b", dark: "#7d563a", belly: "#f0dcc4", inner: "#e9a5b5" },
+    { body: "#f6f2ea", dark: "#cfc8bc", belly: "#ffffff", inner: "#f0a6b8" },
+    { body: "#8a7c6a", dark: "#6a5e50", belly: "#d9cfbf", inner: "#e9a5b5" }
+  ];
+
+  // ===================== 工具 =====================
+  const sleep = ms => new Promise(r => setTimeout(r, ms));
+  const randomTile = () => CONFIG.tileTypes[Math.floor(Math.random() * CONFIG.tileTypes.length)];
+
+  function swap(b, r1, c1, r2, c2) {
+    const t = b[r1][c1]; b[r1][c1] = b[r2][c2]; b[r2][c2] = t;
+  }
+  function getTileEl(r, c) {
+    return boardEl.querySelector(`.tile[data-r="${r}"][data-c="${c}"]`);
+  }
+  function stateLabel(s) {
+    return {
+      waiting: "等待", walking_to_food: "去吃", eating: "进食",
+      cleaning: "清洁", happy: "开心",
+      walking_to_home: "回窝", sleeping: "睡觉", fading: "…"
+    }[s] || s;
+  }
+
+  function clearAllTimers() {
+    if (timers.countdown) clearInterval(timers.countdown);
+    if (timers.gameTick) clearInterval(timers.gameTick);
+    if (timers.catSpawn) clearInterval(timers.catSpawn);
+    timers.countdown = timers.gameTick = timers.catSpawn = null;
+  }
+
+  // ===================== 布局计算 =====================
+  function computePositions() {
+    const W = topArea.clientWidth;
+    const H = topArea.clientHeight;
+    POS.W = W; POS.H = H;
+
+    // 猫粮机居中在猫粮槽上方
+    const troughLeft = 15;
+    const troughRight = W - 118;
+    const troughWidth = troughRight - troughLeft;
+    const machineW = 62;
+    const machineLeft = troughLeft + troughWidth / 2 - machineW / 2;
+
+    foodMachine.style.left = machineLeft + "px";
+    foodMachine.style.top = "58px";
+
+    trough.style.left = troughLeft + "px";
+    trough.style.top = "122px";
+    trough.style.width = troughWidth + "px";
+
+    // 大猫窝在右侧
+    const homeLeft = W - 108;
+    const homeTop = 118;
+    const homeW = 102;
+    const homeH = Math.max(160, H - 132);
+    POS.home = { x: homeLeft, y: homeTop, w: homeW, h: homeH };
+
+    bigHome.style.left = homeLeft + "px";
+    bigHome.style.top = homeTop + "px";
+    bigHome.style.width = homeW + "px";
+    bigHome.style.height = homeH + "px";
+
+    // 进食位置（猫粮槽下方，避开右侧猫窝）
+    POS.eating = [];
+    const eatLeft = 16;
+    const eatRight = W - 118;
+    const eatWidth = eatRight - eatLeft;
+    const eatY = 160;
+    const catW = 60;
+    const minSpacing = 62;
+    let numEat = Math.floor(eatWidth / minSpacing) + 1;
+    numEat = Math.max(3, Math.min(CONFIG.maxEating, numEat));
+    for (let i = 0; i < numEat; i++) {
+      const t = numEat === 1 ? 0.5 : i / (numEat - 1);
+      const x = eatLeft + (eatWidth - catW) * t;
+      POS.eating.push({ x, y: eatY });
+    }
+
+    // 等候位置（底部一排）
+    POS.waiting = [];
+    const waitLeft = 8;
+    const waitRight = W - 118;
+    const waitWidth = waitRight - waitLeft;
+    const waitY = H - 92;
+    let numWait = Math.floor(waitWidth / minSpacing) + 1;
+    numWait = Math.max(3, Math.min(CONFIG.maxWaitingCats, numWait));
+    for (let i = 0; i < numWait; i++) {
+      const t = numWait === 1 ? 0.5 : i / (numWait - 1);
+      const x = waitLeft + (waitWidth - catW) * t;
+      POS.waiting.push({ x, y: waitY });
+    }
+
+    // 大猫窝内的睡眠位置（所有猫叠在一起）
+    POS.sleepSpots = [];
+    const cx = homeLeft + homeW / 2;
+    const cy = homeTop + homeH / 2;
+    const spots = [
+      { dx: -6, dy: -78 },
+      { dx:  6, dy: -50 },
+      { dx: -6, dy: -22 },
+      { dx:  6, dy:   6 },
+      { dx: -6, dy:  34 },
+      { dx:  6, dy:  62 }
+    ];
+    for (const s of spots) {
+      POS.sleepSpots.push({
+        x: cx + s.dx - catW / 2,
+        y: cy + s.dy - 38
+      });
+    }
+  }
+
+  // ===================== 猫咪 SVG =====================
+  function catSVG(state, palette, dirty) {
+    const { body, dark, belly, inner } = palette;
+    let eyes, mouth, extras = "";
+
+    const eyesNormal = `
+      <ellipse cx="40" cy="43" rx="3" ry="3.8" fill="#2a2a2a"/>
+      <ellipse cx="60" cy="43" rx="3" ry="3.8" fill="#2a2a2a"/>
+      <circle cx="41" cy="42" r="1" fill="#fff"/>
+      <circle cx="61" cy="42" r="1" fill="#fff"/>`;
+    const eyesHappy = `
+      <path d="M35,44 Q40,38 45,44" stroke="#2a2a2a" stroke-width="2.4" fill="none" stroke-linecap="round"/>
+      <path d="M55,44 Q60,38 65,44" stroke="#2a2a2a" stroke-width="2.4" fill="none" stroke-linecap="round"/>`;
+    const eyesSleepy = `
+      <path d="M35,44 Q40,47 45,44" stroke="#2a2a2a" stroke-width="2" fill="none" stroke-linecap="round"/>
+      <path d="M55,44 Q60,47 65,44" stroke="#2a2a2a" stroke-width="2" fill="none" stroke-linecap="round"/>`;
+    const eyesBig = `
+      <ellipse cx="40" cy="43" rx="3.8" ry="4.8" fill="#2a2a2a"/>
+      <ellipse cx="60" cy="43" rx="3.8" ry="4.8" fill="#2a2a2a"/>
+      <circle cx="41.2" cy="41.5" r="1.4" fill="#fff"/>
+      <circle cx="61.2" cy="41.5" r="1.4" fill="#fff"/>`;
+
+    switch (state) {
+      case "waiting":
+        eyes = eyesBig;
+        mouth = `<ellipse cx="50" cy="56" rx="2.6" ry="3.2" fill="#5a4a38"/>`;
+        extras = `
+          <g opacity="0.92">
+            <circle cx="78" cy="30" r="8" fill="#ffffff" stroke="#7dc3e8" stroke-width="1.4"/>
+            <text x="78" y="34" font-size="11" text-anchor="middle" fill="#7dc3e8" font-weight="900">?</text>
+            <path d="M72,36 L70,42 L76,38 Z" fill="#ffffff" stroke="#7dc3e8" stroke-width="1.2" stroke-linejoin="round"/>
+          </g>`;
+        break;
+      case "walking_to_food":
+      case "walking_to_home":
+        eyes = eyesNormal;
+        mouth = `<path d="M46,55 Q50,58 54,55" stroke="#2a2a2a" stroke-width="1.6" fill="none" stroke-linecap="round"/>`;
+        break;
+      case "eating":
+        eyes = eyesHappy;
+        mouth = `
+          <ellipse cx="50" cy="56" rx="3.5" ry="2.5" fill="#d16b7a"/>
+          <ellipse cx="50" cy="58.5" rx="4" ry="1.8" fill="#f8a0a8" opacity="0.85"/>`;
+        break;
+      case "cleaning":
+        eyes = eyesSleepy;
+        mouth = `
+          <path d="M44,56 Q50,59 56,56" stroke="#2a2a2a" stroke-width="1.6" fill="none" stroke-linecap="round"/>
+          <ellipse cx="50" cy="61" rx="3.5" ry="2.4" fill="#f48ca2"/>`;
+        break;
+      case "happy":
+        eyes = eyesHappy;
+        mouth = `<path d="M42,55 Q50,61 58,55" stroke="#2a2a2a" stroke-width="2" fill="none" stroke-linecap="round"/>`;
+        extras = `
+          <text x="76" y="26" font-size="14" text-anchor="middle" fill="#e87e8f" font-weight="900">♥</text>
+          <text x="20" y="32" font-size="11" text-anchor="middle" fill="#ffd54f">✦</text>`;
+        break;
+      case "sleeping":
+        eyes = `
+          <path d="M35,44 L45,44" stroke="#2a2a2a" stroke-width="2.2" stroke-linecap="round"/>
+          <path d="M55,44 L65,44" stroke="#2a2a2a" stroke-width="2.2" stroke-linecap="round"/>`;
+        mouth = `<path d="M48,56 Q50,58 52,56" stroke="#2a2a2a" stroke-width="1.4" fill="none" stroke-linecap="round"/>`;
+        extras = `
+          <text x="80" y="32" font-size="14" text-anchor="middle" fill="#5a8fc9" font-weight="900">Z</text>
+          <text x="90" y="22" font-size="10" text-anchor="middle" fill="#5a8fc9" font-weight="900">z</text>`;
+        break;
+      default:
+        eyes = eyesNormal;
+        mouth = `<path d="M46,55 Q50,58 54,55" stroke="#2a2a2a" stroke-width="1.6" fill="none" stroke-linecap="round"/>`;
+    }
+
+    let dirties = "";
+    if (dirty) {
+      dirties = `
+        <circle cx="35" cy="68" r="3.2" fill="#8a7355" opacity="0.55"/>
+        <circle cx="62" cy="72" r="2.8" fill="#8a7355" opacity="0.5"/>
+        <circle cx="46" cy="78" r="2.1" fill="#8a7355" opacity="0.45"/>
+        <circle cx="66" cy="58" r="1.9" fill="#8a7355" opacity="0.5"/>
+        <circle cx="32" cy="52" r="1.7" fill="#8a7355" opacity="0.4"/>`;
+    }
+
+    return `
+      <svg viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">
+        <path d="M68,78 Q86,74 82,58" stroke="${dark}" stroke-width="6" fill="none" stroke-linecap="round"/>
+        <ellipse cx="50" cy="77" rx="22" ry="15" fill="${body}"/>
+        <ellipse cx="50" cy="81" rx="14" ry="9" fill="${belly}"/>
+        ${dirties}
+        <polygon points="28,30 33,13 45,26" fill="${body}"/>
+        <polygon points="72,30 67,13 55,26" fill="${body}"/>
+        <polygon points="32,28 35,18 43,26" fill="${inner}"/>
+        <polygon points="68,28 65,18 57,26" fill="${inner}"/>
+        <circle cx="50" cy="42" r="24" fill="${body}"/>
+        ${eyes}
+        <polygon points="50,48 48,50.5 52,50.5" fill="#e87e8f"/>
+        ${mouth}
+        ${extras}
+      </svg>`;
+  }
+
+  // ===================== 猫咪实体 =====================
+  function makeCat() {
+    const cat = {
+      id: catIdSeq++,
+      state: "waiting",
+      stateStart: performance.now(),
+      palette: CAT_PALETTES[Math.floor(Math.random() * CAT_PALETTES.length)],
+      dirty: true,
+      eatingSlot: -1,
+      waitingSlot: -1,
+      sleepSlot: -1,
+      dead: false,
+      el: document.createElement("div")
+    };
+    cat.el.className = "cat state-waiting";
+    cat.el.innerHTML = `
+      <div class="cat-svg-wrap">${catSVG("waiting", cat.palette, true)}</div>
+      <div class="cat-chip">等待</div>
+    `;
+    catsLayer.appendChild(cat.el);
+    return cat;
+  }
+
+  function refreshCatVisual(cat) {
+    cat.el.className = "cat state-" + cat.state;
+    cat.el.innerHTML = `
+      <div class="cat-svg-wrap">${catSVG(cat.state, cat.palette, cat.dirty)}</div>
+      <div class="cat-chip">${stateLabel(cat.state)}</div>
+    `;
+  }
+
+  function moveCat(cat, x, y) {
+    cat.el.style.left = x + "px";
+    cat.el.style.top = y + "px";
+  }
+
+  function getFreeWaitingSlot() {
+    const used = new Set(
+      cats.filter(c => c.waitingSlot >= 0 && !c.dead).map(c => c.waitingSlot)
+    );
+    for (let i = 0; i < POS.waiting.length; i++) if (!used.has(i)) return i;
+    return -1;
+  }
+  function getFreeEatingSlot() {
+    const used = new Set(
+      cats.filter(c => c.eatingSlot >= 0 &&
+        ["walking_to_food", "eating", "cleaning", "happy"].includes(c.state)).map(c => c.eatingSlot)
+    );
+    for (let i = 0; i < POS.eating.length; i++) if (!used.has(i)) return i;
+    return -1;
+  }
+  function getFreeSleepSlot() {
+    const used = new Set(
+      cats.filter(c => c.sleepSlot >= 0 &&
+        ["walking_to_home", "sleeping", "fading"].includes(c.state)).map(c => c.sleepSlot)
+    );
+    for (let i = 0; i < POS.sleepSpots.length; i++) if (!used.has(i)) return i;
+    return -1;
+  }
+
+  function spawnWaitingCat() {
+    const total = cats.filter(c => !c.dead).length;
+    if (total >= CONFIG.maxTotalCats) return;
+    const wCount = cats.filter(c => c.state === "waiting" && !c.dead).length;
+    if (wCount >= CONFIG.maxWaitingCats) return;
+    if (POS.waiting.length === 0) return;
+
+    const slot = getFreeWaitingSlot();
+    if (slot < 0) return;
+
+    const cat = makeCat();
+    cat.waitingSlot = slot;
+    const p = POS.waiting[slot];
+    cat.el.style.left = p.x + "px";
+    cat.el.style.top = p.y + "px";
+    cats.push(cat);
+  }
+
+  // ===================== 猫咪调度 =====================
+  function maxConcurrentByFood() {
+    const s = foodStock;
+    for (const r of CONFIG.troughConcurrency) {
+      if (s >= r.min && s <= r.max) return r.maxCats;
+    }
+    return 0;
+  }
+
+  function trySendWaitingCat() {
+    if (!gameActive) return;
+    if (timeLeft <= CONFIG.lastPhaseCutoff) return;
+
+    const using = cats.filter(c =>
+      c.state === "eating" || c.state === "cleaning" ||
+      c.state === "happy" || c.state === "walking_to_food"
+    ).length;
+
+    if (using >= CONFIG.maxEating) return;
+    if (using >= maxConcurrentByFood()) return;
+    if (foodStock <= 0) return;
+
+    const waiter = cats.find(c => c.state === "waiting");
+    if (!waiter) return;
+
+    const slot = getFreeEatingSlot();
+    if (slot < 0) return;
+
+    foodStock--;
+    attractedCats++;
+
+    waiter.eatingSlot = slot;
+    waiter.waitingSlot = -1;
+    waiter.state = "walking_to_food";
+    waiter.stateStart = performance.now();
+    refreshCatVisual(waiter);
+
+    const p = POS.eating[slot];
+    moveCat(waiter, p.x, p.y);
+
+    updateHUD();
+  }
+
+  function tickCats() {
+    const now = performance.now();
+
+    for (const cat of cats) {
+      if (cat.dead) continue;
+      const e = now - cat.stateStart;
+
+      switch (cat.state) {
+        case "walking_to_food":
+          if (e >= CONFIG.catPhases.walkingToFood) {
+            cat.state = "eating";
+            cat.stateStart = now;
+            refreshCatVisual(cat);
+          }
+          break;
+        case "eating":
+          if (e >= CONFIG.catPhases.eating) {
+            cat.state = "cleaning";
+            cat.stateStart = now;
+            cat.dirty = false;
+            refreshCatVisual(cat);
+          }
+          break;
+        case "cleaning":
+          if (e >= CONFIG.catPhases.cleaning) {
+            cat.state = "happy";
+            cat.stateStart = now;
+            refreshCatVisual(cat);
+          }
+          break;
+        case "happy":
+          if (e >= CONFIG.catPhases.happy) {
+            const slot = getFreeSleepSlot();
+            if (slot >= 0) {
+              cat.sleepSlot = slot;
+              cat.eatingSlot = -1;
+              cat.state = "walking_to_home";
+              cat.stateStart = now;
+              refreshCatVisual(cat);
+              const p = POS.sleepSpots[slot];
+              moveCat(cat, p.x, p.y);
+            }
+          }
+          break;
+        case "walking_to_home":
+          if (e >= CONFIG.catPhases.walkingToHome) {
+            cat.state = "sleeping";
+            cat.stateStart = now;
+            refreshCatVisual(cat);
+            returnedCats++;
+            updateHUD();
+          }
+          break;
+        case "sleeping":
+          if (e >= CONFIG.catPhases.sleeping) {
+            cat.state = "fading";
+            cat.stateStart = now;
+            cat.el.style.opacity = "0";
+            cat.el.style.transform = "translateY(-10px) scale(0.85)";
+          }
+          break;
+        case "fading":
+          if (e >= CONFIG.catPhases.fading) {
+            cat.dead = true;
+            if (cat.el.parentNode) cat.el.parentNode.removeChild(cat.el);
+          }
+          break;
+      }
+    }
+
+    cats = cats.filter(c => !c.dead);
+    trySendWaitingCat();
+  }
+
+  // ===================== 棋盘 =====================
+  function generateBoard() {
+    for (let attempt = 0; attempt < 200; attempt++) {
+      const b = Array.from({ length: CONFIG.boardSize }, () => Array(CONFIG.boardSize).fill(null));
+      for (let r = 0; r < CONFIG.boardSize; r++) {
+        for (let c = 0; c < CONFIG.boardSize; c++) {
+          const forbid = new Set();
+          if (c >= 2 && b[r][c - 1] === b[r][c - 2]) forbid.add(b[r][c - 1]);
+          if (r >= 2 && b[r - 1][c] === b[r - 2][c]) forbid.add(b[r - 1][c]);
+          const opts = CONFIG.tileTypes.filter(t => !forbid.has(t));
+          b[r][c] = opts[Math.floor(Math.random() * opts.length)];
+        }
+      }
+      if (hasPossibleMove(b)) return b;
+    }
+    return Array.from({ length: CONFIG.boardSize }, () =>
+      Array.from({ length: CONFIG.boardSize }, () => randomTile()));
+  }
+
+  function findMatches(b) {
+    const groups = [];
+    const size = CONFIG.boardSize;
+    for (let r = 0; r < size; r++) {
+      let c = 0;
+      while (c < size) {
+        const t = b[r][c]; let len = 1;
+        while (c + len < size && b[r][c + len] === t) len++;
+        if (len >= 3) {
+          const cells = [];
+          for (let i = 0; i < len; i++) cells.push([r, c + i]);
+          groups.push({ cells, length: len });
+        }
+        c += len;
+      }
+    }
+    for (let c = 0; c < size; c++) {
+      let r = 0;
+      while (r < size) {
+        const t = b[r][c]; let len = 1;
+        while (r + len < size && b[r + len][c] === t) len++;
+        if (len >= 3) {
+          const cells = [];
+          for (let i = 0; i < len; i++) cells.push([r + i, c]);
+          groups.push({ cells, length: len });
+        }
+        r += len;
+      }
+    }
+    return groups;
+  }
+
+  function hasPossibleMove(b) {
+    const size = CONFIG.boardSize;
+    for (let r = 0; r < size; r++) {
+      for (let c = 0; c < size; c++) {
+        if (c < size - 1) {
+          swap(b, r, c, r, c + 1);
+          const ok = findMatches(b).length > 0;
+          swap(b, r, c, r, c + 1);
+          if (ok) return true;
+        }
+        if (r < size - 1) {
+          swap(b, r, c, r + 1, c);
+          const ok = findMatches(b).length > 0;
+          swap(b, r, c, r + 1, c);
+          if (ok) return true;
+        }
+      }
+    }
+    return false;
+  }
+
+  function scoreForLength(len) {
+    if (len === 3) return CONFIG.scoreTable[3];
+    if (len === 4) return CONFIG.scoreTable[4];
+    if (len === 5) return CONFIG.scoreTable[5];
+    return CONFIG.score6Base + (len - 6) * CONFIG.score6Extra;
+  }
+
+  function applyGravity() {
+    const size = CONFIG.boardSize;
+    for (let c = 0; c < size; c++) {
+      let write = size - 1;
+      for (let r = size - 1; r >= 0; r--) {
+        if (board[r][c] !== null) {
+          board[write][c] = board[r][c];
+          if (write !== r) board[r][c] = null;
+          write--;
+        }
+      }
+      while (write >= 0) { board[write][c] = randomTile(); write--; }
+    }
+  }
+
+  function renderBoard() {
+    boardEl.innerHTML = "";
+    const size = CONFIG.boardSize;
+    for (let r = 0; r < size; r++) {
+      for (let c = 0; c < size; c++) {
+        const tile = document.createElement("div");
+        tile.className = "tile";
+        tile.dataset.r = r; tile.dataset.c = c;
+        tile.textContent = CONFIG.tileEmoji[board[r][c]];
+        tile.addEventListener("click", () => onTileClick(r, c));
+        boardEl.appendChild(tile);
+      }
+    }
+    updateSelection();
+    resizeBoard();
+  }
+
+  function updateSelection() {
+    boardEl.querySelectorAll(".tile.selected").forEach(el => el.classList.remove("selected"));
+    if (selected) {
+      const el = getTileEl(selected.r, selected.c);
+      if (el) el.classList.add("selected");
+    }
+  }
+
+  function resizeBoard() {
+    const area = document.getElementById("boardArea");
+    const hint = document.getElementById("hintBottom");
+    const bar = document.getElementById("bottomBar");
+    const rect = area.getBoundingClientRect();
+    const used = (hint ? hint.offsetHeight : 0) + (bar ? bar.offsetHeight : 30) + 24;
+    const size = Math.max(140, Math.min(rect.width - 16, rect.height - used));
+    boardEl.style.width = size + "px";
+    boardEl.style.height = size + "px";
+    boardEl.style.setProperty("--tile-size", size / CONFIG.boardSize + "px");
+  }
+
+  // ===================== 输入 =====================
+  async function onTileClick(r, c) {
+    if (!gameActive || isAnimating || timeLeft <= 0) return;
+    if (selected === null) { selected = { r, c }; updateSelection(); return; }
+    const s = selected;
+    if (s.r === r && s.c === c) { selected = null; updateSelection(); return; }
+    const adjacent = Math.abs(s.r - r) + Math.abs(s.c - c) === 1;
+    if (!adjacent) { selected = { r, c }; updateSelection(); return; }
+    selected = null; updateSelection();
+    await trySwap(s.r, s.c, r, c);
+  }
+
+  async function trySwap(r1, c1, r2, c2) {
+    if (!gameActive) return;
+    isAnimating = true;
+    swap(board, r1, c1, r2, c2);
+    const first = findMatches(board);
+
+    if (first.length === 0) {
+      swap(board, r1, c1, r2, c2);
+      renderBoard();
+      const el = getTileEl(r1, c1);
+      if (el) { el.classList.add("invalid"); setTimeout(() => el.classList.remove("invalid"), 320); }
+      isAnimating = false;
+      return;
+    }
+
+    const now = performance.now();
+    if (now - lastMatchTime <= CONFIG.comboWindow) comboLevel = Math.min(comboLevel + 1, 5);
+    else comboLevel = 0;
+    maxCombo = Math.max(maxCombo, comboLevel);
+    lastMatchTime = now;
+
+    let chainLevel = 0;
+    let current = first;
+
+    while (current.length > 0) {
+      const removeSet = new Set();
+      let base = 0;
+      for (const g of current) {
+        base += scoreForLength(g.length);
+        for (const [r, c] of g.cells) removeSet.add(`${r},${c}`);
+      }
+      const chainMul = 1 + Math.min(chainLevel * CONFIG.chainBonusStep, CONFIG.chainBonusMax);
+      const comboMul = 1 + Math.min(comboLevel * CONFIG.comboStep, CONFIG.comboMax);
+      const gained = Math.round(base * chainMul * comboMul);
+      addScore(gained);
+
+      removeSet.forEach(k => {
+        const [r, c] = k.split(",").map(Number);
+        const el = getTileEl(r, c);
+        if (el) el.classList.add("pop");
+      });
+      await sleep(180);
+
+      removeSet.forEach(k => {
+        const [r, c] = k.split(",").map(Number);
+        board[r][c] = null;
+      });
+      applyGravity();
+      renderBoard();
+      await sleep(100);
+
+      current = findMatches(board);
+      chainLevel++;
+    }
+
+    isAnimating = false;
+    ensurePlayable();
+    updateHUD();
+  }
+
+  function ensurePlayable() {
+    if (!hasPossibleMove(board)) {
+      showToast("没有可交换步数，正在整理棋盘");
+      shuffleBoard();
+    }
+  }
+
+  function shuffleBoard() {
+    const size = CONFIG.boardSize;
+    let attempts = 0;
+    do {
+      const tiles = [];
+      for (let r = 0; r < size; r++) for (let c = 0; c < size; c++) tiles.push(board[r][c]);
+      for (let i = tiles.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        [tiles[i], tiles[j]] = [tiles[j], tiles[i]];
+      }
+      let idx = 0;
+      for (let r = 0; r < size; r++) for (let c = 0; c < size; c++) board[r][c] = tiles[idx++];
+      attempts++;
+    } while ((findMatches(board).length > 0 || !hasPossibleMove(board)) && attempts < 500);
+
+    if (findMatches(board).length > 0 || !hasPossibleMove(board)) board = generateBoard();
+    renderBoard();
+  }
+
+  // ===================== 分数 / 猫粮 =====================
+  function addScore(points) {
+    score += points;
+    foodProgress += points;
+    while (foodProgress >= CONFIG.foodPerScore && foodStock < CONFIG.troughCap) {
+      foodStock++;
+      foodProgress -= CONFIG.foodPerScore;
+    }
+    updateHUD();
+    showFloatingScore(points);
+  }
+
+  function showFloatingScore(points) {
+    const el = document.createElement("div");
+    el.className = "floating-score";
+    el.textContent = "+" + points;
+    const rect = boardEl.getBoundingClientRect();
+    el.style.left = rect.left + rect.width / 2 + "px";
+    el.style.top = rect.top + rect.height / 2 + "px";
+    document.body.appendChild(el);
+    setTimeout(() => el.remove(), 880);
+  }
+
+  function showToast(msg) {
+    const el = document.createElement("div");
+    el.className = "toast";
+    el.textContent = msg;
+    document.body.appendChild(el);
+    setTimeout(() => el.remove(), 1950);
+  }
+
+  // ===================== HUD / 食槽 =====================
+  function updateHUD() {
+    timeText.textContent = Math.ceil(Math.max(0, timeLeft));
+    returnText.textContent = returnedCats;
+    scoreText.textContent = score;
+    foodText.textContent = foodStock;
+    comboText.textContent = "x" + comboLevel;
+    troughFill.style.width = (foodStock / CONFIG.troughCap) * 100 + "%";
+    renderKibbles();
+  }
+
+  function renderKibbles() {
+    troughKibbles.innerHTML = "";
+    if (foodStock <= 0) return;
+    const total = foodStock;
+    const W = troughKibbles.clientWidth || 200;
+    const H = troughKibbles.clientHeight || 26;
+    const perRow = Math.max(6, Math.min(total, Math.ceil(Math.sqrt(total * 4))));
+    const rows = Math.ceil(total / perRow);
+    const cellW = W / perRow;
+    const cellH = H / Math.max(1, rows);
+
+    for (let i = 0; i < total; i++) {
+      const r = Math.floor(i / perRow);
+      const c = i % perRow;
+      const k = document.createElement("div");
+      k.className = "kibble";
+      const jx = (Math.random() - 0.5) * cellW * 0.4;
+      const jy = (Math.random() - 0.5) * cellH * 0.4;
+      k.style.left = (c * cellW + cellW * 0.5 - 3 + jx) + "px";
+      k.style.top = (H - (rows - r - 1) * cellH - cellH * 0.5 - 3 + jy) + "px";
+      troughKibbles.appendChild(k);
+    }
+  }
+
+  // ===================== 主循环 =====================
+  function onCountdownTick() {
+    if (!gameActive) return;
+    timeLeft -= 0.1;
+    if (timeLeft <= 0) {
+      timeLeft = 0;
+      updateHUD();
+      endGame();
+      return;
+    }
+    updateHUD();
+  }
+
+  function onGameTick() {
+    if (!gameActive) return;
+    tickCats();
+  }
+
+  function onCatSpawnTick() {
+    if (!gameActive) return;
+    if (timeLeft <= CONFIG.lastPhaseCutoff) return;
+    const wCount = cats.filter(c => c.state === "waiting" && !c.dead).length;
+    if (wCount < CONFIG.maxWaitingCats) spawnWaitingCat();
+  }
+
+  // ===================== 局内流程 =====================
+  function startGame() {
+    clearAllTimers();
+    catsLayer.innerHTML = "";
+    cats = [];
+    catIdSeq = 1;
+
+    score = 0; foodStock = 0; foodProgress = 0;
+    comboLevel = 0; maxCombo = 0; lastMatchTime = 0;
+    timeLeft = CONFIG.roundTime;
+    returnedCats = 0; attractedCats = 0;
+    gameActive = true; isAnimating = false; selected = null;
+
+    board = generateBoard();
+    computePositions();
+
+    resultOverlay.classList.add("hidden");
+
+    renderBoard();
+    updateHUD();
+    renderKibbles();
+
+    for (let i = 0; i < CONFIG.initialWaitingCats; i++) spawnWaitingCat();
+
+    timers.countdown = setInterval(onCountdownTick, 100);
+    timers.gameTick = setInterval(onGameTick, 100);
+    timers.catSpawn = setInterval(onCatSpawnTick, CONFIG.catSpawnInterval);
+  }
+
+  function endGame() {
+    if (!gameActive) return;
+    gameActive = false;
+    isAnimating = true;
+    selected = null;
+    clearAllTimers();
+
+    resultReturns.textContent = returnedCats;
+    resultScore.textContent = score;
+    resultCombo.textContent = maxCombo;
+    resultCats.textContent = attractedCats;
+
+    resultOverlay.classList.remove("hidden");
+  }
+
+  // ===================== 启动 / 响应式 =====================
+  function relayoutCats() {
+    for (const cat of cats) {
+      if (cat.dead) continue;
+      if (cat.state === "waiting" && cat.waitingSlot >= 0) {
+        const p = POS.waiting[cat.waitingSlot];
+        moveCat(cat, p.x, p.y);
+      } else if (cat.eatingSlot >= 0 &&
+        ["walking_to_food", "eating", "cleaning", "happy"].includes(cat.state)) {
+        const p = POS.eating[cat.eatingSlot];
+        moveCat(cat, p.x, p.y);
+      } else if (cat.sleepSlot >= 0 &&
+        ["walking_to_home", "sleeping", "fading"].includes(cat.state)) {
+        const p = POS.sleepSpots[cat.sleepSlot];
+        moveCat(cat, p.x, p.y);
+      }
+    }
+  }
+
+  restartBtn.addEventListener("click", () => {
+    requestAnimationFrame(() => {
+      startGame();
+    });
+  });
+
+  window.addEventListener("resize", () => {
+    computePositions();
+    resizeBoard();
+    renderKibbles();
+    relayoutCats();
+  });
+
+  window.addEventListener("load", () => {
+    requestAnimationFrame(() => {
+      startGame();
+      computePositions();
+      resizeBoard();
+      renderKibbles();
+    });
+  });
+})();
+</script>
+</body>
+</html>
