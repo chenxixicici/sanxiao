@@ -1,6 +1,6 @@
-// server.js —�? �?�?三消 · 1v1 对战服务�?
-// 运�?�：node server.js
-// 依赖：npm install ws
+// server.js —— 猫咪三消 · 1v1 对战服务端
+// 运行：npm start
+// 依赖：ws
 
 const WebSocket = require('ws');
 
@@ -21,13 +21,11 @@ const CONFIG = {
     walkingToFood: 1300,
     eating: 4500,
     cleaning: 4500,
-    happy: 4500,
+    happy: 3000,       // ← 改成 3 秒
     walkingToHome: 1700
   },
   maxCatsPerPlayer: 8,
-  totalCatCap: 16,
-  botMatchDelay: 3000,     // 3 秒内没人匹配 �? 出机器人
-  botSwapInterval: 1100    // 机器人平均出招间�?
+  totalCatCap: 32
 };
 
 // ============ 核心规则 ============
@@ -145,13 +143,6 @@ class Player {
       try { this.ws.send(JSON.stringify(msg)); } catch (e) {}
     }
   }
-  reset() {
-    this.board = generateBoard();
-    this.score = 0;
-    this.foodStock = 0;
-    this.foodProgress = 0;
-    this.returnedCats = 0;
-  }
 }
 
 // ============ BattleRoom ============
@@ -159,7 +150,7 @@ class BattleRoom {
   constructor(id) {
     this.id = id;
     this.players = [];
-    this.cats = [];           // 共享�?�?�?
+    this.cats = [];           // 共享猫咪池
     this.catIdSeq = 1;
     this.started = false;
     this.ended = false;
@@ -201,7 +192,7 @@ class BattleRoom {
     bot.botTimer = setInterval(() => {
       if (!this.started || this.ended) return;
       this.botMove(bot);
-    }, CONFIG.botSwapInterval + Math.random() * 400);
+    }, 1100 + Math.random() * 400);
   }
 
   botMove(bot) {
@@ -284,29 +275,36 @@ class BattleRoom {
       const elapsed = now - cat.stateStart;
       switch (cat.state) {
         case 'walking_to_food':
-          if (elapsed >= CONFIG.catPhases.walkingToFood) { cat.state = 'eating'; cat.stateStart = now; }
+          if (elapsed >= CONFIG.catPhases.walkingToFood) {
+            cat.state = 'eating'; cat.stateStart = now;
+          }
           break;
         case 'eating':
-          if (elapsed >= CONFIG.catPhases.eating) { cat.state = 'cleaning'; cat.stateStart = now; }
+          if (elapsed >= CONFIG.catPhases.eating) {
+            cat.state = 'cleaning'; cat.stateStart = now;
+          }
           break;
         case 'cleaning':
-          if (elapsed >= CONFIG.catPhases.cleaning) { cat.state = 'happy'; cat.stateStart = now; }
+          if (elapsed >= CONFIG.catPhases.cleaning) {
+            cat.state = 'happy'; cat.stateStart = now;
+          }
           break;
         case 'happy':
-          if (elapsed >= CONFIG.catPhases.happy) { cat.state = 'walking_to_home'; cat.stateStart = now; }
+          if (elapsed >= CONFIG.catPhases.happy) {
+            cat.state = 'walking_to_home'; cat.stateStart = now;
+          }
           break;
         case 'walking_to_home':
           if (elapsed >= CONFIG.catPhases.walkingToHome) {
             cat.state = 'sleeping'; cat.stateStart = now;
             const owner = this.players.find(p => p.id === cat.ownerId);
-            if (owner) {
-              owner.returnedCats++;
-              owner.send({ type: 'event', kind: 'cat_return', catId: cat.id });
-            }
+            if (owner) owner.returnedCats++;
+            this.broadcast({ type: 'cat_event', kind: 'return', catId: cat.id });
           }
           break;
       }
     }
+    // 清理超过一定数量的猫
     if (this.cats.length > CONFIG.totalCatCap) {
       this.cats = this.cats.slice(-CONFIG.totalCatCap);
     }
@@ -335,13 +333,19 @@ class BattleRoom {
     }
 
     target.foodStock--;
-    this.cats.push({
+    const cat = {
       id: this.catIdSeq++,
       ownerId: target.id,
       state: 'walking_to_food',
       stateStart: Date.now(),
       paletteIdx: Math.floor(Math.random() * 5),
       slot: catCount[target.id]
+    };
+    this.cats.push(cat);
+    this.broadcast({
+      type: 'cat_event',
+      kind: 'spawn',
+      cat: { id: cat.id, ownerId: cat.ownerId, paletteIdx: cat.paletteIdx, slot: cat.slot }
     });
   }
 
@@ -436,13 +440,13 @@ function leaveRoom(player) {
 
 function attachBotToRoom(room, forPlayer) {
   if (room.players.length >= 2 || room.started || room.ended) return;
-  const bot = new Player('bot_' + Date.now(), null, '电脑�?�?', true);
+  const bot = new Player('bot_' + Date.now(), null, '电脑猫娘', true);
   room.addPlayer(bot);
   forPlayer.send({ type: 'matched', opponent: { name: bot.name, isBot: true } });
   room.start();
 }
 
-// 定期清理空房�?
+// 定期清理空房间
 setInterval(() => {
   for (const [id, room] of rooms) {
     if (room.isEmpty() || (room.ended && Date.now() - room.startedAt > 60000)) {
@@ -455,7 +459,7 @@ setInterval(() => {
 // ============ WebSocket ============
 wss.on('connection', (ws) => {
   const playerId = 'p' + (playerSeq++);
-  const player = new Player(playerId, ws, '玩�??' + playerSeq);
+  const player = new Player(playerId, ws, '玩家' + playerSeq);
   let botTimeout = null;
 
   console.log(`[连接] ${playerId}`);
@@ -463,7 +467,7 @@ wss.on('connection', (ws) => {
 
   ws.on('message', (data) => {
     let msg;
-    try { msg = JSON.parse(data); } catch { return; }
+    try { msg = JSON.parse(data); } catch (e) { return; }
 
     switch (msg.type) {
       case 'set_name':
@@ -498,7 +502,7 @@ wss.on('connection', (ws) => {
           if (room.players.length < 2 && !room.started && rooms.has(room.id)) {
             attachBotToRoom(room, player);
           }
-        }, CONFIG.botMatchDelay);
+        }, 3000);
         break;
       }
 
@@ -543,13 +547,14 @@ wss.on('connection', (ws) => {
             if (room.players.length < 2 && !room.started && rooms.has(room.id)) {
               attachBotToRoom(room, player);
             }
-          }, CONFIG.botMatchDelay);
+          }, 3000);
         }
         break;
       }
+
       case 'quick_match_human': {
         if (playerRoom.has(playerId)) return;
-        // ֻ�����ڵ����˵ķ���
+        // 只匹配真人，不补 AI
         let found = null;
         for (const [, room] of rooms) {
           if (!room.started && !room.ended && room.players.length === 1 && !room.players[0].isBot) {
@@ -565,7 +570,7 @@ wss.on('connection', (ws) => {
           player.send({ type: 'matched', opponent: { name: found.players[0].name, isBot: false } });
           found.start();
         } else {
-          // �����·���ȴ�����**��**���� AI ����
+          // 创建新房间等待，不补 AI
           const room = createRoom();
           room.addPlayer(player);
           playerRoom.set(playerId, room.id);
@@ -573,6 +578,7 @@ wss.on('connection', (ws) => {
         }
         break;
       }
+
       case 'leave_room':
         if (botTimeout) { clearTimeout(botTimeout); botTimeout = null; }
         leaveRoom(player);
@@ -595,10 +601,10 @@ wss.on('connection', (ws) => {
   });
 
   ws.on('close', () => {
-    console.log(`[�?开] ${playerId}`);
+    console.log(`[断开] ${playerId}`);
     if (botTimeout) clearTimeout(botTimeout);
     leaveRoom(player);
   });
 });
 
-console.log(`🚀 �?�?三消对战服务�?: ws://localhost:${PORT}`);
+console.log(`🚀 猫咪三消对战服务端: ws://localhost:${PORT}`);
