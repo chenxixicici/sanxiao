@@ -3,9 +3,96 @@
 // 依赖：ws
 
 const WebSocket = require('ws');
+const https = require('https');
 
 const PORT = process.env.PORT || 8080;
 const wss = new WebSocket.Server({ port: PORT });
+
+// ============ 排行榜云端存储（JSONBin） ============
+const JSONBIN_BIN_ID = '6aca08c0ffd5d160535e967d';
+const JSONBIN_API_KEY = '$2a$10$.crbh1ykHy/zWYPRZYw6LexAKMKGIcGwvYP3Cu/HG6pmdlTbCsUye';
+
+let leaderboardCache = [];  // 内存缓存
+let jsonbinDirty = false;   // 是否有未同步的修改
+
+function jsonbinRequest(method, data, path, callback) {
+  const body = data ? JSON.stringify(data) : '';
+  const options = {
+    hostname: 'api.jsonbin.io',
+    port: 443,
+    path: path || `/v3/b/${JSONBIN_BIN_ID}`,
+    method: method,
+    headers: {
+      'Content-Type': 'application/json',
+      'X-Master-Key': JSONBIN_API_KEY
+    }
+  };
+  if (body) options.headers['Content-Length'] = Buffer.byteLength(body);
+
+  const req = https.request(options, (res) => {
+    let raw = '';
+    res.on('data', (chunk) => raw += chunk);
+    res.on('end', () => {
+      try {
+        const json = JSON.parse(raw);
+        callback(null, json);
+      } catch (e) {
+        callback(e, null);
+      }
+    });
+  });
+  req.on('error', (e) => callback(e, null));
+  if (body) req.write(body);
+  req.end();
+}
+
+function loadLeaderboardFromCloud() {
+  jsonbinRequest('GET', null, `/v3/b/${JSONBIN_BIN_ID}/latest`, (err, res) => {
+    if (err) {
+      console.warn('[排行榜] 云端读取失败:', err.message);
+      return;
+    }
+    // JSONBin /latest 返回 { record: {...}, metadata: {...} }
+    let record = res && res.record ? res.record : res;
+    if (record && Array.isArray(record.scores)) {
+      leaderboardCache = record.scores;
+      console.log(`[排行榜] 从云端加载 ${leaderboardCache.length} 条记录`);
+    } else {
+      console.log('[排行榜] 云端数据格式不正确，重置为空');
+      leaderboardCache = [];
+    }
+  });
+}
+
+function saveLeaderboardToCloud() {
+  jsonbinRequest('PUT', { scores: leaderboardCache }, null, (err, res) => {
+    if (err) {
+      console.warn('[排行榜] 云端写入失败:', err.message);
+      jsonbinDirty = true;
+    } else {
+      jsonbinDirty = false;
+      console.log(`[排行榜] 云端已保存 ${leaderboardCache.length} 条记录`);
+    }
+  });
+}
+
+function getLeaderboardTop100() {
+  return leaderboardCache
+    .slice()
+    .sort((a, b) => {
+      if (b.returnedCats !== a.returnedCats) return b.returnedCats - a.returnedCats;
+      if (b.maxFoodStock !== a.maxFoodStock) return b.maxFoodStock - a.maxFoodStock;
+      return a.ts - b.ts;
+    })
+    .slice(0, 100);
+}
+
+// 启动时加载
+loadLeaderboardFromCloud();
+// 每 20 秒同步一次未保存的修改（防止高频写云端）
+setInterval(() => {
+  if (jsonbinDirty) saveLeaderboardToCloud();
+}, 20000);
 
 // ============ 配置 ============
 const CONFIG = {
@@ -21,7 +108,7 @@ const CONFIG = {
     walkingToFood: 1300,
     eating: 4500,
     cleaning: 4500,
-    happy: 3000,       // ← 改成 3 秒
+    happy: 3000,
     walkingToHome: 1700
   },
   maxCatsPerPlayer: 8,
@@ -150,7 +237,7 @@ class BattleRoom {
   constructor(id) {
     this.id = id;
     this.players = [];
-    this.cats = [];           // 共享猫咪池
+    this.cats = [];
     this.catIdSeq = 1;
     this.started = false;
     this.ended = false;
@@ -192,7 +279,7 @@ class BattleRoom {
     bot.botTimer = setInterval(() => {
       if (!this.started || this.ended) return;
       this.botMove(bot);
-    }, 1100 + Math.random() * 400);
+    }, 4500 + Math.random() * 1000);
   }
 
   botMove(bot) {
@@ -304,7 +391,6 @@ class BattleRoom {
           break;
       }
     }
-    // 清理超过一定数量的猫
     if (this.cats.length > CONFIG.totalCatCap) {
       this.cats = this.cats.slice(-CONFIG.totalCatCap);
     }
@@ -410,19 +496,6 @@ class BattleRoom {
   }
 }
 
-// ============ 排行榜 ============
-const leaderboard = [];  // { name, returnedCats, maxFoodStock, ts }
-function getLeaderboardTop100() {
-  return leaderboard
-    .slice()
-    .sort((a, b) => {
-      if (b.returnedCats !== a.returnedCats) return b.returnedCats - a.returnedCats;
-      if (b.maxFoodStock !== a.maxFoodStock) return b.maxFoodStock - a.maxFoodStock;
-      return a.ts - b.ts;
-    })
-    .slice(0, 100);
-}
-
 // ============ 匹配系统 ============
 const rooms = new Map();
 const playerRoom = new Map();
@@ -460,7 +533,6 @@ function attachBotToRoom(room, forPlayer) {
   room.start();
 }
 
-// 定期清理空房间
 setInterval(() => {
   for (const [id, room] of rooms) {
     if (room.isEmpty() || (room.ended && Date.now() - room.startedAt > 60000)) {
@@ -568,7 +640,6 @@ wss.on('connection', (ws) => {
 
       case 'quick_match_human': {
         if (playerRoom.has(playerId)) return;
-        // 只匹配真人，不补 AI
         let found = null;
         for (const [, room] of rooms) {
           if (!room.started && !room.ended && room.players.length === 1 && !room.players[0].isBot) {
@@ -584,7 +655,6 @@ wss.on('connection', (ws) => {
           player.send({ type: 'matched', opponent: { name: found.players[0].name, isBot: false } });
           found.start();
         } else {
-          // 创建新房间等待，不补 AI
           const room = createRoom();
           room.addPlayer(player);
           playerRoom.set(playerId, room.id);
@@ -607,6 +677,8 @@ wss.on('connection', (ws) => {
         room.handleSwap(playerId, msg.r1, msg.c1, msg.r2, msg.c2);
         break;
       }
+
+      // ============ 排行榜 ============
       case 'get_leaderboard': {
         ws.send(JSON.stringify({ type: 'leaderboard', list: getLeaderboardTop100() }));
         break;
@@ -619,16 +691,20 @@ wss.on('connection', (ws) => {
           ws.send(JSON.stringify({ type: 'score_result', ok: false, msg: '名字不能为空' }));
           break;
         }
-        const idx = leaderboard.findIndex(e => e.name === name);
+        const idx = leaderboardCache.findIndex(e => e.name === name);
         if (idx >= 0) {
-          const old = leaderboard[idx];
+          const old = leaderboardCache[idx];
           if (returnedCats > old.returnedCats ||
               (returnedCats === old.returnedCats && maxFoodStock > old.maxFoodStock)) {
-            leaderboard[idx] = { name, returnedCats, maxFoodStock, ts: Date.now() };
+            leaderboardCache[idx] = { name, returnedCats, maxFoodStock, ts: Date.now() };
+            jsonbinDirty = true;
           }
         } else {
-          leaderboard.push({ name, returnedCats, maxFoodStock, ts: Date.now() });
+          leaderboardCache.push({ name, returnedCats, maxFoodStock, ts: Date.now() });
+          jsonbinDirty = true;
         }
+        // 立即写云端（排行榜上传频率低，直接同步）
+        saveLeaderboardToCloud();
         const top = getLeaderboardTop100();
         const rank = top.findIndex(e => e.name === name) + 1;
         ws.send(JSON.stringify({
@@ -638,6 +714,7 @@ wss.on('connection', (ws) => {
         console.log(`[排行榜] ${name}：回窝${returnedCats} 猫粮${maxFoodStock} 排名${rank}`);
         break;
       }
+
       case 'ping':
         ws.send(JSON.stringify({ type: 'pong', t: msg.t }));
         break;
@@ -652,3 +729,4 @@ wss.on('connection', (ws) => {
 });
 
 console.log(`🚀 猫咪三消对战服务端: ws://localhost:${PORT}`);
+console.log(`📊 排行榜已连接 JSONBin: ${JSONBIN_BIN_ID}`);
