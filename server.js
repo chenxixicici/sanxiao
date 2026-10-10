@@ -361,6 +361,7 @@ class BattleRoom {
         myBoard: p.board,
         myScore: p.score,
         myFoodStock: p.foodStock,
+        myFoodProgress: p.foodProgress,
         myReturnedCats: p.returnedCats,
         opponent: opp ? {
           id: opp.id, name: opp.name, score: opp.score,
@@ -407,6 +408,19 @@ class BattleRoom {
       }
     }
   }
+}
+
+// ============ 排行榜 ============
+const leaderboard = [];  // { name, returnedCats, maxFoodStock, ts }
+function getLeaderboardTop100() {
+  return leaderboard
+    .slice()
+    .sort((a, b) => {
+      if (b.returnedCats !== a.returnedCats) return b.returnedCats - a.returnedCats;
+      if (b.maxFoodStock !== a.maxFoodStock) return b.maxFoodStock - a.maxFoodStock;
+      return a.ts - b.ts;
+    })
+    .slice(0, 100);
 }
 
 // ============ 匹配系统 ============
@@ -593,7 +607,37 @@ wss.on('connection', (ws) => {
         room.handleSwap(playerId, msg.r1, msg.c1, msg.r2, msg.c2);
         break;
       }
-
+      case 'get_leaderboard': {
+        ws.send(JSON.stringify({ type: 'leaderboard', list: getLeaderboardTop100() }));
+        break;
+      }
+      case 'submit_score': {
+        const name = String(msg.name || '').slice(0, 16).trim();
+        const returnedCats = Math.max(0, Math.floor(Number(msg.returnedCats) || 0));
+        const maxFoodStock = Math.max(0, Math.floor(Number(msg.maxFoodStock) || 0));
+        if (!name) {
+          ws.send(JSON.stringify({ type: 'score_result', ok: false, msg: '名字不能为空' }));
+          break;
+        }
+        const idx = leaderboard.findIndex(e => e.name === name);
+        if (idx >= 0) {
+          const old = leaderboard[idx];
+          if (returnedCats > old.returnedCats ||
+              (returnedCats === old.returnedCats && maxFoodStock > old.maxFoodStock)) {
+            leaderboard[idx] = { name, returnedCats, maxFoodStock, ts: Date.now() };
+          }
+        } else {
+          leaderboard.push({ name, returnedCats, maxFoodStock, ts: Date.now() });
+        }
+        const top = getLeaderboardTop100();
+        const rank = top.findIndex(e => e.name === name) + 1;
+        ws.send(JSON.stringify({
+          type: 'score_result', ok: true,
+          rank: rank > 0 ? rank : null, list: top
+        }));
+        console.log(`[排行榜] ${name}：回窝${returnedCats} 猫粮${maxFoodStock} 排名${rank}`);
+        break;
+      }
       case 'ping':
         ws.send(JSON.stringify({ type: 'pong', t: msg.t }));
         break;
