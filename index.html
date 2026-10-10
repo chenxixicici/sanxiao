@@ -2041,7 +2041,10 @@
   // 尝试让中间等待的猫去某侧食槽
   function trySendBattleCat() {
     if (!gameActive) return;
-    if (mode === 'online') return;
+    if (mode === 'online') {
+      tryPromoteWaitingCats();
+      return;
+    }
     // 检查双方是否有空位
     const myEating = cats.filter(c => c.owner === 'me' &&
       ["eating", "cleaning", "happy", "walking_to_food"].includes(c.state)).length;
@@ -2090,6 +2093,33 @@
 
     SoundManager.meow();
     updateHUD();
+  }
+
+    // 联机模式：客户端把等待区里还没开始流程的猫推进到 walking_to_food。
+  // 服务器权威扣粮已经完成，客户端这里只负责视觉推进。
+  function tryPromoteWaitingCats() {
+    if (!gameActive) return;
+    for (const cat of cats) {
+      if (cat.state !== 'waiting' && cat.state !== 'waiting_walk') continue;
+      const owner = cat.owner;
+      const eatingCount = cats.filter(c => c.owner === owner &&
+        ['walking_to_food', 'eating', 'cleaning', 'happy'].includes(c.state)).length;
+      const maxEat = owner === 'me' ? BATTLE_POS.myEat.length : BATTLE_POS.oppEat.length;
+      if (eatingCount >= maxEat) continue;
+      const eatSlot = getFreeBattleEatSlot(owner);
+      if (eatSlot < 0) continue;
+      cat.eatSlot = eatSlot;
+      cat.poolSlot = -1;
+      cat.state = 'walking_to_food';
+      cat.stateStart = performance.now();
+      refreshBattleCatVisual(cat);
+      const arr = owner === 'me' ? BATTLE_POS.myEat : BATTLE_POS.oppEat;
+      const p = arr[eatSlot];
+      if (p) {
+        cat.el.style.left = p.x + "px";
+        cat.el.style.top = p.y + "px";
+      }
+    }
   }
 
   function maxConcurrentByFood(stock) {
@@ -2509,15 +2539,34 @@
           const c = msg.cat;
           const existing = cats.find(x => x.id === c.id);
           if (!existing) {
-            const cat = makeBattleCat(c.id, c.ownerId === myPlayerId ? 'me' : 'opp',
-              c.paletteIdx, c.slot);
+            const owner = c.ownerId === myPlayerId ? 'me' : 'opp';
+            const cat = makeBattleCat(c.id, owner, c.paletteIdx, c.slot);
+            // 服务器 spawn 时猫就是 walking_to_food 状态，客户端必须立刻同步，
+            // 否则猫会一直卡在 waiting，直到收到 return 事件才被强制切到回窝。
+            const eatSlot = getFreeBattleEatSlot(owner);
+            if (eatSlot >= 0) {
+              cat.eatSlot = eatSlot;
+              cat.poolSlot = -1;
+              cat.state = 'walking_to_food';
+              cat.stateStart = performance.now();
+              refreshBattleCatVisual(cat);
+              const arr = owner === 'me' ? BATTLE_POS.myEat : BATTLE_POS.oppEat;
+              const p = arr[eatSlot];
+              if (p) {
+                cat.el.style.left = p.x + "px";
+                cat.el.style.top = p.y + "px";
+              }
+            }
             cats.push(cat);
           }
         } else if (msg.kind === 'return') {
+          // 兜底：只有还在等待区的猫才需要被强制切到回窝。
+          // 已经在走流程的猫让它自己跑完，避免视觉上从进食直接被拽到回窝。
           const cat = cats.find(x => x.id === msg.catId);
-          if (cat && cat.state !== 'walking_to_home' && cat.state !== 'sleeping') {
+          if (cat && (cat.state === 'waiting' || cat.state === 'waiting_walk')) {
             cat.state = 'walking_to_home';
             cat.stateStart = performance.now();
+            cat.eatSlot = -1;
             cat.homeSlot = getFreeBattleHomeSlot(cat.owner);
             refreshBattleCatVisual(cat);
             const pos = getHomeSlotPos(cat.owner, cat.homeSlot);

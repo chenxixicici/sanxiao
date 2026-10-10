@@ -111,7 +111,7 @@ const CONFIG = {
     happy: 3000,
     walkingToHome: 1700
   },
-  maxCatsPerPlayer: 8,
+  maxCatsPerPlayer: 6,
   totalCatCap: 32
 };
 
