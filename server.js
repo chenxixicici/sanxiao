@@ -112,6 +112,7 @@ const CONFIG = {
     walkingToHome: 1700
   },
   maxCatsPerPlayer: 6,
+  poolSize: 6,
   totalCatCap: 32
 };
 
@@ -269,7 +270,8 @@ class BattleRoom {
     }, 100));
 
     this.timers.push(setInterval(() => this.tickCats(), 100));
-    this.timers.push(setInterval(() => this.trySpawnCat(), 1800));
+    this.timers.push(setInterval(() => this.trySpawnWaitingCat(), 1800));
+    this.timers.push(setInterval(() => this.trySendCatToEat(), 800));
     this.timers.push(setInterval(() => this.broadcastState(), 250));
 
     console.log(`[开局] ${this.id} ${this.players.map(p => p.name).join(' vs ')}`);
@@ -360,39 +362,35 @@ class BattleRoom {
     const now = Date.now();
     for (const cat of this.cats) {
       const elapsed = now - cat.stateStart;
+      let nextState = null;
       switch (cat.state) {
         case 'walking_to_food':
-          if (elapsed >= CONFIG.catPhases.walkingToFood) {
-            cat.state = 'eating'; cat.stateStart = now;
-          }
+          if (elapsed >= CONFIG.catPhases.walkingToFood) nextState = 'eating';
           break;
         case 'eating':
-          if (elapsed >= CONFIG.catPhases.eating) {
-            cat.state = 'cleaning'; cat.stateStart = now;
-          }
+          if (elapsed >= CONFIG.catPhases.eating) nextState = 'cleaning';
           break;
         case 'cleaning':
-          if (elapsed >= CONFIG.catPhases.cleaning) {
-            cat.state = 'happy'; cat.stateStart = now;
-          }
+          if (elapsed >= CONFIG.catPhases.cleaning) nextState = 'happy';
           break;
         case 'happy':
-          if (elapsed >= CONFIG.catPhases.happy) {
-            cat.state = 'walking_to_home'; cat.stateStart = now;
-          }
+          if (elapsed >= CONFIG.catPhases.happy) nextState = 'walking_to_home';
           break;
         case 'walking_to_home':
-          if (elapsed >= CONFIG.catPhases.walkingToHome) {
-            cat.state = 'sleeping'; cat.stateStart = now;
-            const owner = this.players.find(p => p.id === cat.ownerId);
-            if (owner) owner.returnedCats++;
-            this.broadcast({ type: 'cat_event', kind: 'return', catId: cat.id });
-          }
+          if (elapsed >= CONFIG.catPhases.walkingToHome) nextState = 'sleeping';
           break;
       }
+      if (nextState) {
+        cat.state = nextState;
+        cat.stateStart = now;
+        if (nextState === 'sleeping') {
+          const owner = this.players.find(p => p.id === cat.ownerId);
+          if (owner) owner.returnedCats++;
+        }
+        this.broadcast({ type: 'cat_event', kind: 'state', catId: cat.id, state: nextState });
+      }
     }
-    // 清理 sleeping 超时的猫：每只 sleeping 猫在服务端保留 8 秒用于广播，
-    // 之后移除（客户端自己管理视觉堆叠）
+    // 清理 sleeping 超时的猫
     const now2 = Date.now();
     this.cats = this.cats.filter(c => {
       if (c.state === 'sleeping' && now2 - c.stateStart > 8000) return false;
@@ -404,20 +402,49 @@ class BattleRoom {
     }
   }
 
-  trySpawnCat() {
+  // 往等待区补一只中立猫（不扣粮）
+  trySpawnWaitingCat() {
+    if (this.ended || !this.started) return;
+    const waitingCats = this.cats.filter(c => !c.ownerId && c.state === 'waiting');
+    if (waitingCats.length >= CONFIG.poolSize) return;
+    if (this.cats.length >= CONFIG.totalCatCap) return;
+
+    const cat = {
+      id: this.catIdSeq++,
+      ownerId: null,
+      state: 'waiting',
+      stateStart: Date.now(),
+      paletteIdx: Math.floor(Math.random() * 5),
+      slot: waitingCats.length
+    };
+    this.cats.push(cat);
+    this.broadcast({
+      type: 'cat_event',
+      kind: 'spawn',
+      cat: { id: cat.id, paletteIdx: cat.paletteIdx, slot: cat.slot }
+    });
+  }
+
+  // 有粮且有等待猫 → 派一只去吃
+  trySendCatToEat() {
     if (this.ended || !this.started) return;
     if (this.players.length < 2) return;
 
-    // 只统计活跃的猫（排除 sleeping）
-    const catCount = {};
-    for (const p of this.players) catCount[p.id] = 0;
+    const waiter = this.cats.find(c => !c.ownerId && c.state === 'waiting');
+    if (!waiter) return;
+
+    // 只统计活跃的猫（排除 sleeping 和 waiting）
+    const activeCount = {};
+    for (const p of this.players) activeCount[p.id] = 0;
     for (const c of this.cats) {
-      if (c.state === 'sleeping') continue;
-      if (catCount[c.ownerId] !== undefined) catCount[c.ownerId]++;
+      if (c.ownerId &&
+          ['walking_to_food', 'eating', 'cleaning', 'happy', 'walking_to_home'].includes(c.state)) {
+        if (activeCount[c.ownerId] !== undefined) activeCount[c.ownerId]++;
+      }
     }
 
     const candidates = this.players.filter(p =>
-      p.foodStock > 0 && catCount[p.id] < CONFIG.maxCatsPerPlayer
+      p.foodStock > 0 && activeCount[p.id] < CONFIG.maxCatsPerPlayer
     );
     if (candidates.length === 0) return;
 
@@ -431,19 +458,15 @@ class BattleRoom {
     }
 
     target.foodStock--;
-    const cat = {
-      id: this.catIdSeq++,
-      ownerId: target.id,
-      state: 'walking_to_food',
-      stateStart: Date.now(),
-      paletteIdx: Math.floor(Math.random() * 5),
-      slot: catCount[target.id]
-    };
-    this.cats.push(cat);
+    waiter.ownerId = target.id;
+    waiter.state = 'walking_to_food';
+    waiter.stateStart = Date.now();
+
     this.broadcast({
       type: 'cat_event',
-      kind: 'spawn',
-      cat: { id: cat.id, ownerId: cat.ownerId, paletteIdx: cat.paletteIdx, slot: cat.slot }
+      kind: 'go_eat',
+      catId: waiter.id,
+      ownerId: waiter.ownerId
     });
   }
 
