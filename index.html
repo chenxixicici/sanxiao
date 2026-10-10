@@ -607,6 +607,49 @@
   .lb-row .val { text-align: right; font-weight: 900; color: #2f7a3e; }
   .lb-row .val2 { text-align: right; font-weight: 900; color: #e67e22; }
   .lb-empty { text-align: center; color: #8a6a40; padding: 24px 0; font-size: 13px; }
+    .lb-row.me {
+    background: linear-gradient(90deg, #fff7d0, #ffe8a0);
+    border-radius: 8px;
+    box-shadow: 0 0 0 2px #ffb300 inset, 0 2px 6px rgba(255, 180, 0, .3);
+  }
+  .lb-row.me .name {
+    color: #c06300;
+    font-weight: 900;
+    text-shadow: 0 1px 0 rgba(255,255,255,.6);
+  }
+  .lb-row.me .rank { font-weight: 900; }
+  .lb-my-record {
+    margin-top: 10px; padding: 10px 12px;
+    background: linear-gradient(180deg, #fff9ec, #ffe4b8);
+    border-radius: 12px;
+    border: 2px solid #ffb300;
+    text-align: center;
+    font-size: 13px;
+    color: #5a3a1a;
+    box-shadow: inset 0 1px 0 rgba(255,255,255,.8), 0 2px 6px rgba(255, 180, 0, .2);
+  }
+  .lb-my-record .rec-title {
+    font-size: 11px; font-weight: 900; color: #c06300;
+    letter-spacing: .5px; margin-bottom: 4px;
+  }
+  .lb-my-record .rec-stats {
+    display: flex; justify-content: center; gap: 20px;
+  }
+  .lb-my-record .rec-stats b {
+    font-size: 18px; color: #2f7a3e; font-weight: 900;
+  }
+  .lb-my-record .rec-stats span {
+    font-size: 11px; color: #8a6a40;
+  }
+  .lb-empty { text-align: center; color: #8a6a40; padding: 24px 0; font-size: 13px; }
+  .lb-empty-virtual {
+    text-align: center; padding: 30px 10px;
+    color: #a08a6a; font-size: 14px; font-weight: 700;
+    background: repeating-linear-gradient(45deg, #fff6e0, #fff6e0 10px, #ffefd0 10px, #ffefd0 20px);
+    border-radius: 12px; border: 2px dashed #e8b87a;
+    line-height: 1.8;
+  }
+  .lb-empty-virtual .star { font-size: 24px; display: block; margin-bottom: 6px; opacity: .6; }
   .leaderboard-card button {
     padding: 11px 30px; border: none; border-radius: 999px;
     background: linear-gradient(180deg, #ffb257, #ff9f43); color: #fff;
@@ -655,6 +698,7 @@
   <div class="leaderboard-card">
     <h2>🏆 排行榜</h2>
     <div id="leaderboardContent">加载中…</div>
+    <div id="leaderboardMyRecord" class="lb-my-record hidden"></div>
     <button id="btnCloseLeaderboard">关闭</button>
   </div>
 </div>
@@ -1307,6 +1351,11 @@
       if (res.ok) {
         btn.textContent = res.rank ? `✅ 已上传（排名第 ${res.rank}）` : '✅ 已上传';
         showToast(res.rank ? `上传成功！你排第 ${res.rank} 名` : '上传成功！');
+        // 延迟 1 秒打开排行榜，让玩家先看到成功提示
+        setTimeout(() => {
+          document.getElementById('resultOverlay').classList.add('hidden');
+          openLeaderboard();
+        }, 900);
       } else {
         btn.textContent = '上传失败，点击重试';
         btn.disabled = false;
@@ -1320,8 +1369,10 @@
   function openLeaderboard() {
     const ov = document.getElementById('leaderboardOverlay');
     const content = document.getElementById('leaderboardContent');
+    const myRec = document.getElementById('leaderboardMyRecord');
     ov.classList.remove('hidden');
     content.innerHTML = '<div class="lb-empty">加载中…</div>';
+    if (myRec) myRec.classList.add('hidden');
     requestLeaderboard().then(renderLeaderboard).catch(() => {
       content.innerHTML = '<div class="lb-empty">加载失败，请稍后重试</div>';
     });
@@ -1329,25 +1380,65 @@
 
   function renderLeaderboard(list) {
     const content = document.getElementById('leaderboardContent');
-    if (!list || list.length === 0) {
-      content.innerHTML = '<div class="lb-empty">还没有人上榜，快去创造纪录吧！</div>';
-      return;
+    const myRecEl = document.getElementById('leaderboardMyRecord');
+    const myName = getSavedName();
+
+    // 1) 前 10 名
+    const top10 = (list || []).slice(0, 10);
+    if (top10.length === 0) {
+      content.innerHTML = '<div class="lb-empty-virtual"><span class="star">🏆</span>虚位以待<br><span style="font-size:12px;font-weight:600;">快来成为第一个上榜的玩家吧！</span></div>';
+    } else {
+      const rows = ['<div class="lb-row head"><div class="rank">#</div><div class="name">玩家</div><div class="val">回窝</div><div class="val2">猫粮</div></div>'];
+      top10.forEach((entry, idx) => {
+        let rankCls = '';
+        if (idx === 0) rankCls = 'top1';
+        else if (idx === 1) rankCls = 'top2';
+        else if (idx === 2) rankCls = 'top3';
+        const isMe = myName && entry.name === myName;
+        const rowCls = isMe ? ' me' : '';
+        const name = (entry.name || '匿名').slice(0, 16);
+        rows.push(`<div class="lb-row${rowCls}">
+          <div class="rank ${rankCls}">${idx + 1}</div>
+          <div class="name">${escapeHtml(name)}${isMe ? ' 👈' : ''}</div>
+          <div class="val">${entry.returnedCats || 0}</div>
+          <div class="val2">${entry.maxFoodStock || 0}</div>
+        </div>`);
+      });
+      content.innerHTML = rows.join('');
     }
-    const rows = ['<div class="lb-row head"><div class="rank">#</div><div class="name">玩家</div><div class="val">回窝</div><div class="val2">猫粮</div></div>'];
-    list.forEach((entry, idx) => {
-      let cls = '';
-      if (idx === 0) cls = 'top1';
-      else if (idx === 1) cls = 'top2';
-      else if (idx === 2) cls = 'top3';
-      const name = (entry.name || '匿名').slice(0, 16);
-      rows.push(`<div class="lb-row">
-        <div class="rank ${cls}">${idx + 1}</div>
-        <div class="name">${escapeHtml(name)}</div>
-        <div class="val">${entry.returnedCats || 0}</div>
-        <div class="val2">${entry.maxFoodStock || 0}</div>
-      </div>`);
-    });
-    content.innerHTML = rows.join('');
+
+    // 2) 底部显示玩家自己的最佳记录
+    if (!myRecEl) return;
+    const myEntry = myName ? (list || []).find(e => e.name === myName) : null;
+    const localBest = getLocalBest();
+    let recReturns = localBest.returnedCats || 0;
+    let recFood = localBest.maxFoodStock || 0;
+    let rankText = '';
+    if (myEntry) {
+      recReturns = Math.max(recReturns, myEntry.returnedCats || 0);
+      recFood = Math.max(recFood, myEntry.maxFoodStock || 0);
+      const rank = (list || []).findIndex(e => e.name === myName) + 1;
+      rankText = rank > 0 ? ` · 排名第 ${rank}` : '';
+    }
+    if (!myName) {
+      myRecEl.innerHTML = `
+        <div class="rec-title">📌 我的最佳记录</div>
+        <div class="rec-stats">
+          <div><b>${recReturns}</b><br><span>回窝</span></div>
+          <div><b>${recFood}</b><br><span>最大猫粮</span></div>
+        </div>
+        <div style="font-size:11px;color:#a08a6a;margin-top:6px;">上传成绩后可以显示昵称</div>
+      `;
+    } else {
+      myRecEl.innerHTML = `
+        <div class="rec-title">📌 我的最佳记录${rankText}</div>
+        <div class="rec-stats">
+          <div><b>${recReturns}</b><br><span>回窝</span></div>
+          <div><b>${recFood}</b><br><span>最大猫粮</span></div>
+        </div>
+      `;
+    }
+    myRecEl.classList.remove('hidden');
   }
 
   function escapeHtml(s) {
