@@ -2041,6 +2041,7 @@
   // 尝试让中间等待的猫去某侧食槽
   function trySendBattleCat() {
     if (!gameActive) return;
+    if (mode === 'online') return;
     // 检查双方是否有空位
     const myEating = cats.filter(c => c.owner === 'me' &&
       ["eating", "cleaning", "happy", "walking_to_food"].includes(c.state)).length;
@@ -2373,7 +2374,8 @@
     gameActive = true; isAnimating = false; selected = null;
     progressAnimating = false; tickSecond = -1;
 
-    opponent = { name: isOnline ? '等待对手' : '电脑猫娘', score: 0, foodStock: 0,
+    opponent = { name: isOnline ? (opponent.name || '对手') : '电脑猫娘',
+      score: 0, foodStock: 0,
       foodProgress: 0, returnedCats: 0, isBot: !isOnline, board: generateBoard() };
     oppNameLabel.textContent = opponent.name;
 
@@ -2484,11 +2486,15 @@
         timeLeft = msg.timeLeft;
         if (msg.myBoard) board = msg.myBoard;
         if (typeof msg.myScore === 'number') score = msg.myScore;
-        if (typeof msg.myFoodStock === 'number') foodStock = msg.myFoodStock;
+        if (typeof msg.myFoodStock === 'number') {
+          foodStock = msg.myFoodStock;
+          maxFoodStockThisRound = Math.max(maxFoodStockThisRound, foodStock);
+        }
         if (typeof msg.myFoodProgress === 'number') foodProgress = msg.myFoodProgress;
         if (typeof msg.myReturnedCats === 'number') returnedCats = msg.myReturnedCats;
         if (msg.opponent) {
           opponent.name = msg.opponent.name;
+          oppNameLabel.textContent = msg.opponent.name;
           opponent.isBot = msg.opponent.isBot;
           opponent.score = msg.opponent.score || 0;
           opponent.foodStock = msg.opponent.foodStock || 0;
