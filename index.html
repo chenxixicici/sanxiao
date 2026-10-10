@@ -1944,16 +1944,18 @@
     const home = owner === 'me' ? BATTLE_POS.myHome : BATTLE_POS.oppHome;
     if (!home) return { x: 0, y: 0 };
     const catW = 68, catH = 60;
-    const row = Math.floor(index / 3);
-    const col = index % 3;
+    // 只展示前 12 个位置（4 行 × 3 列），超过的叠在最后一排
+    const cappedIndex = Math.min(index, 11);
+    const row = Math.floor(cappedIndex / 3);
+    const col = cappedIndex % 3;
     const innerLeft = home.x + home.w * 0.14;
-    const innerTop = home.y + home.h * 0.58;
+    const innerBottom = home.y + home.h * 0.72;
     const innerW = home.w * 0.72;
     const colSpacing = innerW / 3;
-    const rowSpacing = 10;
+    const rowSpacing = 8;
     return {
       x: innerLeft + col * colSpacing + colSpacing / 2 - catW / 2,
-      y: innerTop - row * rowSpacing - catH * 0.4
+      y: innerBottom - row * rowSpacing - catH * 0.4
     };
   }
   // ===================== 对战猫咪 =====================
@@ -2183,9 +2185,30 @@
           }
           break;
         case "sleeping":
-          // 永远保持，无限叠
+          // 睡觉的猫保留在猫窝里，视觉上限 12 只，超出移除最早的
           break;
       }
+    }
+    // 清理逻辑：每侧最多保留 12 只 sleeping 猫，超出的移除 DOM 和数组
+    const sleepingByOwner = { me: [], opp: [] };
+    for (const c of cats) {
+      if (c.state === 'sleeping' && (c.owner === 'me' || c.owner === 'opp')) {
+        sleepingByOwner[c.owner].push(c);
+      }
+    }
+    for (const owner of ['me', 'opp']) {
+      const list = sleepingByOwner[owner];
+      if (list.length > 12) {
+        list.sort((a, b) => a.stateStart - b.stateStart);
+        const toRemove = list.slice(0, list.length - 12);
+        for (const c of toRemove) {
+          if (c.el && c.el.parentNode) c.el.parentNode.removeChild(c.el);
+          c._dead = true;
+        }
+      }
+    }
+    if (cats.some(c => c._dead)) {
+      cats = cats.filter(c => !c._dead);
     }
     trySendBattleCat();
   }
@@ -2386,8 +2409,12 @@
 
     timers.countdown = setInterval(onCountdownTick, 100);
     timers.gameTick = setInterval(() => { if (gameActive) tickBattleCats(); }, 100);
-    startBattlePoolSpawner();
-    if (!isOnline) startBattleAI();
+    if (!isOnline) {
+      // 本地对战：自己造猫
+      startBattlePoolSpawner();
+      startBattleAI();
+    }
+    // 联机模式：完全依赖服务器广播 cat_event，不本地造猫
   }
 
   function endGame() {

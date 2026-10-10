@@ -391,6 +391,14 @@ class BattleRoom {
           break;
       }
     }
+    // 清理 sleeping 超时的猫：每只 sleeping 猫在服务端保留 8 秒用于广播，
+    // 之后移除（客户端自己管理视觉堆叠）
+    const now2 = Date.now();
+    this.cats = this.cats.filter(c => {
+      if (c.state === 'sleeping' && now2 - c.stateStart > 8000) return false;
+      return true;
+    });
+    // 硬上限，防止极端情况
     if (this.cats.length > CONFIG.totalCatCap) {
       this.cats = this.cats.slice(-CONFIG.totalCatCap);
     }
@@ -400,9 +408,13 @@ class BattleRoom {
     if (this.ended || !this.started) return;
     if (this.players.length < 2) return;
 
+    // 只统计活跃的猫（排除 sleeping）
     const catCount = {};
     for (const p of this.players) catCount[p.id] = 0;
-    for (const c of this.cats) if (catCount[c.ownerId] !== undefined) catCount[c.ownerId]++;
+    for (const c of this.cats) {
+      if (c.state === 'sleeping') continue;
+      if (catCount[c.ownerId] !== undefined) catCount[c.ownerId]++;
+    }
 
     const candidates = this.players.filter(p =>
       p.foodStock > 0 && catCount[p.id] < CONFIG.maxCatsPerPlayer
