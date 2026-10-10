@@ -1759,7 +1759,9 @@
     return -1;
   }
   function spawnSingleWaitingCat() {
-    if (cats.length >= 18) return;
+    // 只统计非 sleeping 的猫（回窝睡觉的不算占用名额）
+    const activeCats = cats.filter(c => c.state !== "sleeping").length;
+    if (activeCats >= 18) return;
     const wCount = cats.filter(c => c.state === "waiting" || c.state === "waiting_walk").length;
     if (wCount >= 10) return;
     if (POS.waiting.length === 0) return;
@@ -2343,6 +2345,7 @@
     battleCatsEl.innerHTML = "";
     cats = []; catIdSeq = 1;
     score = 0; foodStock = 0; foodProgress = 0;
+    maxFoodStockThisRound = 0;
     timeLeft = 90; returnedCats = 0;
     gameActive = true; isAnimating = false; selected = null;
     progressAnimating = false; tickSecond = -1;
@@ -2402,9 +2405,7 @@
       $('resultTitle').textContent = `开心回窝 ${returnedCats} 只`;
       $('resultTitle').className = 'win';
       $('btnResultLobby').textContent = '返回模式选择';
-      showUploadSection();
     } else {
-      document.getElementById('uploadSection').classList.add('hidden');
       const my = returnedCats, op = opponent.returnedCats;
       $('p1Name').textContent = '我'; $('p1Returns').textContent = my;
       $('p2Name').textContent = opponent.name; $('p2Returns').textContent = op;
@@ -2413,6 +2414,8 @@
       else if (my < op) { $('resultTitle').textContent = '😿 失败'; $('resultTitle').className = 'lose'; $('p2Box').classList.add('win'); }
       else { $('resultTitle').textContent = '🤝 平局'; $('resultTitle').className = 'draw'; $('p1Box').classList.add('win'); $('p2Box').classList.add('win'); }
     }
+    // 所有模式都显示上传区（只有破纪录时才会出现上传按钮）
+    showUploadSection();
     resultOverlay.classList.remove('hidden');
   }
 
