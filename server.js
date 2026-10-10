@@ -112,7 +112,7 @@ const CONFIG = {
     walkingToHome: 1700
   },
   maxCatsPerPlayer: 6,
-  poolSize: 6,
+  poolSize: 10,
   totalCatCap: 32
 };
 
@@ -212,6 +212,16 @@ function scoreForLength(len) {
   return CONFIG.score6Base + (len - 6) * CONFIG.score6Extra;
 }
 
+function maxConcurrentByFood(stock) {
+  if (stock <= 0) return 0;
+  if (stock <= 3) return 1;
+  if (stock <= 6) return 2;
+  if (stock <= 9) return 3;
+  if (stock <= 12) return 4;
+  if (stock <= 15) return 5;
+  return 6;
+}
+
 // ============ Player ============
 class Player {
   constructor(id, ws, name, isBot = false) {
@@ -270,8 +280,8 @@ class BattleRoom {
     }, 100));
 
     this.timers.push(setInterval(() => this.tickCats(), 100));
-    this.timers.push(setInterval(() => this.trySpawnWaitingCat(), 1800));
-    this.timers.push(setInterval(() => this.trySendCatToEat(), 800));
+    this.timers.push(setInterval(() => this.trySpawnWaitingCat(), 2500));
+    this.timers.push(setInterval(() => this.trySendCatToEat(), 100));
     this.timers.push(setInterval(() => this.broadcastState(), 250));
 
     console.log(`[开局] ${this.id} ${this.players.map(p => p.name).join(' vs ')}`);
@@ -430,24 +440,32 @@ class BattleRoom {
     if (this.ended || !this.started) return;
     if (this.players.length < 2) return;
 
+    // 找一只还在等待区的无主猫
     const waiter = this.cats.find(c => !c.ownerId && c.state === 'waiting');
     if (!waiter) return;
 
-    // 只统计活跃的猫（排除 sleeping 和 waiting）
-    const activeCount = {};
-    for (const p of this.players) activeCount[p.id] = 0;
+    // 统计每个玩家"正在占用食槽"的猫数。
+    // 跟个人模式对齐：只算 walking_to_food / eating / cleaning / happy，
+    // 不算 walking_to_home（已经在回窝路上，已经离开食槽了）。
+    const usingCount = {};
+    for (const p of this.players) usingCount[p.id] = 0;
     for (const c of this.cats) {
       if (c.ownerId &&
-          ['walking_to_food', 'eating', 'cleaning', 'happy', 'walking_to_home'].includes(c.state)) {
-        if (activeCount[c.ownerId] !== undefined) activeCount[c.ownerId]++;
+          ['walking_to_food', 'eating', 'cleaning', 'happy'].includes(c.state)) {
+        if (usingCount[c.ownerId] !== undefined) usingCount[c.ownerId]++;
       }
     }
 
+    // 候选玩家：有粮，且流程中的猫数 < maxConcurrentByFood(foodStock)
+    // maxCatsPerPlayer 只作为硬上限兜底
     const candidates = this.players.filter(p =>
-      p.foodStock > 0 && activeCount[p.id] < CONFIG.maxCatsPerPlayer
+      p.foodStock > 0 &&
+      usingCount[p.id] < maxConcurrentByFood(p.foodStock) &&
+      usingCount[p.id] < CONFIG.maxCatsPerPlayer
     );
     if (candidates.length === 0) return;
 
+    // 加权随机：按各自粮的多少分配概率
     const total = candidates.reduce((s, p) => s + p.foodStock, 0);
     if (total <= 0) return;
     let rnd = Math.random() * total;
