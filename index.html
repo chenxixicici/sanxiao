@@ -3,427 +3,405 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover, user-scalable=no">
-<title>猫咪三消养成 V0.4</title>
+<title>猫咪三消养成 V1.7</title>
 <style>
   * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
-  html, body {
-    margin: 0; padding: 0; height: 100%; overflow: hidden;
+  html, body { margin: 0; padding: 0; height: 100%; overflow: hidden;
     font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "PingFang SC", "Microsoft YaHei", sans-serif;
-    background: #f7e8cf; color: #4a3524; user-select: none;
-  }
-  #game {
-    height: 100vh; height: 100dvh;
-    max-width: 520px; margin: 0 auto;
-    display: flex; flex-direction: column;
-    position: relative; background: #f7e8cf; overflow: hidden;
-  }
-
-  /* ============================================================
-     上部：猫咪展示区
-     ============================================================ */
-  #topArea {
-    flex: 0 0 auto;
-    height: 47vh; height: 47dvh;
-    min-height: 300px;
-    max-height: 52vh;
-    position: relative; overflow: hidden;
-    border-bottom-left-radius: 24px;
-    border-bottom-right-radius: 24px;
-    box-shadow: 0 6px 16px rgba(90, 120, 70, 0.18);
-    background: linear-gradient(180deg, #cfe9f7 0%, #e6f2dc 40%, #d4ecc0 65%, #a8d68e 100%);
-  }
-
-  .cloud {
-    position: absolute; background: rgba(255,255,255,.9);
-    border-radius: 999px; pointer-events: none;
-  }
-  .cloud::before, .cloud::after {
-    content: ""; position: absolute; background: inherit; border-radius: 50%;
-  }
-  .cloud.c1 { top: 62px; left: 6%; width: 42px; height: 14px; }
-  .cloud.c1::before { width: 20px; height: 20px; top: -10px; left: 5px; }
-  .cloud.c1::after { width: 14px; height: 14px; top: -7px; left: 22px; }
-  .cloud.c2 { top: 86px; left: 42%; width: 34px; height: 12px; opacity: .65; }
-  .cloud.c2::before { width: 16px; height: 16px; top: -8px; left: 4px; }
-  .cloud.c2::after { width: 12px; height: 12px; top: -5px; left: 18px; }
-
-  #sun {
-    position: absolute; top: 58px; right: 14px;
-    width: 28px; height: 28px; border-radius: 50%;
-    background: radial-gradient(circle at 35% 30%, #fff3b0, #ffd54f 60%, #f7b733);
-    box-shadow: 0 0 20px rgba(255, 213, 79, .7);
-    pointer-events: none; z-index: 2;
-  }
-
-  #grass {
-    position: absolute; left: 0; right: 0; bottom: 0;
-    height: 44%;
-    background: linear-gradient(180deg, rgba(168, 214, 142, 0) 0%, #a8d68e 30%, #86c269 100%);
-    z-index: 1; pointer-events: none;
-  }
-  #grass::before {
-    content: "";
-    position: absolute; left: 0; right: 0; top: 6px; height: 8px;
-    background:
-      radial-gradient(circle at 8% 50%, #7dba63 0 4px, transparent 5px),
-      radial-gradient(circle at 24% 50%, #7dba63 0 4px, transparent 5px),
-      radial-gradient(circle at 42% 50%, #7dba63 0 4px, transparent 5px),
-      radial-gradient(circle at 60% 50%, #7dba63 0 4px, transparent 5px),
-      radial-gradient(circle at 78% 50%, #7dba63 0 4px, transparent 5px),
-      radial-gradient(circle at 94% 50%, #7dba63 0 4px, transparent 5px);
-    background-repeat: no-repeat; opacity: 0.55;
-  }
-
-  /* HUD */
-  #hud {
-    position: absolute; top: 0; left: 0; right: 0; height: 54px;
+    background: #f7e8cf; color: #4a3524; user-select: none; }
+  #game { height: 100vh; height: 100dvh; max-width: 520px; margin: 0 auto;
+    display: flex; flex-direction: column; position: relative; background: #f7e8cf; overflow: hidden; }
+  #topArea { flex: 0 0 auto; height: 48vh; height: 48dvh; min-height: 320px; max-height: 52vh;
+    position: relative; overflow: hidden; border-bottom-left-radius: 28px; border-bottom-right-radius: 28px;
+    box-shadow: 0 8px 20px rgba(90, 120, 70, 0.22);
+    background: linear-gradient(180deg, #b8e0f5 0%, #c8e8f0 15%, #d9f0e0 25%, #c8e8b0 32%, #a8d68e 45%, #86c269 100%); }
+  .cloud { position: absolute; background: rgba(255,255,255,.95); border-radius: 999px; pointer-events: none; box-shadow: 0 4px 10px rgba(120, 160, 200, .15); }
+  .cloud::before, .cloud::after { content: ""; position: absolute; background: inherit; border-radius: 50%; }
+  .cloud.c1 { top: 66px; left: 6%; width: 50px; height: 16px; }
+  .cloud.c1::before { width: 24px; height: 24px; top: -13px; left: 6px; }
+  .cloud.c1::after { width: 18px; height: 18px; top: -9px; left: 26px; }
+  .cloud.c2 { top: 88px; left: 40%; width: 40px; height: 14px; opacity: .8; }
+  .cloud.c2::before { width: 20px; height: 20px; top: -10px; left: 5px; }
+  .cloud.c2::after { width: 14px; height: 14px; top: -7px; left: 21px; }
+  #sun { position: absolute; top: 54px; right: 14px; width: 34px; height: 34px; border-radius: 50%;
+    background: radial-gradient(circle at 35% 30%, #fff8c4, #ffd54f 55%, #f7b733);
+    box-shadow: 0 0 26px rgba(255, 213, 79, .8); pointer-events: none; z-index: 2; }
+  #grass { position: absolute; left: 0; right: 0; bottom: 0; height: 70%;
+    background: linear-gradient(180deg, rgba(168, 214, 142, 0) 0%, #a8d68e 15%, #7dba63 100%); z-index: 1; pointer-events: none; }
+  #grass::before { content: ""; position: absolute; left: 0; right: 0; top: 4px; height: 10px;
+    background: radial-gradient(circle at 6% 50%, #7dba63 0 5px, transparent 6px),
+      radial-gradient(circle at 20% 50%, #7dba63 0 4px, transparent 5px),
+      radial-gradient(circle at 36% 50%, #7dba63 0 5px, transparent 6px),
+      radial-gradient(circle at 52% 50%, #7dba63 0 4px, transparent 5px),
+      radial-gradient(circle at 68% 50%, #7dba63 0 5px, transparent 6px),
+      radial-gradient(circle at 84% 50%, #7dba63 0 4px, transparent 5px),
+      radial-gradient(circle at 96% 50%, #7dba63 0 5px, transparent 6px);
+    background-repeat: no-repeat; opacity: 0.6; }
+  #fence { position: absolute; left: 0; right: 0; top: 29%; height: 14px;
+    background: repeating-linear-gradient(90deg, #d9b382 0 10px, #c89e6a 10px 20px);
+    border-top: 2px solid #b08550; border-bottom: 2px solid #a07442;
+    opacity: .6; z-index: 1; pointer-events: none; }
+  #hud { position: absolute; top: 0; left: 0; right: 0; height: 62px;
     display: flex; justify-content: space-between; align-items: flex-start;
-    padding: 6px 12px; z-index: 22; pointer-events: none;
-  }
-  .hud-item {
-    background: rgba(255, 255, 255, 0.94);
-    border-radius: 16px; padding: 4px 12px 5px;
-    min-width: 100px; text-align: center;
-    box-shadow: 0 3px 8px rgba(0,0,0,.10), inset 0 0 0 1px rgba(255,255,255,.7);
-  }
-  .hud-item span {
-    display: block; font-size: 11px; color: #7a6a55;
-    line-height: 1.15; letter-spacing: .5px;
-  }
-  .hud-item strong {
-    display: block; font-size: 25px; line-height: 1.05;
-    color: #2f7a3e; font-weight: 800; font-variant-numeric: tabular-nums;
-  }
+    padding: 8px 12px; z-index: 22; pointer-events: none; }
+  .hud-item { background: linear-gradient(180deg, #fffdf5, #ffeccf); border-radius: 999px;
+    padding: 4px 14px 5px 10px; min-width: 108px; display: flex; align-items: center; gap: 8px;
+    box-shadow: 0 3px 0 #d9a86c, 0 6px 12px rgba(120, 80, 40, .18), inset 0 1px 0 rgba(255,255,255,.9);
+    border: 1.5px solid #f0cfa0; }
+  .hud-icon { font-size: 22px; line-height: 1; }
+  .hud-text { display: flex; flex-direction: column; line-height: 1.1; }
+  .hud-label { font-size: 9px; color: #a07a50; font-weight: 700; letter-spacing: .5px; }
+  .hud-value { font-size: 24px; font-weight: 900; color: #5a3a1a; font-variant-numeric: tabular-nums; }
   #returnText { color: #e67e22; }
-
-  /* 场景容器 */
-  #scene { position: absolute; inset: 0; padding-top: 54px; z-index: 2; }
-
-  /* 猫粮机（居中，位于猫粮槽上方） */
-  #foodMachine {
-    position: absolute; z-index: 9;
-    width: 62px; height: 62px;
-    filter: drop-shadow(0 4px 5px rgba(60, 90, 120, .3));
-    transition: left .3s;
-  }
-  .machine-body {
-    position: absolute; inset: 0 0 20px 0;
-    background: linear-gradient(180deg, #b8d4f2 0%, #7aa5d8 55%, #5b88c0 100%);
-    border-radius: 12px;
-    box-shadow: inset 0 2px 0 rgba(255,255,255,.6), inset 0 -3px 6px rgba(0,0,0,.12);
-  }
-  .mach-slot {
-    position: absolute; top: 12px; left: 10px; right: 10px;
-    height: 8px; border-radius: 4px;
-    background: rgba(30, 50, 80, .38);
-    box-shadow: inset 0 1px 2px rgba(0,0,0,.4);
-  }
-  .mach-light {
-    position: absolute; top: 26px; right: 10px;
-    width: 8px; height: 8px; border-radius: 50%;
-    background: #ffe082;
-    box-shadow: 0 0 8px #ffd54f, inset 0 0 3px #fff;
-    animation: machBlink 1.6s ease-in-out infinite;
-  }
+  #scene { position: absolute; inset: 0; padding-top: 62px; z-index: 2; }
+  #leftColumn { position: absolute; left: 6px; width: 76px;
+    display: flex; flex-direction: column; align-items: center;
+    gap: 6px; z-index: 30; pointer-events: none; }
+  #foodMachine { position: relative; width: 68px; height: 84px;
+    filter: drop-shadow(0 5px 8px rgba(60, 90, 120, .3));
+    transform-origin: center bottom; pointer-events: auto; }
+  #foodMachine.producing { animation: machineProduce .55s cubic-bezier(.3,1.4,.5,1); }
+  @keyframes machineProduce {
+    0% { transform: scale(1) rotate(0); }
+    25% { transform: scale(1.08) rotate(-3deg); }
+    50% { transform: scale(1.12) rotate(3deg); }
+    75% { transform: scale(1.06) rotate(-2deg); }
+    100% { transform: scale(1) rotate(0); } }
+  .machine-body { position: absolute; inset: 14px 0 0 0;
+    background: linear-gradient(180deg, #f5e6cf 0%, #e8cfa8 45%, #d4b07a 100%);
+    border-radius: 10px;
+    box-shadow: inset 0 3px 0 rgba(255,255,255,.8), inset 0 -4px 8px rgba(0,0,0,.12), 0 2px 4px rgba(0,0,0,.1); }
+  .machine-body::before { content: ""; position: absolute; top: 6px; left: 8px; right: 8px; bottom: 24px;
+    border-radius: 8px;
+    background: radial-gradient(circle at 30% 20%, rgba(255,255,255,.5) 0 6px, transparent 7px),
+      radial-gradient(circle at 70% 40%, rgba(255,255,255,.3) 0 4px, transparent 5px),
+      linear-gradient(180deg, rgba(255,255,255,.2), rgba(255,255,255,.05)); }
+  .mach-slot { position: absolute; top: 10px; left: 11px; right: 11px; height: 9px; border-radius: 5px;
+    background: rgba(60, 40, 20, .25); box-shadow: inset 0 2px 3px rgba(0,0,0,.4); }
+  .mach-light { position: absolute; top: 24px; right: 11px; width: 8px; height: 8px; border-radius: 50%;
+    background: #ffe082; box-shadow: 0 0 10px #ffd54f, inset 0 0 4px #fff;
+    animation: machBlink 1.6s ease-in-out infinite; }
   @keyframes machBlink { 0%, 100% { opacity: 1; } 50% { opacity: .35; } }
-  .mach-funnel {
-    position: absolute; bottom: 6px; left: 12px; right: 12px; height: 18px;
-    background: linear-gradient(180deg, #d7dde3, #99a3ac);
-    clip-path: polygon(0 0, 100% 0, 74% 100%, 26% 100%);
-    border-radius: 2px;
-  }
-  .mach-drip {
-    position: absolute; bottom: -4px; left: 50%;
-    width: 5px; height: 5px; margin-left: -2.5px;
-    background: #f2b544; border-radius: 50%; opacity: 0;
-    animation: drip 2.4s ease-in infinite;
-  }
-  @keyframes drip {
-    0%, 70% { opacity: 0; transform: translateY(0); }
-    80% { opacity: 1; transform: translateY(2px); }
-    95% { opacity: 0; transform: translateY(12px); }
-    100% { opacity: 0; }
-  }
-  .mach-label {
-    position: absolute; top: 3px; left: 0; right: 0; text-align: center;
-    font-size: 8px; font-weight: 800; color: rgba(255,255,255,.95);
-    letter-spacing: .5px; text-shadow: 0 1px 1px rgba(0,0,0,.3);
-  }
-
-  /* 食槽（位于猫粮机正下方） */
-  #trough {
-    position: absolute; z-index: 9;
-    height: 32px;
-    border-radius: 18px;
-    background: linear-gradient(180deg, #d8a97a 0%, #b78656 55%, #94673c 100%);
-    padding: 3px;
-    box-shadow: 0 3px 6px rgba(90, 60, 30, .28), inset 0 1px 0 rgba(255,255,255,.35);
-  }
-  #troughInner {
-    position: relative; width: 100%; height: 100%;
-    border-radius: 15px;
-    background: linear-gradient(180deg, #4a3826, #2f2318);
-    overflow: hidden;
-    box-shadow: inset 0 2px 4px rgba(0,0,0,.45);
-  }
-  #troughInner::before {
-    content: ""; position: absolute; left: 6px; right: 6px; top: 3px;
-    height: 3px; border-radius: 3px; background: rgba(255,255,255,.08);
-  }
-  #troughFill {
-    position: absolute; left: 0; top: 0; bottom: 0; width: 0%;
-    background: linear-gradient(180deg, #f6c34a 0%, #e29a25 70%, #b8791a 100%);
+  .mach-label { position: absolute; top: 18px; left: 0; right: 0; text-align: center;
+    font-size: 8px; font-weight: 900; color: #8a6a40; letter-spacing: .8px;
+    text-shadow: 0 1px 0 rgba(255,255,255,.7); }
+  .mach-spout { position: absolute; top: 2px; left: 50%; transform: translateX(-50%);
+    width: 26px; height: 14px;
+    background: linear-gradient(180deg, #d8c8a8, #b8a888);
+    border-radius: 6px 6px 2px 2px;
+    box-shadow: 0 2px 3px rgba(0,0,0,.15), inset 0 1px 0 rgba(255,255,255,.6); z-index: 3; }
+  .mach-spout::before { content: ""; position: absolute;
+    top: 2px; left: 50%; transform: translateX(-50%);
+    width: 14px; height: 5px; background: #7a6a4a;
+    border-radius: 3px; box-shadow: inset 0 1px 2px rgba(0,0,0,.5); }
+  .mach-drip { position: absolute; top: 8px; left: 50%;
+    width: 6px; height: 6px; margin-left: -3px;
+    background: radial-gradient(circle at 35% 30%, #ffd977, #c98a20 75%, #8d5a10);
+    border-radius: 50%; opacity: 0;
+    animation: dripUp 1.8s ease-out infinite;
+    box-shadow: 0 0 6px #f2b544; z-index: 4; }
+  @keyframes dripUp {
+    0%, 55% { opacity: 0; transform: translateY(0); }
+    65% { opacity: 1; transform: translateY(-6px); }
+    100% { opacity: 0; transform: translateY(-26px); } }
+  #progressTrack { position: relative; width: 22px; height: 300px;
+    background: linear-gradient(180deg, rgba(120, 80, 40, .15), rgba(120, 80, 40, .3));
+    border-radius: 12px; border: 2px solid #e8b87a; overflow: hidden;
+    box-shadow: inset 0 2px 5px rgba(0,0,0,.25), 0 2px 6px rgba(120, 80, 40, .2);
+    pointer-events: auto; }
+  #progressTrack::before { content: ""; position: absolute; inset: 2px; border-radius: 10px;
+    background: repeating-linear-gradient(0deg, transparent 0 14px, rgba(255, 255, 255, .18) 14px 15px);
+    pointer-events: none; z-index: 3; }
+  #progressFill { position: absolute; left: 0; right: 0; bottom: 0; height: 0%;
+    background: linear-gradient(0deg, #e29a25 0%, #f6c34a 45%, #ffe082 100%);
+    border-radius: 10px;
+    transition: height .32s cubic-bezier(.3,.8,.4,1);
+    box-shadow: 0 0 10px rgba(255, 200, 80, .7), inset 0 0 8px rgba(255, 255, 255, .5);
+    z-index: 2; }
+  #progressTrack.full #progressFill { animation: barPulse 1s ease-in-out infinite; }
+  @keyframes barPulse {
+    0%, 100% { box-shadow: 0 0 10px rgba(255, 200, 80, .7), inset 0 0 8px rgba(255,255,255,.5); }
+    50% { box-shadow: 0 0 26px rgba(255, 220, 100, 1), inset 0 0 16px rgba(255,255,255,.95); } }
+  #progressLabel { position: absolute; left: 50%; bottom: -18px; transform: translateX(-50%);
+    font-size: 9px; font-weight: 800; color: #8a6a40; white-space: nowrap;
+    letter-spacing: .5px; pointer-events: none; text-shadow: 0 1px 0 rgba(255,255,255,.85); }
+  #progressTopIcon { position: absolute; left: 50%; top: -22px; transform: translateX(-50%);
+    font-size: 15px; line-height: 1; pointer-events: none;
+    text-shadow: 0 1px 2px rgba(0,0,0,.2); }
+  #trough { position: absolute; z-index: 9; height: 40px; border-radius: 22px;
+    background: linear-gradient(180deg, #e8c9a0 0%, #c9a06a 50%, #a87c48 100%);
+    padding: 4px;
+    box-shadow: 0 4px 10px rgba(90, 60, 30, .35), inset 0 2px 0 rgba(255,255,255,.5), inset 0 -3px 6px rgba(0,0,0,.15); }
+  #troughInner { position: relative; width: 100%; height: 100%; border-radius: 18px;
+    background: linear-gradient(180deg, #5a4630, #2f2318);
+    overflow: hidden; box-shadow: inset 0 3px 6px rgba(0,0,0,.55); }
+  #troughInner::before { content: ""; position: absolute; left: 8px; right: 8px; top: 4px; height: 4px; border-radius: 4px;
+    background: rgba(255,255,255,.08); }
+  #troughFill { position: absolute; left: 0; top: 0; bottom: 0; width: 0%;
+    background: linear-gradient(180deg, #f6c34a 0%, #e29a25 65%, #b8791a 100%);
     transition: width .45s ease;
-    border-top-right-radius: 6px; border-bottom-right-radius: 6px;
-  }
-  #troughKibbles { position: absolute; inset: 0; pointer-events: none; }
-  .kibble {
-    position: absolute; width: 6px; height: 5px;
+    border-top-right-radius: 8px; border-bottom-right-radius: 8px; z-index: 1; }
+  #troughKibbles { position: absolute; inset: 0; pointer-events: none; z-index: 2; }
+  .kibble { position: absolute; width: 7px; height: 6px;
     background: radial-gradient(circle at 35% 30%, #ffd977, #c98a20 75%, #8d5a10);
     border-radius: 45% 55% 50% 50%;
-    box-shadow: inset 0 -1px 0 rgba(0,0,0,.25);
-  }
-
-  /* 大猫窝（右侧） */
-  #bigHome {
-    position: absolute; z-index: 5;
+    box-shadow: inset 0 -1px 0 rgba(0,0,0,.25), 0 1px 1px rgba(255,255,255,.2); }
+  #troughMarks { position: absolute; inset: 0; pointer-events: none; z-index: 4; }
+  .trough-mark { position: absolute; top: 0; bottom: 0; width: 2px;
+    background: rgba(255, 255, 255, 0.7); box-shadow: 0 0 4px rgba(0,0,0,.6); }
+  .trough-mark::after { content: attr(data-label);
+    position: absolute; top: -16px; left: 50%; transform: translateX(-50%);
+    font-size: 9px; font-weight: 900; color: #fff;
+    background: rgba(80, 50, 20, .85);
+    padding: 1px 4px; border-radius: 6px; white-space: nowrap;
+    box-shadow: 0 1px 3px rgba(0,0,0,.3); }
+  .trough-mark.final { background: rgba(255, 230, 120, 0.95); box-shadow: 0 0 8px #ffd54f; }
+  .trough-mark.final::after { background: #e67e22; }
+  #bigHome { position: absolute; z-index: 5; border-radius: 50% / 42%;
+    background: radial-gradient(ellipse at 50% 20%, #f8d8a0 0%, #e8a860 35%, #c98840 70%, #a86b30 100%);
+    box-shadow: inset 0 14px 24px rgba(255, 240, 200, 0.55),
+      inset 0 -16px 30px rgba(80, 40, 10, 0.35),
+      inset 0 0 0 6px rgba(210, 160, 90, 0.5),
+      0 12px 28px rgba(90, 60, 30, .48);
+    transition: left .3s, top .3s, width .3s, height .3s; overflow: hidden; }
+  #bigHome::before { content: ""; position: absolute; inset: 0;
+    background-image: repeating-linear-gradient(0deg, rgba(120, 70, 25, .12) 0 4px, transparent 4px 12px),
+      repeating-linear-gradient(90deg, rgba(120, 70, 25, .08) 0 6px, transparent 6px 14px);
+    border-radius: inherit; opacity: 0.7; pointer-events: none; }
+  #bigHome::after { content: ""; position: absolute; inset: 6px; border-radius: inherit;
+    box-shadow: inset 0 6px 10px rgba(255, 245, 220, 0.5), inset 0 -8px 16px rgba(80, 40, 10, 0.35);
+    pointer-events: none; }
+  #bigHomeInner { position: absolute; left: 11%; right: 11%; top: 17%; bottom: 22%;
     border-radius: 50% / 38%;
-    background:
-      radial-gradient(ellipse at 50% 18%, #ffd8a4 0%, #f0a860 45%, #c98840 78%, #a86b30 100%);
-    box-shadow:
-      inset 0 10px 18px rgba(255, 255, 255, 0.45),
-      inset 0 -12px 22px rgba(0, 0, 0, 0.28),
-      0 8px 22px rgba(90, 60, 30, .4);
-    transition: left .3s, top .3s, width .3s, height .3s;
-  }
-  #bigHomeInner {
-    position: absolute;
-    left: 9%; right: 9%; top: 16%; bottom: 22%;
-    border-radius: 50% / 34%;
-    background: radial-gradient(ellipse at 50% 28%, #3d2e1e, #1f1710);
-    box-shadow: inset 0 6px 14px rgba(0,0,0,.65);
-    overflow: hidden;
-  }
-  #bigHomeCushion {
-    position: absolute;
-    left: 10%; right: 10%; top: 20%; bottom: 26%;
-    border-radius: 50% / 40%;
-    background: radial-gradient(ellipse at 50% 25%, #ffd7a0 0%, #e8a860 70%, #cf8f4a 100%);
-    box-shadow: inset 0 -3px 8px rgba(150, 90, 30, .35);
-  }
-  #bigHomeLabel {
-    position: absolute;
-    top: 6%; left: 0; right: 0;
-    text-align: center; font-size: 10px; font-weight: 800;
-    color: #7a4d1f; opacity: .75; letter-spacing: 1px;
-    text-shadow: 0 1px 0 rgba(255,255,255,.5);
-  }
-
-  /* 猫咪 */
-  .cat {
-    position: absolute;
-    width: 60px; height: 74px;
-    display: flex; flex-direction: column; align-items: center;
-    transition: left 1.05s cubic-bezier(.45,.05,.55,.95),
-                top  1.05s cubic-bezier(.45,.05,.55,.95),
-                opacity .55s ease, transform .45s ease;
-    z-index: 10;
-    pointer-events: none;
-  }
-  .cat-svg-wrap {
-    width: 60px; height: 60px;
+    background: radial-gradient(ellipse at 50% 30%, #55402a, #2a1f14);
+    box-shadow: inset 0 10px 22px rgba(0,0,0,.8), inset 0 -8px 18px rgba(0,0,0,.6), 0 0 0 3px rgba(210, 160, 90, .35);
+    overflow: hidden; }
+  #bigHomeCushion { position: absolute; left: 12%; right: 12%; top: 22%; bottom: 26%;
+    border-radius: 50% / 42%;
+    background: radial-gradient(ellipse at 50% 25%, #fff1c8 0%, #ffd88a 45%, #e8a860 100%);
+    box-shadow: inset 0 -5px 12px rgba(150, 90, 30, .45), inset 0 4px 8px rgba(255, 255, 255, .6); }
+  #bigHomeCushion::before { content: ""; position: absolute; inset: 8% 10%; border-radius: inherit;
+    background: radial-gradient(circle at 30% 40%, rgba(255,255,255,.35) 0 6px, transparent 7px),
+      radial-gradient(circle at 70% 60%, rgba(255,255,255,.25) 0 4px, transparent 5px),
+      radial-gradient(circle at 55% 25%, rgba(255,255,255,.3) 0 3px, transparent 4px);
+    pointer-events: none; }
+  #bigHomeLabel { position: absolute; top: 5%; left: 0; right: 0; text-align: center;
+    font-size: 11px; font-weight: 900; color: #7a4d1f;
+    letter-spacing: 1.5px; text-shadow: 0 1px 0 rgba(255,255,255,.7); z-index: 3; }
+  .cat { position: absolute; width: 78px; height: 68px;
+    display: flex; flex-direction: column; align-items: center; justify-content: flex-end;
+    transition: left 1.05s cubic-bezier(.45,.05,.55,.95), top 1.05s cubic-bezier(.45,.05,.55,.95), opacity .4s ease;
+    z-index: 10; pointer-events: none; }
+  .cat-svg-wrap { width: 78px; height: 62px;
     display: flex; align-items: flex-end; justify-content: center;
-    position: relative;
-  }
-  .cat-svg-wrap svg {
-    width: 58px; height: 58px;
-    overflow: visible;
-    filter: drop-shadow(0 2px 3px rgba(0,0,0,.18));
-  }
-  .cat-chip {
-    font-size: 9px; font-weight: 800;
-    padding: 1px 7px; border-radius: 8px;
-    background: rgba(255,255,255,.9);
-    color: #4a3524;
-    box-shadow: 0 1px 2px rgba(0,0,0,.12);
-    letter-spacing: .3px;
-    margin-top: -4px;
-    white-space: nowrap;
-  }
-  .cat.state-waiting .cat-chip { background: #ece0c8; color: #7a6a55; }
+    position: relative; transition: transform .3s; }
+  .cat.facing-left .cat-svg-wrap { transform: scaleX(-1); }
+  .cat-svg-wrap svg { width: 76px; height: 60px; overflow: visible;
+    filter: drop-shadow(0 3px 3px rgba(0,0,0,.18)); }
+  .cat-chip { font-size: 9px; font-weight: 800;
+    padding: 1px 8px; border-radius: 10px;
+    background: rgba(255,255,255,.92); color: #4a3524;
+    box-shadow: 0 1px 3px rgba(0,0,0,.15);
+    letter-spacing: .3px; margin-top: -4px; white-space: nowrap;
+    border: 1px solid rgba(255,255,255,.8); }
+  .cat.state-waiting .cat-chip { background: #f0e2c8; color: #8a6a40; }
+  .cat.state-waiting_walk .cat-chip { background: #e6f0d0; color: #5a7a30; }
   .cat.state-walking_to_food .cat-chip,
   .cat.state-walking_to_home .cat-chip { background: #d6f5cf; color: #2f7a3e; }
   .cat.state-eating .cat-chip { background: #ffe0b0; color: #a15a1a; }
   .cat.state-cleaning .cat-chip { background: #cfe9ff; color: #25628f; }
   .cat.state-happy .cat-chip { background: #ffe2ef; color: #b8456f; }
   .cat.state-sleeping .cat-chip { background: #dcd6f5; color: #4a3d8a; }
-
+  .meow-bubble { transform-box: fill-box; transform-origin: center;
+    animation: meowPulse 1.8s ease-in-out infinite; }
+  @keyframes meowPulse {
+    0%, 100% { opacity: 0.55; transform: scale(0.92); }
+    50% { opacity: 1; transform: scale(1.05); } }
   .cat.state-walking_to_food .cat-svg-wrap svg,
-  .cat.state-walking_to_home .cat-svg-wrap svg {
-    animation: walkBob .42s ease-in-out infinite;
-  }
+  .cat.state-walking_to_home .cat-svg-wrap svg,
+  .cat.state-waiting_walk .cat-svg-wrap svg { animation: walkBob .48s ease-in-out infinite; }
   @keyframes walkBob {
-    0%, 100% { transform: translateY(0) rotate(-2deg); }
-    50% { transform: translateY(-3px) rotate(2deg); }
-  }
-  .cat.state-eating .cat-svg-wrap svg { animation: eatBob .5s ease-in-out infinite; }
+    0%, 100% { transform: translateY(0) rotate(-1deg); }
+    50% { transform: translateY(-3px) rotate(1deg); } }
+  .cat .leg { transform-box: fill-box; transform-origin: center top; }
+  .cat.state-walking_to_food .leg-fl,
+  .cat.state-walking_to_home .leg-fl,
+  .cat.state-waiting_walk .leg-fl { animation: legSwingF .48s ease-in-out infinite; }
+  .cat.state-walking_to_food .leg-fr,
+  .cat.state-walking_to_home .leg-fr,
+  .cat.state-waiting_walk .leg-fr { animation: legSwingF .48s ease-in-out infinite reverse; }
+  .cat.state-walking_to_food .leg-bl,
+  .cat.state-walking_to_home .leg-bl,
+  .cat.state-waiting_walk .leg-bl { animation: legSwingF .48s ease-in-out infinite reverse; }
+  .cat.state-walking_to_food .leg-br,
+  .cat.state-walking_to_home .leg-br,
+  .cat.state-waiting_walk .leg-br { animation: legSwingF .48s ease-in-out infinite; }
+  @keyframes legSwingF {
+    0%, 100% { transform: rotate(-14deg); }
+    50% { transform: rotate(14deg); } }
+  .cat.state-eating .cat-svg-wrap svg { animation: eatBob .55s ease-in-out infinite; }
   @keyframes eatBob {
     0%, 100% { transform: translateY(0) rotate(0); }
-    50% { transform: translateY(-2px) rotate(-3deg); }
-  }
-  .cat.state-cleaning .cat-svg-wrap svg { animation: cleanSway .9s ease-in-out infinite; }
+    50% { transform: translateY(-2px) rotate(-4deg); } }
+  .cat.state-cleaning .cat-svg-wrap svg { animation: cleanSway 1.1s ease-in-out infinite; }
   @keyframes cleanSway {
-    0%, 100% { transform: rotate(-5deg); }
-    50% { transform: rotate(5deg); }
-  }
-  .cat.state-happy .cat-svg-wrap svg { animation: happyHop .52s ease-in-out infinite; }
+    0%, 100% { transform: rotate(-3deg); }
+    50% { transform: rotate(3deg); } }
+  .cat.state-happy .cat-svg-wrap svg { animation: happyHop .55s ease-in-out infinite; }
   @keyframes happyHop {
     0%, 100% { transform: translateY(0) scale(1); }
-    50% { transform: translateY(-5px) scale(1.05); }
-  }
-  .cat.state-sleeping .cat-svg-wrap svg { animation: sleepBreathe 2.4s ease-in-out infinite; }
+    50% { transform: translateY(-5px) scale(1.05); } }
+  .cat.state-sleeping .cat-svg-wrap svg { animation: sleepBreathe 2.6s ease-in-out infinite; }
   @keyframes sleepBreathe {
     0%, 100% { transform: scale(1); }
-    50% { transform: scale(1.04); }
-  }
-
-  /* 提示文本 */
-  .hint {
-    position: absolute;
-    left: 8px; right: 8px;
-    font-size: 10px;
-    line-height: 1.35;
-    color: #5a4a38;
-    background: rgba(255, 255, 255, .72);
-    padding: 3px 8px;
-    border-radius: 9px;
-    text-align: center;
-    pointer-events: none;
-    box-shadow: 0 1px 3px rgba(0,0,0,.06);
-    z-index: 12;
-    font-weight: 600;
-    letter-spacing: .2px;
-  }
-  #hintTop { bottom: 4px; }
+    50% { transform: scale(1.05); } }
+  .feed-particle { position: fixed; width: 9px; height: 9px; border-radius: 50%;
+    background: radial-gradient(circle at 35% 30%, #ffd977, #e29a25 75%, #8d5a10);
+    box-shadow: 0 0 8px #ffd54f;
+    z-index: 100; pointer-events: none;
+    transition: transform .72s cubic-bezier(.5,.05,.7,.25), opacity .72s ease-out;
+    will-change: transform, opacity; }
+  .spark { position: fixed; width: 20px; height: 20px; border-radius: 50%;
+    background: radial-gradient(circle, rgba(255,255,220,.95) 0%, rgba(255,210,120,.6) 40%, transparent 70%);
+    z-index: 95; pointer-events: none; transform: translate(-50%, -50%);
+    animation: sparkPop .38s ease-out forwards; }
+  @keyframes sparkPop {
+    0% { transform: translate(-50%, -50%) scale(.2); opacity: 1; }
+    100% { transform: translate(-50%, -50%) scale(1.6); opacity: 0; } }
+  .chain-banner { position: fixed; left: 50%; top: 42%;
+    transform: translate(-50%, -50%) scale(.6);
+    color: #fff;
+    background: linear-gradient(180deg, #ffb257, #ff7b1a);
+    padding: 8px 20px; border-radius: 999px;
+    font-size: 20px; font-weight: 900; letter-spacing: 1px;
+    box-shadow: 0 6px 18px rgba(255, 123, 26, .5), inset 0 2px 0 rgba(255,255,255,.5);
+    text-shadow: 0 2px 4px rgba(120, 50, 0, .4);
+    z-index: 130; pointer-events: none;
+    animation: chainBannerAnim .9s cubic-bezier(.2,.9,.3,1.3) forwards; }
+  @keyframes chainBannerAnim {
+    0% { transform: translate(-50%, -50%) scale(.4); opacity: 0; }
+    20% { transform: translate(-50%, -50%) scale(1.15); opacity: 1; }
+    40% { transform: translate(-50%, -50%) scale(1); opacity: 1; }
+    85% { transform: translate(-50%, -80%) scale(1); opacity: 1; }
+    100% { transform: translate(-50%, -120%) scale(.9); opacity: 0; } }
+  #startBanner { position: fixed; left: 50%; top: 42%;
+    transform: translate(-50%, -50%) scale(.5);
+    color: #fff;
+    background: linear-gradient(180deg, #ffd166, #ff9f43 60%, #f2851f);
+    padding: 16px 40px; border-radius: 999px;
+    font-size: 26px; font-weight: 900; letter-spacing: 3px;
+    box-shadow: 0 10px 30px rgba(255, 140, 0, .55), 0 4px 0 #b5571a, inset 0 3px 0 rgba(255, 255, 255, .55);
+    text-shadow: 0 2px 0 #b5571a, 0 3px 6px rgba(120, 50, 0, .55);
+    z-index: 150; pointer-events: none; opacity: 0; white-space: nowrap; }
+  #startBanner.show { animation: startBannerAnim 2.2s cubic-bezier(.2,.9,.3,1.3) forwards; }
+  @keyframes startBannerAnim {
+    0% { transform: translate(-50%, -50%) scale(.4); opacity: 0; }
+    15% { transform: translate(-50%, -50%) scale(1.15); opacity: 1; }
+    30% { transform: translate(-50%, -50%) scale(1); opacity: 1; }
+    75% { transform: translate(-50%, -55%) scale(1); opacity: 1; }
+    100% { transform: translate(-50%, -80%) scale(.9); opacity: 0; } }
+  .hint { position: absolute; left: 8px; right: 8px;
+    font-size: 10px; line-height: 1.35; color: #5a4a38;
+    background: rgba(255, 255, 255, .78);
+    padding: 3px 10px; border-radius: 12px; text-align: center;
+    pointer-events: none; box-shadow: 0 2px 5px rgba(0,0,0,.08);
+    z-index: 12; font-weight: 600;
+    border: 1px solid rgba(255,255,255,.8); }
+  #hintTop { bottom: 6px; }
   #hintBottom { position: static; margin-bottom: 2px; }
-
-  /* ============================================================
-     下部：三消棋盘
-     ============================================================ */
-  #boardArea {
-    flex: 1 1 auto; min-height: 0;
+  #boardArea { flex: 1 1 auto; min-height: 0;
     display: flex; flex-direction: column;
     align-items: center; justify-content: center;
-    padding: 6px 8px 8px;
+    padding: 6px 8px 8px 90px;
     position: relative;
-    background: radial-gradient(circle at 50% 0%, #fff6e4 0%, #ffeecf 60%, #fbe1b5 100%);
-    gap: 4px;
-  }
-  #board {
-    display: grid;
-    grid-template-columns: repeat(8, 1fr);
-    grid-template-rows: repeat(8, 1fr);
-    gap: 2px; padding: 5px;
-    background: linear-gradient(180deg, #d8b78e, #b79065);
-    border-radius: 16px;
-    box-shadow: 0 8px 18px rgba(120, 80, 40, .22), inset 0 1px 0 rgba(255,255,255,.5);
-    touch-action: none;
-    flex: 0 0 auto;
-  }
-  .tile {
-    display: flex; align-items: center; justify-content: center;
-    background: linear-gradient(180deg, #fffaf0, #f6e7cd);
-    border-radius: 9px;
+    background: radial-gradient(circle at 50% 0%, #fff8e8 0%, #ffeed0 60%, #fbe1b5 100%);
+    gap: 5px; }
+  #board { display: grid; grid-template-columns: repeat(8, 1fr); grid-template-rows: repeat(8, 1fr);
+    gap: 3px; padding: 6px;
+    background: linear-gradient(180deg, #e8c9a0, #c9a06a);
+    border-radius: 20px;
+    box-shadow: 0 10px 24px rgba(120, 80, 40, .28), inset 0 2px 0 rgba(255,255,255,.6), inset 0 -3px 6px rgba(0,0,0,.12);
+    touch-action: none; flex: 0 0 auto;
+    transition: transform .12s ease; }
+  #board.shake { animation: boardShake .22s ease; }
+  @keyframes boardShake {
+    0%, 100% { transform: translate(0, 0); }
+    25% { transform: translate(-1px, .5px); }
+    50% { transform: translate(1px, -.5px); }
+    75% { transform: translate(-.5px, 1px); } }
+  .tile { display: flex; align-items: center; justify-content: center;
+    border-radius: 10px;
     font-size: calc(var(--tile-size, 40px) * 0.55);
-    line-height: 1;
-    border: 2px solid transparent;
-    cursor: pointer;
+    line-height: 1; border: 2px solid transparent; cursor: pointer;
     transition: transform .12s ease, border-color .12s ease, box-shadow .12s ease;
     will-change: transform;
-    box-shadow: inset 0 1px 0 rgba(255,255,255,.9), 0 1px 2px rgba(140, 100, 60, .12);
-  }
-  .tile.selected {
-    transform: scale(1.10);
+    box-shadow: inset 0 2px 0 rgba(255,255,255,.8), 0 1px 3px rgba(140, 100, 60, .15); }
+  .tile[data-type="paw"] { background: linear-gradient(180deg, #ffe0d0, #ffc8b0); }
+  .tile[data-type="fish"] { background: linear-gradient(180deg, #d0e8ff, #b0d4ff); }
+  .tile[data-type="yarn"] { background: linear-gradient(180deg, #d8f0c8, #b8e0a0); }
+  .tile[data-type="cookie"] { background: linear-gradient(180deg, #ffefc0, #ffe0a0); }
+  .tile[data-type="milk"] { background: linear-gradient(180deg, #f0e8ff, #e0d0ff); }
+  .tile.selected { transform: scale(1.10);
     border-color: #ff9f43;
-    box-shadow: 0 0 0 2px #ff9f43 inset, 0 0 12px rgba(255, 159, 67, .6);
-  }
+    box-shadow: 0 0 0 2px #ff9f43 inset, 0 0 14px rgba(255, 159, 67, .7); }
   .tile.invalid { animation: shake .3s ease; }
-  .tile.pop { animation: pop .18s ease forwards; }
+  .tile.pop { animation: popBig .32s cubic-bezier(.4,0,.7,1) forwards; }
   @keyframes shake {
     0%, 100% { transform: translateX(0); }
-    25% { transform: translateX(-4px); }
-    75% { transform: translateX(4px); }
-  }
-  @keyframes pop { to { transform: scale(.15); opacity: 0; } }
-
-  #bottomBar {
-    height: 30px; flex: 0 0 auto;
+    25% { transform: translateX(-3px); }
+    75% { transform: translateX(3px); } }
+  @keyframes popBig {
+    0% { transform: scale(1) rotate(0); opacity: 1; }
+    40% { transform: scale(1.35) rotate(8deg); opacity: 1; box-shadow: 0 0 20px 6px rgba(255,220,120,.9), inset 0 0 12px rgba(255,255,255,.9); }
+    100% { transform: scale(0) rotate(-25deg); opacity: 0; } }
+  #bottomBar { height: 32px; flex: 0 0 auto;
     display: flex; gap: 14px; align-items: center; justify-content: center;
     font-size: 13px; color: #6b5a44; white-space: nowrap;
-  }
-  #bottomBar > div {
-    background: rgba(255, 255, 255, .78);
-    padding: 3px 10px; border-radius: 10px;
-    box-shadow: 0 1px 3px rgba(120, 80, 40, .12);
-  }
-  #bottomBar strong {
-    color: #2f7a3e; font-size: 15px; font-variant-numeric: tabular-nums;
-  }
-
-  /* 浮字 / 提示 / 结果 */
-  .floating-score {
-    position: fixed; transform: translate(-50%, -50%);
-    color: #ff8c00; font-weight: 900; font-size: 18px;
+    background: linear-gradient(180deg, #fff6e0, #ffe4b8);
+    padding: 0 16px; border-radius: 999px;
+    border: 1.5px solid #e8b87a;
+    box-shadow: 0 3px 8px rgba(120, 80, 40, .15), inset 0 1px 0 rgba(255,255,255,.8); }
+  #bottomBar > div { display: flex; align-items: center; gap: 4px; font-weight: 700; }
+  #bottomBar strong { color: #5a3a1a; font-size: 15px; font-variant-numeric: tabular-nums; font-weight: 900; }
+  .floating-score { position: fixed; transform: translate(-50%, -50%);
+    color: #ffe066; font-weight: 900; font-size: 24px;
     pointer-events: none;
-    animation: floatUp .85s ease-out forwards;
-    z-index: 90;
-    text-shadow: 0 1px 2px #fff, 0 0 6px #fff, 0 2px 4px rgba(255, 140, 0, .35);
-  }
-  @keyframes floatUp { to { transform: translate(-50%, -140%); opacity: 0; } }
-  .toast {
-    position: fixed; left: 50%; top: 58%;
+    animation: floatUp .95s cubic-bezier(.2,.7,.3,1.2) forwards;
+    z-index: 90; -webkit-text-stroke: 1.2px #7a4000;
+    text-shadow: 0 2px 0 #7a4000, 0 0 10px #ffd54f, 0 0 18px #ffb300, 0 3px 8px rgba(0, 0, 0, .45); }
+  @keyframes floatUp {
+    0% { transform: translate(-50%, -50%) scale(.5); opacity: 0; }
+    25% { transform: translate(-50%, -70%) scale(1.25); opacity: 1; }
+    100% { transform: translate(-50%, -160%) scale(1); opacity: 0; } }
+  .toast { position: fixed; left: 50%; top: 58%;
     transform: translate(-50%, -50%);
-    background: rgba(45, 35, 25, .84); color: #fff;
-    padding: 9px 16px; border-radius: 22px; font-size: 13px;
+    background: rgba(45, 35, 25, .88); color: #fff;
+    padding: 10px 18px; border-radius: 24px; font-size: 13px;
     z-index: 120; pointer-events: none;
     animation: toastFade 1.9s ease forwards;
-    box-shadow: 0 6px 18px rgba(0,0,0,.22);
-  }
+    box-shadow: 0 8px 22px rgba(0,0,0,.25); }
   @keyframes toastFade {
     0% { opacity: 0; transform: translate(-50%, -40%); }
     15%, 70% { opacity: 1; transform: translate(-50%, -50%); }
-    100% { opacity: 0; transform: translate(-50%, -62%); }
-  }
-
-  #resultOverlay {
-    position: fixed; inset: 0;
-    background: rgba(40, 30, 20, .5);
+    100% { opacity: 0; transform: translate(-50%, -62%); } }
+  #resultOverlay { position: fixed; inset: 0;
+    background: rgba(40, 30, 20, .55);
     display: flex; align-items: center; justify-content: center;
-    z-index: 200; backdrop-filter: blur(3px);
-  }
-  .result-card {
-    background: linear-gradient(180deg, #fff9ec, #ffefd3);
-    border-radius: 24px; padding: 26px 22px 22px;
-    width: min(86vw, 330px); text-align: center;
-    box-shadow: 0 16px 40px rgba(0,0,0,.28), inset 0 0 0 1px rgba(255,255,255,.8);
-  }
-  .result-card h2 {
-    margin: 0 0 12px; font-size: 22px; color: #e67e22; letter-spacing: 1px;
-  }
-  .result-card .big-number {
-    font-size: 44px; font-weight: 900; color: #2f7a3e; line-height: 1; margin: 4px 0 6px;
-  }
-  .result-card p { margin: 6px 0; font-size: 14px; color: #6b5a44; }
+    z-index: 200; backdrop-filter: blur(4px); }
+  .result-card { background: linear-gradient(180deg, #fff9ec, #ffefd3);
+    border-radius: 28px; padding: 28px 24px 24px;
+    width: min(86vw, 340px); text-align: center;
+    box-shadow: 0 18px 44px rgba(0,0,0,.3), inset 0 0 0 1px rgba(255,255,255,.8); }
+  .result-card h2 { margin: 0 0 12px; font-size: 24px; color: #e67e22; letter-spacing: 1px; }
+  .result-card .big-number { font-size: 48px; font-weight: 900; color: #2f7a3e; line-height: 1; margin: 4px 0 6px; }
+  .result-card p { margin: 7px 0; font-size: 14px; color: #6b5a44; }
   .result-card p span { font-weight: 800; color: #4a3524; }
-  .result-card button {
-    margin-top: 18px; padding: 12px 32px;
-    border: none; border-radius: 999px;
+  .result-card button { margin-top: 20px; padding: 13px 36px; border: none; border-radius: 999px;
     background: linear-gradient(180deg, #ffb257, #ff9f43);
-    color: #fff; font-size: 16px; font-weight: 800;
-    box-shadow: 0 4px 0 #d97d1f, 0 6px 14px rgba(217, 125, 31, .35);
-    cursor: pointer; letter-spacing: 1px;
-  }
-  .result-card button:active { transform: translateY(2px); box-shadow: 0 2px 0 #d97d1f; }
+    color: #fff; font-size: 17px; font-weight: 800;
+    box-shadow: 0 5px 0 #d97d1f, 0 8px 18px rgba(217, 125, 31, .4);
+    cursor: pointer; letter-spacing: 1px; }
+  .result-card button:active { transform: translateY(2px); box-shadow: 0 3px 0 #d97d1f; }
   .hidden { display: none !important; }
 </style>
 </head>
@@ -431,60 +409,67 @@
 <div id="game">
   <div id="topArea">
     <div id="grass"></div>
+    <div id="fence"></div>
     <div class="cloud c1"></div>
     <div class="cloud c2"></div>
     <div id="sun"></div>
-
     <div id="hud">
       <div class="hud-item">
-        <span>剩余时间</span>
-        <strong id="timeText">90</strong>
+        <div class="hud-icon">⏰</div>
+        <div class="hud-text">
+          <span class="hud-label">剩余时间</span>
+          <span class="hud-value" id="timeText">90</span>
+        </div>
       </div>
       <div class="hud-item">
-        <span>开心回窝</span>
-        <strong id="returnText">0</strong>
+        <div class="hud-icon">🏠</div>
+        <div class="hud-text">
+          <span class="hud-label">开心回窝</span>
+          <span class="hud-value" id="returnText">0</span>
+        </div>
       </div>
     </div>
-
     <div id="scene">
-      <div id="foodMachine">
-        <div class="machine-body">
-          <div class="mach-slot"></div>
-          <div class="mach-light"></div>
-          <div class="mach-label">猫粮机</div>
-        </div>
-        <div class="mach-funnel"></div>
-        <div class="mach-drip"></div>
-      </div>
-
-      <div id="trough">
-        <div id="troughInner">
-          <div id="troughFill"></div>
-          <div id="troughKibbles"></div>
-        </div>
-      </div>
-
+      <div id="trough"><div id="troughInner">
+        <div id="troughFill"></div>
+        <div id="troughMarks"></div>
+        <div id="troughKibbles"></div>
+      </div></div>
       <div id="bigHome">
         <div id="bigHomeInner"></div>
         <div id="bigHomeCushion"></div>
         <div id="bigHomeLabel">猫窝</div>
       </div>
-
       <div id="catsLayer" style="position:absolute;inset:0;z-index:10;pointer-events:none;"></div>
       <div class="hint" id="hintTop">猫咪吃饱后会清洁自己、变得开心，再回到猫窝休息</div>
     </div>
   </div>
-
   <div id="boardArea">
     <div class="hint" id="hintBottom">连成 3 个或更多相同图案即可消除，连锁和连续消除会获得额外积分</div>
     <div id="board"></div>
     <div id="bottomBar">
-      <div>积分 <strong id="scoreText">0</strong></div>
-      <div>猫粮 <strong id="foodText">0</strong></div>
-      <div>连击 <strong id="comboText">x0</strong></div>
+      <div>⭐ 积分 <strong id="scoreText">0</strong></div>
+      <div>🥣 猫粮 <strong id="foodText">0</strong></div>
+      <div>🔥 连击 <strong id="comboText">x0</strong></div>
     </div>
   </div>
-
+  <div id="leftColumn">
+    <div id="foodMachine">
+      <div class="mach-spout"></div>
+      <div class="machine-body">
+        <div class="mach-slot"></div>
+        <div class="mach-light"></div>
+        <div class="mach-label">猫粮机</div>
+      </div>
+      <div class="mach-drip"></div>
+    </div>
+    <div id="progressTrack">
+      <div id="progressFill"></div>
+      <div id="progressTopIcon">🥣</div>
+      <div id="progressLabel">出粮</div>
+    </div>
+  </div>
+  <div id="startBanner">准备开始！</div>
   <div id="resultOverlay" class="hidden">
     <div class="result-card">
       <h2>本局结束</h2>
@@ -502,51 +487,158 @@
 (function () {
   "use strict";
 
+  // ===================== 音效模块 =====================
+  const SoundManager = (function () {
+    let ctx = null, enabled = true, masterGain = null;
+    function init() {
+      if (ctx) return;
+      try {
+        ctx = new (window.AudioContext || window.webkitAudioContext)();
+        masterGain = ctx.createGain();
+        masterGain.gain.value = 0.35;
+        masterGain.connect(ctx.destination);
+      } catch (e) { enabled = false; console.warn('AudioContext 不可用'); }
+    }
+    function tone(freq, dur, type = 'sine', vol = 0.5, delay = 0) {
+      if (!ctx || !enabled) return;
+      const t0 = ctx.currentTime + delay;
+      const osc = ctx.createOscillator();
+      const g = ctx.createGain();
+      osc.type = type; osc.frequency.setValueAtTime(freq, t0);
+      g.gain.setValueAtTime(0, t0);
+      g.gain.linearRampToValueAtTime(vol, t0 + 0.01);
+      g.gain.exponentialRampToValueAtTime(0.001, t0 + dur);
+      osc.connect(g); g.connect(masterGain);
+      osc.start(t0); osc.stop(t0 + dur + 0.02);
+    }
+    function slide(f1, f2, dur, type = 'sine', vol = 0.5, delay = 0) {
+      if (!ctx || !enabled) return;
+      const t0 = ctx.currentTime + delay;
+      const osc = ctx.createOscillator();
+      const g = ctx.createGain();
+      osc.type = type;
+      osc.frequency.setValueAtTime(f1, t0);
+      osc.frequency.exponentialRampToValueAtTime(f2, t0 + dur);
+      g.gain.setValueAtTime(0, t0);
+      g.gain.linearRampToValueAtTime(vol, t0 + 0.01);
+      g.gain.exponentialRampToValueAtTime(0.001, t0 + dur);
+      osc.connect(g); g.connect(masterGain);
+      osc.start(t0); osc.stop(t0 + dur + 0.02);
+    }
+    return {
+      init,
+      setEnabled(v) { enabled = v; },
+      isEnabled() { return enabled; },
+      match(n) { const base = 660; const freq = base * Math.pow(1.12, Math.min(n - 3, 3));
+        tone(freq, 0.12, 'triangle', 0.45); tone(freq * 1.5, 0.10, 'sine', 0.25, 0.02); },
+      chain(level) { const base = 523.25; const steps = [0, 2, 4, 7, 9, 12];
+        const idx = Math.min(level, steps.length - 1);
+        const freq = base * Math.pow(2, steps[idx] / 12);
+        tone(freq, 0.16, 'triangle', 0.5); tone(freq * 1.25, 0.14, 'sine', 0.3, 0.03); },
+      feed() { tone(120, 0.06, 'square', 0.4); tone(180, 0.08, 'square', 0.3, 0.06); tone(90, 0.10, 'sine', 0.35, 0.12); },
+      meow() { slide(880, 660, 0.18, 'sine', 0.35); slide(1320, 990, 0.16, 'triangle', 0.15, 0.03); slide(660, 440, 0.22, 'sine', 0.25, 0.15); },
+      returnHome() { const notes = [523.25, 659.25, 783.99, 1046.5]; notes.forEach((f, i) => tone(f, 0.14, 'triangle', 0.4, i * 0.08)); },
+      click() { tone(880, 0.04, 'sine', 0.25); },
+      invalid() { tone(220, 0.12, 'sawtooth', 0.3); tone(180, 0.14, 'sawtooth', 0.25, 0.05); },
+      start() { const notes = [523.25, 659.25, 783.99]; notes.forEach((f, i) => tone(f, 0.16, 'triangle', 0.5, i * 0.1)); },
+      end() { const notes = [783.99, 659.25, 523.25, 392.00]; notes.forEach((f, i) => tone(f, 0.22, 'triangle', 0.4, i * 0.12)); },
+      tick() { tone(880, 0.05, 'square', 0.2); }
+    };
+  })();
+
+  // ===================== 联机客户端 =====================
+  const NetworkClient = (function () {
+    let ws = null, connected = false, mode = 'single', playerId = null, roomId = null, lastSeq = 0;
+    const handlers = { onState: null, onEvent: null, onJoined: null, onDisconnected: null, onRoundEnd: null };
+    let heartbeat = null;
+
+    function connect(url, opts = {}) {
+      return new Promise((resolve, reject) => {
+        if (connected) return resolve();
+        try { ws = new WebSocket(url); } catch (e) { return reject(e); }
+        const timeout = setTimeout(() => reject(new Error('连接超时')), 8000);
+        ws.onopen = () => {
+          clearTimeout(timeout);
+          connected = true; mode = 'online';
+          send({ type: 'join', room: opts.room || 'default', name: opts.name || '玩家' });
+          startHeartbeat();
+          resolve();
+        };
+        ws.onmessage = (e) => {
+          let msg; try { msg = JSON.parse(e.data); } catch { return; }
+          handleMessage(msg);
+        };
+        ws.onerror = (e) => { clearTimeout(timeout); reject(e); };
+        ws.onclose = () => {
+          connected = false; mode = 'single'; stopHeartbeat();
+          if (handlers.onDisconnected) handlers.onDisconnected();
+        };
+      });
+    }
+    function handleMessage(msg) {
+      switch (msg.type) {
+        case 'joined':
+          playerId = msg.playerId; roomId = msg.room;
+          if (handlers.onJoined) handlers.onJoined(msg);
+          break;
+        case 'state': if (handlers.onState) handlers.onState(msg); break;
+        case 'event': if (handlers.onEvent) handlers.onEvent(msg); break;
+        case 'round_end': if (handlers.onRoundEnd) handlers.onRoundEnd(msg); break;
+      }
+    }
+    function send(msg) { if (ws && ws.readyState === 1) ws.send(JSON.stringify(msg)); }
+    function sendSwap(r1, c1, r2, c2) {
+      lastSeq++;
+      send({ type: 'swap', r1, c1, r2, c2, seq: lastSeq, t: Date.now() });
+    }
+    function sendReady() { send({ type: 'ready' }); }
+    function startHeartbeat() { stopHeartbeat(); heartbeat = setInterval(() => send({ type: 'ping', t: Date.now() }), 15000); }
+    function stopHeartbeat() { if (heartbeat) clearInterval(heartbeat); heartbeat = null; }
+    function disconnect() { stopHeartbeat(); if (ws) ws.close(); ws = null; connected = false; mode = 'single'; }
+    return {
+      connect, disconnect, send, sendSwap, sendReady,
+      isConnected: () => connected, getMode: () => mode,
+      getPlayerId: () => playerId, getRoomId: () => roomId,
+      onState: (cb) => { handlers.onState = cb; },
+      onEvent: (cb) => { handlers.onEvent = cb; },
+      onJoined: (cb) => { handlers.onJoined = cb; },
+      onDisconnected: (cb) => { handlers.onDisconnected = cb; },
+      onRoundEnd: (cb) => { handlers.onRoundEnd = cb; }
+    };
+  })();
+
   // ===================== 配置 =====================
   const CONFIG = {
-    roundTime: 90,
-    boardSize: 8,
+    roundTime: 90, boardSize: 8,
     tileTypes: ["paw", "fish", "yarn", "cookie", "milk"],
     tileEmoji: { paw: "🐾", fish: "🐟", yarn: "🧶", cookie: "🍪", milk: "🥛" },
     scoreTable: { 3: 30, 4: 45, 5: 60 },
     score6Base: 60, score6Extra: 10,
     chainBonusStep: 0.25, chainBonusMax: 0.75,
     comboWindow: 4000, comboStep: 0.10, comboMax: 0.50,
-    foodPerScore: 120,
-    troughCap: 24,
-    catPhases: {
-      walkingToFood: 1100,
-      eating: 4500,
-      cleaning: 4500,
-      happy: 4500,
-      walkingToHome: 1500,
-      sleeping: 6000,
-      fading: 600
-    },
-    maxEating: 6,
-    initialWaitingCats: 4,
-    maxWaitingCats: 5,
-    maxTotalCats: 12,
-    catSpawnInterval: 3000,
-    lastPhaseCutoff: 18,
+    foodPerScore: 90, troughCap: 24,
+    catPhases: { walkingToFood: 1300, eating: 4500, cleaning: 4500, happy: 4500, walkingToHome: 1700 },
+    maxEating: 6, initialWaitingCats: 6, maxWaitingCats: 10, maxTotalCats: 18,
+    catSpawnInterval: 2400,
     troughConcurrency: [
-      { min: 1, max: 3, maxCats: 1 },
-      { min: 4, max: 6, maxCats: 2 },
-      { min: 7, max: 10, maxCats: 3 },
-      { min: 11, max: 15, maxCats: 4 },
-      { min: 16, max: 20, maxCats: 5 },
-      { min: 21, max: 24, maxCats: 6 }
+      { min: 1, max: 3, maxCats: 1 }, { min: 4, max: 6, maxCats: 2 },
+      { min: 7, max: 10, maxCats: 3 }, { min: 11, max: 15, maxCats: 4 },
+      { min: 16, max: 20, maxCats: 5 }, { min: 21, max: 24, maxCats: 6 }
     ]
   };
 
-  // ===================== DOM =====================
+  const gameEl = document.getElementById("game");
   const boardEl = document.getElementById("board");
   const catsLayer = document.getElementById("catsLayer");
   const topArea = document.getElementById("topArea");
-  const scene = document.getElementById("scene");
+  const boardArea = document.getElementById("boardArea");
+  const leftColumn = document.getElementById("leftColumn");
   const foodMachine = document.getElementById("foodMachine");
   const trough = document.getElementById("trough");
   const bigHome = document.getElementById("bigHome");
+  const troughMarks = document.getElementById("troughMarks");
+  const progressTrack = document.getElementById("progressTrack");
+  const progressFill = document.getElementById("progressFill");
   const timeText = document.getElementById("timeText");
   const returnText = document.getElementById("returnText");
   const scoreText = document.getElementById("scoreText");
@@ -560,60 +652,35 @@
   const resultCombo = document.getElementById("resultCombo");
   const resultCats = document.getElementById("resultCats");
   const restartBtn = document.getElementById("restartBtn");
+  const startBanner = document.getElementById("startBanner");
 
-  // ===================== 状态 =====================
-  let board = [];
-  let selected = null;
-  let isAnimating = false;
-
-  let score = 0;
-  let foodStock = 0;
-  let foodProgress = 0;
-
-  let comboLevel = 0;
-  let maxCombo = 0;
-  let lastMatchTime = 0;
-
-  let timeLeft = CONFIG.roundTime;
-  let returnedCats = 0;
-  let attractedCats = 0;
-
-  let cats = [];
-  let catIdSeq = 1;
-  let gameActive = false;
+  let board = [], selected = null, isAnimating = false;
+  let score = 0, foodStock = 0, foodProgress = 0;
+  let comboLevel = 0, maxCombo = 0, lastMatchTime = 0;
+  let timeLeft = CONFIG.roundTime, returnedCats = 0, attractedCats = 0;
+  let cats = [], catIdSeq = 1, gameActive = false;
+  let progressAnimating = false, lastTickSecond = -1;
 
   const timers = { countdown: null, gameTick: null, catSpawn: null };
-
-  // 位置
   const POS = { W: 0, H: 0, eating: [], waiting: [], sleepSpots: [], home: null };
 
-  // ===================== 猫咪调色板 =====================
   const CAT_PALETTES = [
-    { body: "#f5a352", dark: "#d97d2e", belly: "#ffe8c7", inner: "#f5a8b8" },
-    { body: "#c5cdd6", dark: "#96a1ad", belly: "#f2f5f8", inner: "#f0a6b8" },
-    { body: "#a87b5b", dark: "#7d563a", belly: "#f0dcc4", inner: "#e9a5b5" },
-    { body: "#f6f2ea", dark: "#cfc8bc", belly: "#ffffff", inner: "#f0a6b8" },
-    { body: "#8a7c6a", dark: "#6a5e50", belly: "#d9cfbf", inner: "#e9a5b5" }
+    { body: "#f5a352", dark: "#d97d2e", belly: "#ffe8c7", inner: "#f5a8b8", blush: "#ffb8a0" },
+    { body: "#c5cdd6", dark: "#96a1ad", belly: "#f2f5f8", inner: "#f0a6b8", blush: "#ffc0c8" },
+    { body: "#a87b5b", dark: "#7d563a", belly: "#f0dcc4", inner: "#e9a5b5", blush: "#e8a898" },
+    { body: "#f6f2ea", dark: "#cfc8bc", belly: "#ffffff", inner: "#f0a6b8", blush: "#ffd0d0" },
+    { body: "#8a7c6a", dark: "#6a5e50", belly: "#d9cfbf", inner: "#e9a5b5", blush: "#d0a898" }
   ];
 
-  // ===================== 工具 =====================
   const sleep = ms => new Promise(r => setTimeout(r, ms));
   const randomTile = () => CONFIG.tileTypes[Math.floor(Math.random() * CONFIG.tileTypes.length)];
 
-  function swap(b, r1, c1, r2, c2) {
-    const t = b[r1][c1]; b[r1][c1] = b[r2][c2]; b[r2][c2] = t;
-  }
-  function getTileEl(r, c) {
-    return boardEl.querySelector(`.tile[data-r="${r}"][data-c="${c}"]`);
-  }
+  function swap(b, r1, c1, r2, c2) { const t = b[r1][c1]; b[r1][c1] = b[r2][c2]; b[r2][c2] = t; }
+  function getTileEl(r, c) { return boardEl.querySelector(`.tile[data-r="${r}"][data-c="${c}"]`); }
   function stateLabel(s) {
-    return {
-      waiting: "等待", walking_to_food: "去吃", eating: "进食",
-      cleaning: "清洁", happy: "开心",
-      walking_to_home: "回窝", sleeping: "睡觉", fading: "…"
-    }[s] || s;
+    return { waiting: "等待", waiting_walk: "饿了", walking_to_food: "去吃", eating: "进食",
+      cleaning: "清洁", happy: "开心", walking_to_home: "回窝", sleeping: "睡觉" }[s] || s;
   }
-
   function clearAllTimers() {
     if (timers.countdown) clearInterval(timers.countdown);
     if (timers.gameTick) clearInterval(timers.gameTick);
@@ -621,257 +688,346 @@
     timers.countdown = timers.gameTick = timers.catSpawn = null;
   }
 
-  // ===================== 布局计算 =====================
+  function positionLeftColumn() {
+    const gameRect = gameEl.getBoundingClientRect();
+    const topAreaRect = topArea.getBoundingClientRect();
+    const topAreaBottomRel = topAreaRect.bottom - gameRect.top;
+    const machineH = 84;
+    const machineTop = topAreaBottomRel - machineH / 2;
+    leftColumn.style.top = machineTop + "px";
+    const boardH = boardEl.offsetHeight || 300;
+    progressTrack.style.height = boardH + "px";
+  }
+
   function computePositions() {
-    const W = topArea.clientWidth;
-    const H = topArea.clientHeight;
+    const W = topArea.clientWidth, H = topArea.clientHeight;
     POS.W = W; POS.H = H;
-
-    // 猫粮机居中在猫粮槽上方
-    const troughLeft = 15;
-    const troughRight = W - 118;
-    const troughWidth = troughRight - troughLeft;
-    const machineW = 62;
-    const machineLeft = troughLeft + troughWidth / 2 - machineW / 2;
-
-    foodMachine.style.left = machineLeft + "px";
-    foodMachine.style.top = "58px";
-
+    const troughLeft = 44, troughRight = W - 106;
+    const troughWidth = Math.max(180, troughRight - troughLeft);
     trough.style.left = troughLeft + "px";
-    trough.style.top = "122px";
+    trough.style.bottom = "42px";
     trough.style.width = troughWidth + "px";
-
-    // 大猫窝在右侧
-    const homeLeft = W - 108;
-    const homeTop = 118;
-    const homeW = 102;
-    const homeH = Math.max(160, H - 132);
+    const homeW = 91, homeLeft = W - 100, homeTop = 130;
+    const maxHomeH = H - homeTop - 24;
+    const homeH = Math.max(140, Math.min(maxHomeH, (H - 130) * 0.78));
     POS.home = { x: homeLeft, y: homeTop, w: homeW, h: homeH };
-
     bigHome.style.left = homeLeft + "px";
     bigHome.style.top = homeTop + "px";
     bigHome.style.width = homeW + "px";
     bigHome.style.height = homeH + "px";
-
-    // 进食位置（猫粮槽下方，避开右侧猫窝）
+    const catW = 78;
+    const troughTopY = H - 42 - 40;
+    const eatY = troughTopY - 66;
     POS.eating = [];
-    const eatLeft = 16;
-    const eatRight = W - 118;
-    const eatWidth = eatRight - eatLeft;
-    const eatY = 160;
-    const catW = 60;
-    const minSpacing = 62;
-    let numEat = Math.floor(eatWidth / minSpacing) + 1;
-    numEat = Math.max(3, Math.min(CONFIG.maxEating, numEat));
+    const eatLeft = troughLeft + 8;
+    const eatRight = troughLeft + troughWidth - catW - 6;
+    const eatWidth = Math.max(80, eatRight - eatLeft);
+    let numEat = Math.floor(eatWidth / 80) + 1;
+    numEat = Math.max(2, Math.min(CONFIG.maxEating, numEat));
     for (let i = 0; i < numEat; i++) {
       const t = numEat === 1 ? 0.5 : i / (numEat - 1);
-      const x = eatLeft + (eatWidth - catW) * t;
-      POS.eating.push({ x, y: eatY });
+      POS.eating.push({ x: eatLeft + (eatWidth - catW) * t, y: eatY });
     }
-
-    // 等候位置（底部一排）
+    const catH = 68;
+    const grassTopY = H * 0.3;
+    const eatZoneTop = eatY - 4;
+    const waitBottomLimit = eatZoneTop - 34;
+    const waitLeft = 78, waitRight = W - 108;
+    const waitWidth = Math.max(120, waitRight - waitLeft);
+    const minSpacing = 54;
+    let cols = Math.max(3, Math.min(5, Math.floor(waitWidth / minSpacing) + 1));
+    let rows = Math.ceil(CONFIG.maxWaitingCats / cols);
+    if (rows > 2) rows = 2;
+    const cellH = 46;
+    let baseY = waitBottomLimit - (rows - 1) * cellH - catH;
+    const minBaseY = grassTopY + 2;
+    while (rows > 1 && baseY < minBaseY) {
+      rows--;
+      baseY = waitBottomLimit - (rows - 1) * cellH - catH;
+    }
+    if (baseY < minBaseY) baseY = minBaseY;
     POS.waiting = [];
-    const waitLeft = 8;
-    const waitRight = W - 118;
-    const waitWidth = waitRight - waitLeft;
-    const waitY = H - 92;
-    let numWait = Math.floor(waitWidth / minSpacing) + 1;
-    numWait = Math.max(3, Math.min(CONFIG.maxWaitingCats, numWait));
-    for (let i = 0; i < numWait; i++) {
-      const t = numWait === 1 ? 0.5 : i / (numWait - 1);
-      const x = waitLeft + (waitWidth - catW) * t;
-      POS.waiting.push({ x, y: waitY });
+    const cellW = waitWidth / cols;
+    for (let row = 0; row < rows; row++) {
+      for (let col = 0; col < cols; col++) {
+        const jx = (Math.random() - 0.5) * 10;
+        const jy = (Math.random() - 0.5) * 6;
+        const centerX = waitLeft + cellW * (col + 0.5);
+        POS.waiting.push({ x: centerX - catW / 2 + jx, y: baseY + row * cellH + jy });
+      }
     }
-
-    // 大猫窝内的睡眠位置（所有猫叠在一起）
     POS.sleepSpots = [];
-    const cx = homeLeft + homeW / 2;
-    const cy = homeTop + homeH / 2;
-    const spots = [
-      { dx: -6, dy: -78 },
-      { dx:  6, dy: -50 },
-      { dx: -6, dy: -22 },
-      { dx:  6, dy:   6 },
-      { dx: -6, dy:  34 },
-      { dx:  6, dy:  62 }
-    ];
-    for (const s of spots) {
-      POS.sleepSpots.push({
-        x: cx + s.dx - catW / 2,
-        y: cy + s.dy - 38
-      });
+    const sleepRows = 4, sleepCols = 4;
+    const sCellW = homeW / sleepCols;
+    const sCellH = homeH / (sleepRows + 1);
+    for (let row = 0; row < sleepRows; row++) {
+      for (let col = 0; col < sleepCols; col++) {
+        const jx = (Math.random() - 0.5) * sCellW * 0.35;
+        const jy = (Math.random() - 0.5) * sCellH * 0.35;
+        POS.sleepSpots.push({
+          x: homeLeft + sCellW * (col + 0.5) + jx - catW / 2,
+          y: homeTop + sCellH * (row + 1) + jy - 20
+        });
+      }
     }
+    positionLeftColumn();
   }
 
-  // ===================== 猫咪 SVG =====================
-  function catSVG(state, palette, dirty) {
-    const { body, dark, belly, inner } = palette;
+  function renderTroughMarks() {
+    troughMarks.innerHTML = "";
+    const cap = CONFIG.troughCap;
+    [3, 6, 10, 15, 20].forEach((val, idx, arr) => {
+      const pct = (val / cap) * 100;
+      const mark = document.createElement("div");
+      mark.className = "trough-mark";
+      if (idx === arr.length - 1) mark.classList.add("final");
+      mark.style.left = pct + "%";
+      mark.setAttribute("data-label", val + "→" + (idx + 2));
+      troughMarks.appendChild(mark);
+    });
+  }
+
+  function gradDefs(body, dark, belly, blush) {
+    const bId = "b" + Math.random().toString(36).slice(2, 8);
+    const lId = "l" + Math.random().toString(36).slice(2, 8);
+    const rId = "r" + Math.random().toString(36).slice(2, 8);
+    return {
+      defs: `<defs>
+        <radialGradient id="${bId}" cx="40%" cy="30%" r="70%">
+          <stop offset="0%" stop-color="${body}" stop-opacity="1"/>
+          <stop offset="100%" stop-color="${dark}" stop-opacity="0.95"/>
+        </radialGradient>
+        <radialGradient id="${lId}" cx="50%" cy="40%" r="60%">
+          <stop offset="0%" stop-color="#ffffff" stop-opacity="0.9"/>
+          <stop offset="100%" stop-color="${belly}" stop-opacity="0.9"/>
+        </radialGradient>
+        <radialGradient id="${rId}" cx="50%" cy="50%" r="50%">
+          <stop offset="0%" stop-color="${blush}" stop-opacity="0.75"/>
+          <stop offset="100%" stop-color="${blush}" stop-opacity="0"/>
+        </radialGradient>
+      </defs>`, bId, lId, rId
+    };
+  }
+
+  function catSVG_Sitting(state, palette, dirty, tailUp) {
+    const { body, dark, belly, inner, blush } = palette;
+    const { defs, bId, lId, rId } = gradDefs(body, dark, belly, blush);
     let eyes, mouth, extras = "";
-
-    const eyesNormal = `
-      <ellipse cx="40" cy="43" rx="3" ry="3.8" fill="#2a2a2a"/>
-      <ellipse cx="60" cy="43" rx="3" ry="3.8" fill="#2a2a2a"/>
-      <circle cx="41" cy="42" r="1" fill="#fff"/>
-      <circle cx="61" cy="42" r="1" fill="#fff"/>`;
-    const eyesHappy = `
-      <path d="M35,44 Q40,38 45,44" stroke="#2a2a2a" stroke-width="2.4" fill="none" stroke-linecap="round"/>
-      <path d="M55,44 Q60,38 65,44" stroke="#2a2a2a" stroke-width="2.4" fill="none" stroke-linecap="round"/>`;
-    const eyesSleepy = `
-      <path d="M35,44 Q40,47 45,44" stroke="#2a2a2a" stroke-width="2" fill="none" stroke-linecap="round"/>
-      <path d="M55,44 Q60,47 65,44" stroke="#2a2a2a" stroke-width="2" fill="none" stroke-linecap="round"/>`;
-    const eyesBig = `
-      <ellipse cx="40" cy="43" rx="3.8" ry="4.8" fill="#2a2a2a"/>
-      <ellipse cx="60" cy="43" rx="3.8" ry="4.8" fill="#2a2a2a"/>
-      <circle cx="41.2" cy="41.5" r="1.4" fill="#fff"/>
-      <circle cx="61.2" cy="41.5" r="1.4" fill="#fff"/>`;
-
+    const eyesHappy = `<path d="M35,44 Q40,37 45,44" stroke="#2a2a2a" stroke-width="2.6" fill="none" stroke-linecap="round"/>
+      <path d="M55,44 Q60,37 65,44" stroke="#2a2a2a" stroke-width="2.6" fill="none" stroke-linecap="round"/>`;
+    const eyesSleepy = `<path d="M35,44 Q40,48 45,44" stroke="#2a2a2a" stroke-width="2.2" fill="none" stroke-linecap="round"/>
+      <path d="M55,44 Q60,48 65,44" stroke="#2a2a2a" stroke-width="2.2" fill="none" stroke-linecap="round"/>`;
+    const eyesBig = `<ellipse cx="40" cy="43" rx="4" ry="5" fill="#2a2a2a"/>
+      <ellipse cx="60" cy="43" rx="4" ry="5" fill="#2a2a2a"/>
+      <circle cx="41.4" cy="41.2" r="1.6" fill="#fff"/>
+      <circle cx="61.4" cy="41.2" r="1.6" fill="#fff"/>`;
     switch (state) {
       case "waiting":
         eyes = eyesBig;
-        mouth = `<ellipse cx="50" cy="56" rx="2.6" ry="3.2" fill="#5a4a38"/>`;
-        extras = `
-          <g opacity="0.92">
-            <circle cx="78" cy="30" r="8" fill="#ffffff" stroke="#7dc3e8" stroke-width="1.4"/>
-            <text x="78" y="34" font-size="11" text-anchor="middle" fill="#7dc3e8" font-weight="900">?</text>
-            <path d="M72,36 L70,42 L76,38 Z" fill="#ffffff" stroke="#7dc3e8" stroke-width="1.2" stroke-linejoin="round"/>
-          </g>`;
-        break;
-      case "walking_to_food":
-      case "walking_to_home":
-        eyes = eyesNormal;
-        mouth = `<path d="M46,55 Q50,58 54,55" stroke="#2a2a2a" stroke-width="1.6" fill="none" stroke-linecap="round"/>`;
-        break;
-      case "eating":
-        eyes = eyesHappy;
-        mouth = `
-          <ellipse cx="50" cy="56" rx="3.5" ry="2.5" fill="#d16b7a"/>
-          <ellipse cx="50" cy="58.5" rx="4" ry="1.8" fill="#f8a0a8" opacity="0.85"/>`;
+        mouth = `<ellipse cx="50" cy="56" rx="2.8" ry="3.4" fill="#5a4a38"/>`;
+        extras = `<g class="meow-bubble">
+          <ellipse cx="82" cy="22" rx="20" ry="11" fill="#ffffff" stroke="#7dc3e8" stroke-width="1.3"/>
+          <text x="82" y="26" font-size="10" text-anchor="middle" fill="#5a8fc9" font-weight="900">喵~</text>
+          <path d="M72,30 L70,38 L78,32 Z" fill="#ffffff" stroke="#7dc3e8" stroke-width="1.2" stroke-linejoin="round"/>
+        </g>`;
         break;
       case "cleaning":
         eyes = eyesSleepy;
-        mouth = `
-          <path d="M44,56 Q50,59 56,56" stroke="#2a2a2a" stroke-width="1.6" fill="none" stroke-linecap="round"/>
-          <ellipse cx="50" cy="61" rx="3.5" ry="2.4" fill="#f48ca2"/>`;
+        mouth = `<path d="M44,55 Q50,60 56,55" stroke="#2a2a2a" stroke-width="1.8" fill="none" stroke-linecap="round"/>
+          <ellipse cx="50" cy="61" rx="3.8" ry="2.6" fill="#f48ca2"/>
+          <ellipse cx="68" cy="58" rx="5" ry="3.5" fill="${body}" opacity="0.95"/>
+          <ellipse cx="68" cy="58" rx="3" ry="2" fill="#f48ca2" opacity="0.7"/>`;
         break;
       case "happy":
         eyes = eyesHappy;
-        mouth = `<path d="M42,55 Q50,61 58,55" stroke="#2a2a2a" stroke-width="2" fill="none" stroke-linecap="round"/>`;
-        extras = `
-          <text x="76" y="26" font-size="14" text-anchor="middle" fill="#e87e8f" font-weight="900">♥</text>
-          <text x="20" y="32" font-size="11" text-anchor="middle" fill="#ffd54f">✦</text>`;
-        break;
-      case "sleeping":
-        eyes = `
-          <path d="M35,44 L45,44" stroke="#2a2a2a" stroke-width="2.2" stroke-linecap="round"/>
-          <path d="M55,44 L65,44" stroke="#2a2a2a" stroke-width="2.2" stroke-linecap="round"/>`;
-        mouth = `<path d="M48,56 Q50,58 52,56" stroke="#2a2a2a" stroke-width="1.4" fill="none" stroke-linecap="round"/>`;
-        extras = `
-          <text x="80" y="32" font-size="14" text-anchor="middle" fill="#5a8fc9" font-weight="900">Z</text>
-          <text x="90" y="22" font-size="10" text-anchor="middle" fill="#5a8fc9" font-weight="900">z</text>`;
+        mouth = `<path d="M42,54 Q50,61 58,54" stroke="#2a2a2a" stroke-width="2.2" fill="none" stroke-linecap="round"/>`;
+        extras = `<text x="76" y="24" font-size="16" text-anchor="middle" fill="#e87e8f" font-weight="900">♥</text>
+          <text x="20" y="30" font-size="12" text-anchor="middle" fill="#ffd54f">✦</text>
+          <text x="84" y="46" font-size="10" text-anchor="middle" fill="#ffd54f" opacity="0.85">✦</text>`;
         break;
       default:
-        eyes = eyesNormal;
-        mouth = `<path d="M46,55 Q50,58 54,55" stroke="#2a2a2a" stroke-width="1.6" fill="none" stroke-linecap="round"/>`;
+        eyes = eyesBig;
+        mouth = `<ellipse cx="50" cy="56" rx="2.8" ry="3.4" fill="#5a4a38"/>`;
     }
-
     let dirties = "";
     if (dirty) {
-      dirties = `
-        <circle cx="35" cy="68" r="3.2" fill="#8a7355" opacity="0.55"/>
-        <circle cx="62" cy="72" r="2.8" fill="#8a7355" opacity="0.5"/>
-        <circle cx="46" cy="78" r="2.1" fill="#8a7355" opacity="0.45"/>
-        <circle cx="66" cy="58" r="1.9" fill="#8a7355" opacity="0.5"/>
-        <circle cx="32" cy="52" r="1.7" fill="#8a7355" opacity="0.4"/>`;
+      dirties = `<circle cx="35" cy="70" r="3.5" fill="#8a7355" opacity="0.5"/>
+        <circle cx="62" cy="74" r="3" fill="#8a7355" opacity="0.45"/>
+        <circle cx="46" cy="80" r="2.4" fill="#8a7355" opacity="0.4"/>
+        <circle cx="66" cy="60" r="2.2" fill="#8a7355" opacity="0.45"/>
+        <circle cx="32" cy="54" r="2" fill="#8a7355" opacity="0.35"/>`;
     }
-
-    return `
-      <svg viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">
-        <path d="M68,78 Q86,74 82,58" stroke="${dark}" stroke-width="6" fill="none" stroke-linecap="round"/>
-        <ellipse cx="50" cy="77" rx="22" ry="15" fill="${body}"/>
-        <ellipse cx="50" cy="81" rx="14" ry="9" fill="${belly}"/>
-        ${dirties}
-        <polygon points="28,30 33,13 45,26" fill="${body}"/>
-        <polygon points="72,30 67,13 55,26" fill="${body}"/>
-        <polygon points="32,28 35,18 43,26" fill="${inner}"/>
-        <polygon points="68,28 65,18 57,26" fill="${inner}"/>
-        <circle cx="50" cy="42" r="24" fill="${body}"/>
-        ${eyes}
-        <polygon points="50,48 48,50.5 52,50.5" fill="#e87e8f"/>
-        ${mouth}
-        ${extras}
-      </svg>`;
+    const tailPath = tailUp ? "M28,80 Q10,76 14,58" : "M28,80 Q14,88 10,96";
+    return `<svg viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">
+      ${defs}
+      <path d="${tailPath}" stroke="${dark}" stroke-width="7" fill="none" stroke-linecap="round"/>
+      <path d="${tailPath}" stroke="${body}" stroke-width="4" fill="none" stroke-linecap="round" opacity="0.7"/>
+      <ellipse cx="50" cy="80" rx="24" ry="17" fill="url(#${bId})"/>
+      <ellipse cx="50" cy="84" rx="16" ry="11" fill="url(#${lId})"/>
+      ${dirties}
+      <ellipse cx="38" cy="90" rx="7" ry="4" fill="${body}"/>
+      <ellipse cx="62" cy="90" rx="7" ry="4" fill="${body}"/>
+      <polygon points="28,30 33,12 45,26" fill="${body}"/>
+      <polygon points="72,30 67,12 55,26" fill="${body}"/>
+      <polygon points="32,28 35,17 43,26" fill="${inner}"/>
+      <polygon points="68,28 65,17 57,26" fill="${inner}"/>
+      <circle cx="50" cy="42" r="25" fill="url(#${bId})"/>
+      <ellipse cx="34" cy="50" rx="5" ry="3.5" fill="url(#${rId})"/>
+      <ellipse cx="66" cy="50" rx="5" ry="3.5" fill="url(#${rId})"/>
+      ${eyes}
+      <polygon points="50,48 48,50.5 52,50.5" fill="#e87e8f"/>
+      ${mouth}
+      ${extras}
+    </svg>`;
   }
 
-  // ===================== 猫咪实体 =====================
+  function catSVG_Walk(state, palette, dirty, tailUp) {
+    const { body, dark, belly, inner, blush } = palette;
+    const { defs, bId, lId, rId } = gradDefs(body, dark, belly, blush);
+    let eyes, mouth, headTilt = 0, extra = "";
+    const eyeCx1 = 84, eyeCx2 = 98, eyeCy = 46;
+    const eyesNormal = `<ellipse cx="${eyeCx1}" cy="${eyeCy}" rx="2.6" ry="3.4" fill="#2a2a2a"/>
+      <ellipse cx="${eyeCx2}" cy="${eyeCy}" rx="2.6" ry="3.4" fill="#2a2a2a"/>
+      <circle cx="${eyeCx1 + 0.8}" cy="${eyeCy - 1}" r="1" fill="#fff"/>
+      <circle cx="${eyeCx2 + 0.8}" cy="${eyeCy - 1}" r="1" fill="#fff"/>`;
+    const eyesHappy = `<path d="M${eyeCx1 - 4},${eyeCy} Q${eyeCx1},${eyeCy - 5} ${eyeCx1 + 4},${eyeCy}" stroke="#2a2a2a" stroke-width="2.2" fill="none" stroke-linecap="round"/>
+      <path d="M${eyeCx2 - 4},${eyeCy} Q${eyeCx2},${eyeCy - 5} ${eyeCx2 + 4},${eyeCy}" stroke="#2a2a2a" stroke-width="2.2" fill="none" stroke-linecap="round"/>`;
+    const eyesSad = `<ellipse cx="${eyeCx1}" cy="${eyeCy+1}" rx="3" ry="3.6" fill="#2a2a2a"/>
+      <ellipse cx="${eyeCx2}" cy="${eyeCy+1}" rx="3" ry="3.6" fill="#2a2a2a"/>
+      <circle cx="${eyeCx1 + 1}" cy="${eyeCy - 0.2}" r="1.3" fill="#fff"/>
+      <circle cx="${eyeCx2 + 1}" cy="${eyeCy - 0.2}" r="1.3" fill="#fff"/>
+      <path d="M${eyeCx1 - 5},${eyeCy - 6} Q${eyeCx1},${eyeCy - 8} ${eyeCx1 + 4},${eyeCy - 6}" stroke="#2a2a2a" stroke-width="1.6" fill="none" stroke-linecap="round"/>
+      <path d="M${eyeCx2 - 4},${eyeCy - 6} Q${eyeCx2},${eyeCy - 8} ${eyeCx2 + 5},${eyeCy - 6}" stroke="#2a2a2a" stroke-width="1.6" fill="none" stroke-linecap="round"/>`;
+    switch (state) {
+      case "walking_to_food":
+      case "walking_to_home":
+        eyes = eyesNormal;
+        mouth = `<path d="M86,54 Q90,57 94,54" stroke="#2a2a2a" stroke-width="1.6" fill="none" stroke-linecap="round"/>`;
+        break;
+      case "eating":
+        eyes = eyesHappy;
+        mouth = `<ellipse cx="90" cy="56" rx="3.2" ry="2.4" fill="#d16b7a"/>
+          <ellipse cx="90" cy="59" rx="3.8" ry="1.6" fill="#f8a0a8" opacity="0.9"/>`;
+        headTilt = 8;
+        break;
+      default:
+        eyes = eyesSad;
+        mouth = `<path d="M86,58 Q90,55 94,58" stroke="#2a2a2a" stroke-width="1.8" fill="none" stroke-linecap="round"/>`;
+        extra = `<text x="70" y="16" font-size="10" text-anchor="middle" fill="#7dc3e8" font-weight="900" opacity="0.75">呜…</text>`;
+        break;
+    }
+    let dirties = "";
+    if (dirty) {
+      dirties = `<circle cx="42" cy="74" r="2.8" fill="#8a7355" opacity="0.5"/>
+        <circle cx="24" cy="72" r="2.4" fill="#8a7355" opacity="0.45"/>
+        <circle cx="34" cy="62" r="2" fill="#8a7355" opacity="0.45"/>
+        <circle cx="56" cy="80" r="2.2" fill="#8a7355" opacity="0.4"/>
+        <circle cx="14" cy="62" r="1.8" fill="#8a7355" opacity="0.4"/>`;
+    }
+    const tailPath = tailUp ? "M28,58 Q6,54 8,22" : "M28,58 Q10,72 12,86";
+    return `<svg viewBox="0 0 120 100" xmlns="http://www.w3.org/2000/svg">
+      ${defs}
+      <path d="${tailPath}" stroke="${dark}" stroke-width="7" fill="none" stroke-linecap="round"/>
+      <path d="${tailPath}" stroke="${body}" stroke-width="4" fill="none" stroke-linecap="round" opacity="0.7"/>
+      <rect class="leg leg-fr" x="34" y="72" width="8" height="22" rx="4" fill="${dark}"/>
+      <rect class="leg leg-br" x="66" y="72" width="8" height="22" rx="4" fill="${dark}"/>
+      <ellipse cx="52" cy="62" rx="34" ry="22" fill="url(#${bId})"/>
+      <ellipse cx="52" cy="70" rx="26" ry="13" fill="url(#${lId})"/>
+      ${dirties}
+      <rect class="leg leg-fl" x="26" y="72" width="9" height="22" rx="4.5" fill="${body}"/>
+      <rect class="leg leg-bl" x="60" y="72" width="9" height="22" rx="4.5" fill="${body}"/>
+      <g transform="rotate(${headTilt} 90 46)">
+        <circle cx="90" cy="46" r="22" fill="url(#${bId})"/>
+        <polygon points="76,32 78,12 92,26" fill="${body}"/>
+        <polygon points="80,30 82,18 90,26" fill="${inner}"/>
+        <polygon points="102,26 106,12 112,32" fill="${body}"/>
+        <polygon points="104,26 106,18 110,30" fill="${inner}"/>
+        <ellipse cx="74" cy="52" rx="4.5" ry="3" fill="url(#${rId})"/>
+        <ellipse cx="106" cy="52" rx="4.5" ry="3" fill="url(#${rId})"/>
+        ${eyes}
+        <polygon points="90,51 88.3,53 91.7,53" fill="#e87e8f"/>
+        ${mouth}
+      </g>
+      ${extra}
+    </svg>`;
+  }
+
+  function catSVG_Sleep(state, palette) {
+    const { body, dark, belly, inner, blush } = palette;
+    const { defs, bId, lId, rId } = gradDefs(body, dark, belly, blush);
+    return `<svg viewBox="0 0 100 70" xmlns="http://www.w3.org/2000/svg">
+      ${defs}
+      <ellipse cx="50" cy="46" rx="34" ry="20" fill="url(#${bId})"/>
+      <ellipse cx="50" cy="52" rx="24" ry="12" fill="url(#${lId})"/>
+      <path d="M20,52 Q12,36 34,32" stroke="${dark}" stroke-width="6" fill="none" stroke-linecap="round"/>
+      <circle cx="68" cy="38" r="18" fill="url(#${bId})"/>
+      <polygon points="58,26 60,12 70,22" fill="${body}"/>
+      <polygon points="61,25 62,16 68,22" fill="${inner}"/>
+      <polygon points="78,22 82,12 86,26" fill="${body}"/>
+      <polygon points="80,22 82,16 84,24" fill="${inner}"/>
+      <path d="M62,42 L70,42" stroke="#2a2a2a" stroke-width="2.2" stroke-linecap="round"/>
+      <path d="M76,42 L84,42" stroke="#2a2a2a" stroke-width="2.2" stroke-linecap="round"/>
+      <ellipse cx="60" cy="46" rx="3" ry="2" fill="url(#${rId})"/>
+      <ellipse cx="86" cy="46" rx="3" ry="2" fill="url(#${rId})"/>
+      <polygon points="72,46 70.5,48 73.5,48" fill="#e87e8f"/>
+      <text x="12" y="20" font-size="14" text-anchor="middle" fill="#5a8fc9" font-weight="900">Z</text>
+      <text x="4" y="10" font-size="10" text-anchor="middle" fill="#5a8fc9" font-weight="900">z</text>
+    </svg>`;
+  }
+
+  function catSVG(state, palette, dirty, tailUp) {
+    if (state === "walking_to_food" || state === "walking_to_home" || state === "eating" || state === "waiting_walk") {
+      return catSVG_Walk(state, palette, dirty, tailUp);
+    }
+    if (state === "sleeping") return catSVG_Sleep(state, palette);
+    return catSVG_Sitting(state, palette, dirty, tailUp);
+  }
+
   function makeCat() {
     const cat = {
-      id: catIdSeq++,
-      state: "waiting",
-      stateStart: performance.now(),
+      id: catIdSeq++, state: "waiting", stateStart: performance.now(),
+      nextIdleChange: performance.now() + 2000 + Math.random() * 4000,
+      walkDir: "right",
       palette: CAT_PALETTES[Math.floor(Math.random() * CAT_PALETTES.length)],
-      dirty: true,
-      eatingSlot: -1,
-      waitingSlot: -1,
-      sleepSlot: -1,
-      dead: false,
+      dirty: true, eatingSlot: -1, waitingSlot: -1, sleepSlot: -1,
       el: document.createElement("div")
     };
     cat.el.className = "cat state-waiting";
-    cat.el.innerHTML = `
-      <div class="cat-svg-wrap">${catSVG("waiting", cat.palette, true)}</div>
-      <div class="cat-chip">等待</div>
-    `;
+    cat.el.innerHTML = `<div class="cat-svg-wrap">${catSVG("waiting", cat.palette, true, false)}</div><div class="cat-chip">等待</div>`;
     catsLayer.appendChild(cat.el);
     return cat;
   }
-
   function refreshCatVisual(cat) {
     cat.el.className = "cat state-" + cat.state;
-    cat.el.innerHTML = `
-      <div class="cat-svg-wrap">${catSVG(cat.state, cat.palette, cat.dirty)}</div>
-      <div class="cat-chip">${stateLabel(cat.state)}</div>
-    `;
+    if (cat.state === "walking_to_food") cat.el.classList.add("facing-left");
+    else if (cat.state === "waiting_walk" && cat.walkDir === "left") cat.el.classList.add("facing-left");
+    const tailUp = cat.state === "walking_to_home" || cat.state === "eating";
+    cat.el.innerHTML = `<div class="cat-svg-wrap">${catSVG(cat.state, cat.palette, cat.dirty, tailUp)}</div><div class="cat-chip">${stateLabel(cat.state)}</div>`;
   }
-
-  function moveCat(cat, x, y) {
-    cat.el.style.left = x + "px";
-    cat.el.style.top = y + "px";
-  }
+  function moveCat(cat, x, y) { cat.el.style.left = x + "px"; cat.el.style.top = y + "px"; }
 
   function getFreeWaitingSlot() {
-    const used = new Set(
-      cats.filter(c => c.waitingSlot >= 0 && !c.dead).map(c => c.waitingSlot)
-    );
+    const used = new Set(cats.filter(c => c.waitingSlot >= 0).map(c => c.waitingSlot));
     for (let i = 0; i < POS.waiting.length; i++) if (!used.has(i)) return i;
     return -1;
   }
   function getFreeEatingSlot() {
-    const used = new Set(
-      cats.filter(c => c.eatingSlot >= 0 &&
-        ["walking_to_food", "eating", "cleaning", "happy"].includes(c.state)).map(c => c.eatingSlot)
-    );
+    const used = new Set(cats.filter(c => c.eatingSlot >= 0 && ["walking_to_food", "eating", "cleaning", "happy"].includes(c.state)).map(c => c.eatingSlot));
     for (let i = 0; i < POS.eating.length; i++) if (!used.has(i)) return i;
     return -1;
   }
   function getFreeSleepSlot() {
-    const used = new Set(
-      cats.filter(c => c.sleepSlot >= 0 &&
-        ["walking_to_home", "sleeping", "fading"].includes(c.state)).map(c => c.sleepSlot)
-    );
+    const used = new Set(cats.filter(c => c.sleepSlot >= 0 && c.state === "sleeping").map(c => c.sleepSlot));
     for (let i = 0; i < POS.sleepSpots.length; i++) if (!used.has(i)) return i;
     return -1;
   }
-
   function spawnWaitingCat() {
-    const total = cats.filter(c => !c.dead).length;
-    if (total >= CONFIG.maxTotalCats) return;
-    const wCount = cats.filter(c => c.state === "waiting" && !c.dead).length;
+    if (cats.length >= CONFIG.maxTotalCats) return;
+    const wCount = cats.filter(c => c.state === "waiting" || c.state === "waiting_walk").length;
     if (wCount >= CONFIG.maxWaitingCats) return;
     if (POS.waiting.length === 0) return;
-
     const slot = getFreeWaitingSlot();
     if (slot < 0) return;
-
     const cat = makeCat();
     cat.waitingSlot = slot;
     const p = POS.waiting[slot];
@@ -879,125 +1035,146 @@
     cat.el.style.top = p.y + "px";
     cats.push(cat);
   }
-
-  // ===================== 猫咪调度 =====================
   function maxConcurrentByFood() {
     const s = foodStock;
-    for (const r of CONFIG.troughConcurrency) {
-      if (s >= r.min && s <= r.max) return r.maxCats;
-    }
+    for (const r of CONFIG.troughConcurrency) if (s >= r.min && s <= r.max) return r.maxCats;
     return 0;
   }
-
   function trySendWaitingCat() {
     if (!gameActive) return;
-    if (timeLeft <= CONFIG.lastPhaseCutoff) return;
-
-    const using = cats.filter(c =>
-      c.state === "eating" || c.state === "cleaning" ||
-      c.state === "happy" || c.state === "walking_to_food"
-    ).length;
-
+    const using = cats.filter(c => c.state === "eating" || c.state === "cleaning" || c.state === "happy" || c.state === "walking_to_food").length;
     if (using >= CONFIG.maxEating) return;
     if (using >= maxConcurrentByFood()) return;
     if (foodStock <= 0) return;
-
-    const waiter = cats.find(c => c.state === "waiting");
+    const waiter = cats.find(c => c.state === "waiting" || c.state === "waiting_walk");
     if (!waiter) return;
-
     const slot = getFreeEatingSlot();
     if (slot < 0) return;
-
-    foodStock--;
-    attractedCats++;
-
-    waiter.eatingSlot = slot;
-    waiter.waitingSlot = -1;
-    waiter.state = "walking_to_food";
-    waiter.stateStart = performance.now();
+    foodStock--; attractedCats++;
+    waiter.eatingSlot = slot; waiter.waitingSlot = -1;
+    waiter.state = "walking_to_food"; waiter.stateStart = performance.now();
     refreshCatVisual(waiter);
-
     const p = POS.eating[slot];
     moveCat(waiter, p.x, p.y);
-
+    SoundManager.meow();
     updateHUD();
   }
-
   function tickCats() {
     const now = performance.now();
-
     for (const cat of cats) {
-      if (cat.dead) continue;
       const e = now - cat.stateStart;
-
       switch (cat.state) {
-        case "walking_to_food":
-          if (e >= CONFIG.catPhases.walkingToFood) {
-            cat.state = "eating";
-            cat.stateStart = now;
+        case "waiting":
+          if (now >= cat.nextIdleChange) {
+            const p = POS.waiting[cat.waitingSlot];
+            if (p && Math.random() < 0.55) {
+              cat.state = "waiting_walk";
+              cat.stateStart = now;
+              cat.walkDir = Math.random() < 0.5 ? "left" : "right";
+              cat.nextIdleChange = now + 2000 + Math.random() * 1800;
+              const offset = (cat.walkDir === "right" ? 1 : -1) * (14 + Math.random() * 12);
+              let nx = p.x + offset;
+              nx = Math.max(70, Math.min(POS.W - 96 - 78, nx));
+              moveCat(cat, nx, p.y);
+              refreshCatVisual(cat);
+            } else {
+              cat.nextIdleChange = now + 3000 + Math.random() * 4000;
+            }
+          }
+          break;
+        case "waiting_walk":
+          if (now >= cat.nextIdleChange) {
+            const p = POS.waiting[cat.waitingSlot];
+            if (p) moveCat(cat, p.x, p.y);
+            cat.state = "waiting"; cat.stateStart = now;
+            cat.nextIdleChange = now + 3000 + Math.random() * 4000;
             refreshCatVisual(cat);
           }
+          break;
+        case "walking_to_food":
+          if (e >= CONFIG.catPhases.walkingToFood) { cat.state = "eating"; cat.stateStart = now; refreshCatVisual(cat); }
           break;
         case "eating":
-          if (e >= CONFIG.catPhases.eating) {
-            cat.state = "cleaning";
-            cat.stateStart = now;
-            cat.dirty = false;
-            refreshCatVisual(cat);
-          }
+          if (e >= CONFIG.catPhases.eating) { cat.state = "cleaning"; cat.stateStart = now; cat.dirty = false; refreshCatVisual(cat); }
           break;
         case "cleaning":
-          if (e >= CONFIG.catPhases.cleaning) {
-            cat.state = "happy";
-            cat.stateStart = now;
-            refreshCatVisual(cat);
-          }
+          if (e >= CONFIG.catPhases.cleaning) { cat.state = "happy"; cat.stateStart = now; refreshCatVisual(cat); }
           break;
         case "happy":
           if (e >= CONFIG.catPhases.happy) {
             const slot = getFreeSleepSlot();
-            if (slot >= 0) {
-              cat.sleepSlot = slot;
-              cat.eatingSlot = -1;
-              cat.state = "walking_to_home";
-              cat.stateStart = now;
-              refreshCatVisual(cat);
-              const p = POS.sleepSpots[slot];
-              moveCat(cat, p.x, p.y);
-            }
+            const idx = slot >= 0 ? slot : Math.floor(Math.random() * POS.sleepSpots.length);
+            cat.sleepSlot = idx; cat.eatingSlot = -1;
+            cat.state = "walking_to_home"; cat.stateStart = now;
+            refreshCatVisual(cat);
+            const p = POS.sleepSpots[idx];
+            const jx = slot >= 0 ? 0 : (Math.random() - 0.5) * 10;
+            const jy = slot >= 0 ? 0 : (Math.random() - 0.5) * 8;
+            moveCat(cat, p.x + jx, p.y + jy);
           }
           break;
         case "walking_to_home":
           if (e >= CONFIG.catPhases.walkingToHome) {
-            cat.state = "sleeping";
-            cat.stateStart = now;
-            refreshCatVisual(cat);
-            returnedCats++;
+            cat.state = "sleeping"; cat.stateStart = now;
+            refreshCatVisual(cat); returnedCats++;
+            SoundManager.returnHome();
             updateHUD();
-          }
-          break;
-        case "sleeping":
-          if (e >= CONFIG.catPhases.sleeping) {
-            cat.state = "fading";
-            cat.stateStart = now;
-            cat.el.style.opacity = "0";
-            cat.el.style.transform = "translateY(-10px) scale(0.85)";
-          }
-          break;
-        case "fading":
-          if (e >= CONFIG.catPhases.fading) {
-            cat.dead = true;
-            if (cat.el.parentNode) cat.el.parentNode.removeChild(cat.el);
           }
           break;
       }
     }
-
-    cats = cats.filter(c => !c.dead);
     trySendWaitingCat();
   }
 
-  // ===================== 棋盘 =====================
+  function spawnParticles(cells) {
+    if (!cells || cells.length === 0) return;
+    const mRect = foodMachine.getBoundingClientRect();
+    const endX = mRect.left + mRect.width / 2, endY = mRect.top + mRect.height / 2;
+    const count = Math.min(5, cells.length);
+    const chosen = [...cells].sort(() => Math.random() - 0.5).slice(0, count);
+    chosen.forEach(([r, c], i) => {
+      const el = getTileEl(r, c);
+      if (!el) return;
+      const rect = el.getBoundingClientRect();
+      const startX = rect.left + rect.width / 2, startY = rect.top + rect.height / 2;
+      const sp = document.createElement("div");
+      sp.className = "spark"; sp.style.left = startX + "px"; sp.style.top = startY + "px";
+      document.body.appendChild(sp); setTimeout(() => sp.remove(), 420);
+      setTimeout(() => {
+        const p = document.createElement("div");
+        p.className = "feed-particle";
+        p.style.left = startX + "px"; p.style.top = startY + "px";
+        p.style.transform = "translate(-50%, -50%) scale(1)";
+        document.body.appendChild(p);
+        requestAnimationFrame(() => {
+          const dx = endX - startX, dy = endY - startY;
+          p.style.transform = `translate(calc(-50% + ${dx}px), calc(-50% + ${dy}px)) scale(0.35)`;
+          p.style.opacity = "0";
+        });
+        setTimeout(() => p.remove(), 780);
+      }, i * 40);
+    });
+  }
+  function shakeBoard() { boardEl.classList.add("shake"); setTimeout(() => boardEl.classList.remove("shake"), 220); }
+  function showChainBanner(level) {
+    const el = document.createElement("div");
+    el.className = "chain-banner"; el.textContent = `连锁 x${level}！`;
+    document.body.appendChild(el); setTimeout(() => el.remove(), 950);
+    SoundManager.chain(level);
+  }
+  function animateMachineProduce() {
+    SoundManager.feed();
+    foodMachine.classList.remove("producing");
+    void foodMachine.offsetWidth;
+    foodMachine.classList.add("producing");
+    setTimeout(() => foodMachine.classList.remove("producing"), 600);
+  }
+  function showStartBanner() {
+    startBanner.classList.remove("show");
+    void startBanner.offsetWidth;
+    startBanner.classList.add("show");
+  }
+
   function generateBoard() {
     for (let attempt = 0; attempt < 200; attempt++) {
       const b = Array.from({ length: CONFIG.boardSize }, () => Array(CONFIG.boardSize).fill(null));
@@ -1012,23 +1189,16 @@
       }
       if (hasPossibleMove(b)) return b;
     }
-    return Array.from({ length: CONFIG.boardSize }, () =>
-      Array.from({ length: CONFIG.boardSize }, () => randomTile()));
+    return Array.from({ length: CONFIG.boardSize }, () => Array.from({ length: CONFIG.boardSize }, () => randomTile()));
   }
-
   function findMatches(b) {
-    const groups = [];
-    const size = CONFIG.boardSize;
+    const groups = []; const size = CONFIG.boardSize;
     for (let r = 0; r < size; r++) {
       let c = 0;
       while (c < size) {
         const t = b[r][c]; let len = 1;
         while (c + len < size && b[r][c + len] === t) len++;
-        if (len >= 3) {
-          const cells = [];
-          for (let i = 0; i < len; i++) cells.push([r, c + i]);
-          groups.push({ cells, length: len });
-        }
+        if (len >= 3) { const cells = []; for (let i = 0; i < len; i++) cells.push([r, c + i]); groups.push({ cells, length: len }); }
         c += len;
       }
     }
@@ -1037,45 +1207,34 @@
       while (r < size) {
         const t = b[r][c]; let len = 1;
         while (r + len < size && b[r + len][c] === t) len++;
-        if (len >= 3) {
-          const cells = [];
-          for (let i = 0; i < len; i++) cells.push([r + i, c]);
-          groups.push({ cells, length: len });
-        }
+        if (len >= 3) { const cells = []; for (let i = 0; i < len; i++) cells.push([r + i, c]); groups.push({ cells, length: len }); }
         r += len;
       }
     }
     return groups;
   }
-
   function hasPossibleMove(b) {
     const size = CONFIG.boardSize;
     for (let r = 0; r < size; r++) {
       for (let c = 0; c < size; c++) {
         if (c < size - 1) {
-          swap(b, r, c, r, c + 1);
-          const ok = findMatches(b).length > 0;
-          swap(b, r, c, r, c + 1);
+          swap(b, r, c, r, c + 1); const ok = findMatches(b).length > 0; swap(b, r, c, r, c + 1);
           if (ok) return true;
         }
         if (r < size - 1) {
-          swap(b, r, c, r + 1, c);
-          const ok = findMatches(b).length > 0;
-          swap(b, r, c, r + 1, c);
+          swap(b, r, c, r + 1, c); const ok = findMatches(b).length > 0; swap(b, r, c, r + 1, c);
           if (ok) return true;
         }
       }
     }
     return false;
   }
-
   function scoreForLength(len) {
     if (len === 3) return CONFIG.scoreTable[3];
     if (len === 4) return CONFIG.scoreTable[4];
     if (len === 5) return CONFIG.scoreTable[5];
     return CONFIG.score6Base + (len - 6) * CONFIG.score6Extra;
   }
-
   function applyGravity() {
     const size = CONFIG.boardSize;
     for (let c = 0; c < size; c++) {
@@ -1090,7 +1249,6 @@
       while (write >= 0) { board[write][c] = randomTile(); write--; }
     }
   }
-
   function renderBoard() {
     boardEl.innerHTML = "";
     const size = CONFIG.boardSize;
@@ -1098,7 +1256,7 @@
       for (let c = 0; c < size; c++) {
         const tile = document.createElement("div");
         tile.className = "tile";
-        tile.dataset.r = r; tile.dataset.c = c;
+        tile.dataset.r = r; tile.dataset.c = c; tile.dataset.type = board[r][c];
         tile.textContent = CONFIG.tileEmoji[board[r][c]];
         tile.addEventListener("click", () => onTileClick(r, c));
         boardEl.appendChild(tile);
@@ -1107,31 +1265,47 @@
     updateSelection();
     resizeBoard();
   }
-
   function updateSelection() {
     boardEl.querySelectorAll(".tile.selected").forEach(el => el.classList.remove("selected"));
-    if (selected) {
-      const el = getTileEl(selected.r, selected.c);
-      if (el) el.classList.add("selected");
-    }
+    if (selected) { const el = getTileEl(selected.r, selected.c); if (el) el.classList.add("selected"); }
   }
-
   function resizeBoard() {
-    const area = document.getElementById("boardArea");
     const hint = document.getElementById("hintBottom");
     const bar = document.getElementById("bottomBar");
-    const rect = area.getBoundingClientRect();
-    const used = (hint ? hint.offsetHeight : 0) + (bar ? bar.offsetHeight : 30) + 24;
-    const size = Math.max(140, Math.min(rect.width - 16, rect.height - used));
+    const rect = boardArea.getBoundingClientRect();
+    const style = getComputedStyle(boardArea);
+    const padLeft = parseFloat(style.paddingLeft) || 0;
+    const padRight = parseFloat(style.paddingRight) || 0;
+    const padTop = parseFloat(style.paddingTop) || 0;
+    const padBottom = parseFloat(style.paddingBottom) || 0;
+    const availW = rect.width - padLeft - padRight - 4;
+    const used = (hint ? hint.offsetHeight : 0) + (bar ? bar.offsetHeight : 30) + 20;
+    const availH = rect.height - padTop - padBottom - used;
+    const size = Math.max(140, Math.min(availW, availH));
     boardEl.style.width = size + "px";
     boardEl.style.height = size + "px";
     boardEl.style.setProperty("--tile-size", size / CONFIG.boardSize + "px");
+    progressTrack.style.height = size + "px";
   }
 
-  // ===================== 输入 =====================
   async function onTileClick(r, c) {
+    SoundManager.init();
     if (!gameActive || isAnimating || timeLeft <= 0) return;
-    if (selected === null) { selected = { r, c }; updateSelection(); return; }
+
+    // 联机模式：发送到服务端
+    if (NetworkClient.getMode() === 'online') {
+      if (selected === null) { selected = { r, c }; updateSelection(); SoundManager.click(); return; }
+      const s = selected;
+      if (s.r === r && s.c === c) { selected = null; updateSelection(); return; }
+      const adjacent = Math.abs(s.r - r) + Math.abs(s.c - c) === 1;
+      if (!adjacent) { selected = { r, c }; updateSelection(); return; }
+      selected = null; updateSelection();
+      NetworkClient.sendSwap(s.r, s.c, r, c);
+      return;
+    }
+
+    // 单机模式
+    if (selected === null) { selected = { r, c }; updateSelection(); SoundManager.click(); return; }
     const s = selected;
     if (s.r === r && s.c === c) { selected = null; updateSelection(); return; }
     const adjacent = Math.abs(s.r - r) + Math.abs(s.c - c) === 1;
@@ -1145,28 +1319,22 @@
     isAnimating = true;
     swap(board, r1, c1, r2, c2);
     const first = findMatches(board);
-
     if (first.length === 0) {
-      swap(board, r1, c1, r2, c2);
-      renderBoard();
+      swap(board, r1, c1, r2, c2); renderBoard();
+      SoundManager.invalid();
       const el = getTileEl(r1, c1);
       if (el) { el.classList.add("invalid"); setTimeout(() => el.classList.remove("invalid"), 320); }
       isAnimating = false;
       return;
     }
-
     const now = performance.now();
     if (now - lastMatchTime <= CONFIG.comboWindow) comboLevel = Math.min(comboLevel + 1, 5);
     else comboLevel = 0;
     maxCombo = Math.max(maxCombo, comboLevel);
     lastMatchTime = now;
-
-    let chainLevel = 0;
-    let current = first;
-
+    let chainLevel = 0, current = first;
     while (current.length > 0) {
-      const removeSet = new Set();
-      let base = 0;
+      const removeSet = new Set(); let base = 0;
       for (const g of current) {
         base += scoreForLength(g.length);
         for (const [r, c] of g.cells) removeSet.add(`${r},${c}`);
@@ -1175,89 +1343,90 @@
       const comboMul = 1 + Math.min(comboLevel * CONFIG.comboStep, CONFIG.comboMax);
       const gained = Math.round(base * chainMul * comboMul);
       addScore(gained);
-
+      SoundManager.match(current[0].length);
+      const removeCells = [...removeSet].map(k => k.split(",").map(Number));
+      spawnParticles(removeCells); shakeBoard();
       removeSet.forEach(k => {
         const [r, c] = k.split(",").map(Number);
         const el = getTileEl(r, c);
         if (el) el.classList.add("pop");
       });
-      await sleep(180);
-
+      await sleep(320);
       removeSet.forEach(k => {
         const [r, c] = k.split(",").map(Number);
         board[r][c] = null;
       });
-      applyGravity();
-      renderBoard();
-      await sleep(100);
-
-      current = findMatches(board);
-      chainLevel++;
+      applyGravity(); renderBoard(); await sleep(180);
+      current = findMatches(board); chainLevel++;
+      if (current.length > 0) { showChainBanner(chainLevel); await sleep(450); }
     }
-
-    isAnimating = false;
-    ensurePlayable();
-    updateHUD();
+    isAnimating = false; ensurePlayable(); updateHUD();
   }
 
   function ensurePlayable() {
-    if (!hasPossibleMove(board)) {
-      showToast("没有可交换步数，正在整理棋盘");
-      shuffleBoard();
-    }
+    if (!hasPossibleMove(board)) { showToast("没有可交换步数，正在整理棋盘"); shuffleBoard(); }
   }
-
   function shuffleBoard() {
     const size = CONFIG.boardSize;
     let attempts = 0;
     do {
       const tiles = [];
       for (let r = 0; r < size; r++) for (let c = 0; c < size; c++) tiles.push(board[r][c]);
-      for (let i = tiles.length - 1; i > 0; i--) {
-        const j = Math.floor(Math.random() * (i + 1));
-        [tiles[i], tiles[j]] = [tiles[j], tiles[i]];
-      }
+      for (let i = tiles.length - 1; i > 0; i--) { const j = Math.floor(Math.random() * (i + 1)); [tiles[i], tiles[j]] = [tiles[j], tiles[i]]; }
       let idx = 0;
       for (let r = 0; r < size; r++) for (let c = 0; c < size; c++) board[r][c] = tiles[idx++];
       attempts++;
     } while ((findMatches(board).length > 0 || !hasPossibleMove(board)) && attempts < 500);
-
     if (findMatches(board).length > 0 || !hasPossibleMove(board)) board = generateBoard();
     renderBoard();
   }
 
-  // ===================== 分数 / 猫粮 =====================
   function addScore(points) {
-    score += points;
-    foodProgress += points;
+    score += points; foodProgress += points;
+    let produced = false;
     while (foodProgress >= CONFIG.foodPerScore && foodStock < CONFIG.troughCap) {
-      foodStock++;
-      foodProgress -= CONFIG.foodPerScore;
+      foodStock++; foodProgress -= CONFIG.foodPerScore; produced = true;
     }
+    if (produced && !progressAnimating) {
+      progressAnimating = true;
+      progressFill.style.transition = "height .25s cubic-bezier(.3,.8,.4,1)";
+      progressFill.style.height = "100%";
+      progressTrack.classList.add("full");
+      animateMachineProduce();
+      setTimeout(() => {
+        progressTrack.classList.remove("full");
+        progressFill.style.transition = "height .5s cubic-bezier(.3,.8,.4,1)";
+        const pct = foodStock >= CONFIG.troughCap ? 100 : Math.min(100, (foodProgress / CONFIG.foodPerScore) * 100);
+        progressFill.style.height = pct + "%";
+        progressAnimating = false;
+      }, 400);
+    } else if (!progressAnimating) updateProgressBar();
     updateHUD();
     showFloatingScore(points);
   }
-
+  function updateProgressBar() {
+    if (progressAnimating) return;
+    let pct;
+    if (foodStock >= CONFIG.troughCap) { pct = 100; progressTrack.classList.add("full"); }
+    else { pct = Math.min(100, (foodProgress / CONFIG.foodPerScore) * 100); progressTrack.classList.remove("full"); }
+    progressFill.style.transition = "height .32s cubic-bezier(.3,.8,.4,1)";
+    progressFill.style.height = pct + "%";
+  }
   function showFloatingScore(points) {
     const el = document.createElement("div");
-    el.className = "floating-score";
-    el.textContent = "+" + points;
+    el.className = "floating-score"; el.textContent = "+" + points;
     const rect = boardEl.getBoundingClientRect();
-    el.style.left = rect.left + rect.width / 2 + "px";
-    el.style.top = rect.top + rect.height / 2 + "px";
+    el.style.left = (rect.left + rect.width / 2) + "px";
+    el.style.top = (rect.top + rect.height / 2) + "px";
     document.body.appendChild(el);
-    setTimeout(() => el.remove(), 880);
+    setTimeout(() => el.remove(), 950);
   }
-
   function showToast(msg) {
     const el = document.createElement("div");
-    el.className = "toast";
-    el.textContent = msg;
-    document.body.appendChild(el);
-    setTimeout(() => el.remove(), 1950);
+    el.className = "toast"; el.textContent = msg;
+    document.body.appendChild(el); setTimeout(() => el.remove(), 1950);
   }
 
-  // ===================== HUD / 食槽 =====================
   function updateHUD() {
     timeText.textContent = Math.ceil(Math.max(0, timeLeft));
     returnText.textContent = returnedCats;
@@ -1272,134 +1441,163 @@
     troughKibbles.innerHTML = "";
     if (foodStock <= 0) return;
     const total = foodStock;
-    const W = troughKibbles.clientWidth || 200;
-    const H = troughKibbles.clientHeight || 26;
+    const W = troughKibbles.clientWidth || 200, H = troughKibbles.clientHeight || 28;
     const perRow = Math.max(6, Math.min(total, Math.ceil(Math.sqrt(total * 4))));
     const rows = Math.ceil(total / perRow);
-    const cellW = W / perRow;
-    const cellH = H / Math.max(1, rows);
-
+    const cellW = W / perRow, cellH = H / Math.max(1, rows);
     for (let i = 0; i < total; i++) {
-      const r = Math.floor(i / perRow);
-      const c = i % perRow;
+      const r = Math.floor(i / perRow), c = i % perRow;
       const k = document.createElement("div");
       k.className = "kibble";
       const jx = (Math.random() - 0.5) * cellW * 0.4;
       const jy = (Math.random() - 0.5) * cellH * 0.4;
-      k.style.left = (c * cellW + cellW * 0.5 - 3 + jx) + "px";
+      k.style.left = (c * cellW + cellW * 0.5 - 3.5 + jx) + "px";
       k.style.top = (H - (rows - r - 1) * cellH - cellH * 0.5 - 3 + jy) + "px";
       troughKibbles.appendChild(k);
     }
   }
 
-  // ===================== 主循环 =====================
   function onCountdownTick() {
     if (!gameActive) return;
     timeLeft -= 0.1;
-    if (timeLeft <= 0) {
-      timeLeft = 0;
-      updateHUD();
-      endGame();
-      return;
+    const sec = Math.ceil(timeLeft);
+    if (sec <= 10 && sec > 0 && sec !== lastTickSecond) {
+      lastTickSecond = sec;
+      SoundManager.tick();
     }
+    if (timeLeft <= 0) { timeLeft = 0; updateHUD(); endGame(); return; }
     updateHUD();
   }
-
-  function onGameTick() {
-    if (!gameActive) return;
-    tickCats();
-  }
-
+  function onGameTick() { if (!gameActive) return; tickCats(); }
   function onCatSpawnTick() {
     if (!gameActive) return;
-    if (timeLeft <= CONFIG.lastPhaseCutoff) return;
-    const wCount = cats.filter(c => c.state === "waiting" && !c.dead).length;
+    const wCount = cats.filter(c => c.state === "waiting" || c.state === "waiting_walk").length;
     if (wCount < CONFIG.maxWaitingCats) spawnWaitingCat();
   }
 
-  // ===================== 局内流程 =====================
   function startGame() {
     clearAllTimers();
-    catsLayer.innerHTML = "";
-    cats = [];
-    catIdSeq = 1;
-
+    catsLayer.innerHTML = ""; cats = []; catIdSeq = 1;
     score = 0; foodStock = 0; foodProgress = 0;
     comboLevel = 0; maxCombo = 0; lastMatchTime = 0;
     timeLeft = CONFIG.roundTime;
     returnedCats = 0; attractedCats = 0;
     gameActive = true; isAnimating = false; selected = null;
+    progressAnimating = false; lastTickSecond = -1;
 
     board = generateBoard();
-    computePositions();
-
+    renderTroughMarks();
     resultOverlay.classList.add("hidden");
-
     renderBoard();
     updateHUD();
     renderKibbles();
+    updateProgressBar();
+    computePositions();
 
     for (let i = 0; i < CONFIG.initialWaitingCats; i++) spawnWaitingCat();
+
+    showStartBanner();
+    SoundManager.start();
 
     timers.countdown = setInterval(onCountdownTick, 100);
     timers.gameTick = setInterval(onGameTick, 100);
     timers.catSpawn = setInterval(onCatSpawnTick, CONFIG.catSpawnInterval);
   }
-
   function endGame() {
     if (!gameActive) return;
-    gameActive = false;
-    isAnimating = true;
-    selected = null;
+    gameActive = false; isAnimating = true; selected = null;
     clearAllTimers();
-
+    SoundManager.end();
     resultReturns.textContent = returnedCats;
     resultScore.textContent = score;
     resultCombo.textContent = maxCombo;
     resultCats.textContent = attractedCats;
-
     resultOverlay.classList.remove("hidden");
   }
-
-  // ===================== 启动 / 响应式 =====================
   function relayoutCats() {
     for (const cat of cats) {
-      if (cat.dead) continue;
-      if (cat.state === "waiting" && cat.waitingSlot >= 0) {
+      if ((cat.state === "waiting" || cat.state === "waiting_walk") && cat.waitingSlot >= 0) {
         const p = POS.waiting[cat.waitingSlot];
-        moveCat(cat, p.x, p.y);
-      } else if (cat.eatingSlot >= 0 &&
-        ["walking_to_food", "eating", "cleaning", "happy"].includes(cat.state)) {
-        const p = POS.eating[cat.eatingSlot];
-        moveCat(cat, p.x, p.y);
-      } else if (cat.sleepSlot >= 0 &&
-        ["walking_to_home", "sleeping", "fading"].includes(cat.state)) {
-        const p = POS.sleepSpots[cat.sleepSlot];
-        moveCat(cat, p.x, p.y);
+        if (cat.state === "waiting") moveCat(cat, p.x, p.y);
+      }
+      else if (cat.eatingSlot >= 0 && ["walking_to_food", "eating", "cleaning", "happy"].includes(cat.state)) {
+        const p = POS.eating[cat.eatingSlot]; moveCat(cat, p.x, p.y);
+      }
+      else if (cat.sleepSlot >= 0 && ["walking_to_home", "sleeping"].includes(cat.state)) {
+        const p = POS.sleepSpots[cat.sleepSlot]; moveCat(cat, p.x, p.y);
       }
     }
   }
 
-  restartBtn.addEventListener("click", () => {
-    requestAnimationFrame(() => {
-      startGame();
-    });
+  // ===================== 联机回调 =====================
+  NetworkClient.onState((msg) => {
+    board = msg.board;
+    timeLeft = msg.timeLeft;
+    if (Array.isArray(msg.cats)) {
+      const newIds = new Set(msg.cats.map(c => c.id));
+      cats = cats.filter(c => newIds.has(c.id));
+      for (const sc of msg.cats) {
+        let cat = cats.find(c => c.id === sc.id);
+        if (!cat) { cat = makeCat(); cat.id = sc.id; cats.push(cat); }
+        if (cat.state !== sc.state) {
+          cat.state = sc.state;
+          cat.stateStart = performance.now();
+          refreshCatVisual(cat);
+        }
+        moveCat(cat, sc.x, sc.y);
+      }
+    }
+    // 联机时，自己的分数从 players 里取
+    const me = NetworkClient.getPlayerId();
+    if (me && msg.players && msg.players[me]) {
+      score = msg.players[me].score;
+      foodStock = msg.players[me].foodStock;
+      returnedCats = msg.players[me].returnedCats;
+    }
+    renderBoard(); updateHUD(); updateProgressBar();
+  });
+  NetworkClient.onEvent((msg) => {
+    if (msg.kind === 'match') {
+      msg.cells.forEach(([r, c]) => {
+        const el = getTileEl(r, c);
+        if (el) el.classList.add('pop');
+      });
+      spawnParticles(msg.cells); shakeBoard();
+      SoundManager.match(msg.length || 3);
+      showFloatingScore(msg.gain);
+    } else if (msg.kind === 'invalid') {
+      SoundManager.invalid();
+    } else if (msg.kind === 'swap_result') {
+      if (msg.board) board = msg.board;
+      renderBoard();
+      for (const ev of msg.events) {
+        if (ev.kind === 'match' && ev.chain > 0) showChainBanner(ev.chain);
+      }
+    }
+  });
+  NetworkClient.onJoined((msg) => {
+    showToast('已加入房间 ' + msg.room);
+  });
+  NetworkClient.onDisconnected(() => {
+    showToast('连接已断开，切换到单机模式');
+  });
+  NetworkClient.onRoundEnd((msg) => {
+    gameActive = false;
+    resultOverlay.classList.remove('hidden');
   });
 
+  restartBtn.addEventListener("click", () => requestAnimationFrame(() => startGame()));
   window.addEventListener("resize", () => {
-    computePositions();
-    resizeBoard();
-    renderKibbles();
-    relayoutCats();
+    resizeBoard(); computePositions(); renderKibbles(); renderTroughMarks(); relayoutCats();
   });
-
   window.addEventListener("load", () => {
     requestAnimationFrame(() => {
-      startGame();
-      computePositions();
-      resizeBoard();
-      renderKibbles();
+      startGame(); resizeBoard(); computePositions(); renderKibbles();
     });
+    // 如需联机：取消下面注释，把 URL 改成你的服务端地址
+    // NetworkClient.connect('ws://localhost:8080', { room: 'room1', name: '我的猫' })
+    //   .then(() => console.log('联机已连接'))
+    //   .catch(e => console.warn('联机失败，保持单机模式', e));
   });
 })();
 </script>

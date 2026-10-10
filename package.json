@@ -1,0 +1,12 @@
+{
+  "name": "cat-match3-server",
+  "version": "1.0.0",
+  "description": "猫咪三消权威服务端",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js"
+  },
+  "dependencies": {
+    "ws": "^8.18.0"
+  }
+}
