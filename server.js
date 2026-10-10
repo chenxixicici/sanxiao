@@ -1,5 +1,5 @@
-// server.js —— 猫咪三消 · 权威服务端
-// 运行方式：node server.js
+// server.js —�? �?�?三消 · 1v1 对战服务�?
+// 运�?�：node server.js
 // 依赖：npm install ws
 
 const WebSocket = require('ws');
@@ -7,7 +7,7 @@ const WebSocket = require('ws');
 const PORT = process.env.PORT || 8080;
 const wss = new WebSocket.Server({ port: PORT });
 
-// ============ 核心规则（与客户端共享） ============
+// ============ 配置 ============
 const CONFIG = {
   boardSize: 8,
   tileTypes: ['paw', 'fish', 'yarn', 'cookie', 'milk'],
@@ -17,20 +17,28 @@ const CONFIG = {
   foodPerScore: 90,
   troughCap: 24,
   roundTime: 90,
-  maxPlayersPerRoom: 4
+  catPhases: {
+    walkingToFood: 1300,
+    eating: 4500,
+    cleaning: 4500,
+    happy: 4500,
+    walkingToHome: 1700
+  },
+  maxCatsPerPlayer: 8,
+  totalCatCap: 16,
+  botMatchDelay: 3000,     // 3 秒内没人匹配 �? 出机器人
+  botSwapInterval: 1100    // 机器人平均出招间�?
 };
 
+// ============ 核心规则 ============
 function randomTile() {
   return CONFIG.tileTypes[Math.floor(Math.random() * CONFIG.tileTypes.length)];
 }
-
 function swap(b, r1, c1, r2, c2) {
   const t = b[r1][c1]; b[r1][c1] = b[r2][c2]; b[r2][c2] = t;
 }
-
 function findMatches(b) {
-  const groups = [];
-  const size = CONFIG.boardSize;
+  const groups = []; const size = CONFIG.boardSize;
   for (let r = 0; r < size; r++) {
     let c = 0;
     while (c < size) {
@@ -59,7 +67,6 @@ function findMatches(b) {
   }
   return groups;
 }
-
 function hasPossibleMove(b) {
   const size = CONFIG.boardSize;
   for (let r = 0; r < size; r++) {
@@ -80,7 +87,6 @@ function hasPossibleMove(b) {
   }
   return false;
 }
-
 function generateBoard() {
   for (let attempt = 0; attempt < 200; attempt++) {
     const b = Array.from({ length: CONFIG.boardSize }, () =>
@@ -99,7 +105,6 @@ function generateBoard() {
   return Array.from({ length: CONFIG.boardSize }, () =>
     Array.from({ length: CONFIG.boardSize }, () => randomTile()));
 }
-
 function applyGravity(board) {
   const size = CONFIG.boardSize;
   for (let c = 0; c < size; c++) {
@@ -114,7 +119,6 @@ function applyGravity(board) {
     while (write >= 0) { board[write][c] = randomTile(); write--; }
   }
 }
-
 function scoreForLength(len) {
   if (len === 3) return CONFIG.scoreTable[3];
   if (len === 4) return CONFIG.scoreTable[4];
@@ -122,73 +126,126 @@ function scoreForLength(len) {
   return CONFIG.score6Base + (len - 6) * CONFIG.score6Extra;
 }
 
-// ============ 房间 ============
-const rooms = new Map();
-
-class Room {
-  constructor(id) {
+// ============ Player ============
+class Player {
+  constructor(id, ws, name, isBot = false) {
     this.id = id;
-    this.players = new Map();
+    this.ws = ws;
+    this.name = name;
+    this.isBot = isBot;
     this.board = generateBoard();
-    this.timeLeft = CONFIG.roundTime;
-    this.started = false;
-    this.timer = null;
-    this.cats = [];
-    this.catIdSeq = 1;
+    this.score = 0;
+    this.foodStock = 0;
+    this.foodProgress = 0;
+    this.returnedCats = 0;
+    this.botTimer = null;
   }
-
-  join(playerId, ws, name) {
-    if (this.players.size >= CONFIG.maxPlayersPerRoom) return false;
-    this.players.set(playerId, {
-      ws, name,
-      score: 0, foodStock: 0, foodProgress: 0, returnedCats: 0,
-      ready: false
-    });
-    return true;
-  }
-
-  leave(playerId) {
-    this.players.delete(playerId);
-    if (this.players.size === 0) {
-      if (this.timer) clearInterval(this.timer);
-      rooms.delete(this.id);
+  send(msg) {
+    if (this.ws && this.ws.readyState === 1) {
+      try { this.ws.send(JSON.stringify(msg)); } catch (e) {}
     }
   }
+  reset() {
+    this.board = generateBoard();
+    this.score = 0;
+    this.foodStock = 0;
+    this.foodProgress = 0;
+    this.returnedCats = 0;
+  }
+}
 
-  start() {
-    if (this.started) return;
-    this.started = true;
+// ============ BattleRoom ============
+class BattleRoom {
+  constructor(id) {
+    this.id = id;
+    this.players = [];
+    this.cats = [];           // 共享�?�?�?
+    this.catIdSeq = 1;
+    this.started = false;
+    this.ended = false;
     this.timeLeft = CONFIG.roundTime;
-    this.timer = setInterval(() => {
-      this.timeLeft -= 0.1;
-      if (this.timeLeft <= 0) {
-        this.timeLeft = 0;
-        this.endRound();
-      }
-      if (Math.floor(this.timeLeft * 10) % 10 === 0) {
-        this.broadcastState();
-      }
-    }, 100);
+    this.startedAt = 0;
+    this.timers = [];
   }
 
-  handleSwap(playerId, r1, c1, r2, c2, seq) {
-    const player = this.players.get(playerId);
-    if (!player) return;
-    if (Math.abs(r1 - r2) + Math.abs(c1 - c2) !== 1) return;
+  addPlayer(p) {
+    if (this.players.length >= 2) return false;
+    this.players.push(p);
+    return true;
+  }
+  isFull() { return this.players.length >= 2; }
+  isEmpty() { return this.players.length === 0; }
 
-    swap(this.board, r1, c1, r2, c2);
-    const first = findMatches(this.board);
+  start() {
+    if (this.started || this.ended) return;
+    this.started = true;
+    this.timeLeft = CONFIG.roundTime;
+    this.startedAt = Date.now();
 
+    for (const p of this.players) if (p.isBot) this.startBot(p);
+
+    this.timers.push(setInterval(() => {
+      if (this.ended) return;
+      this.timeLeft -= 0.1;
+      if (this.timeLeft <= 0) { this.timeLeft = 0; this.endRound(); }
+    }, 100));
+
+    this.timers.push(setInterval(() => this.tickCats(), 100));
+    this.timers.push(setInterval(() => this.trySpawnCat(), 1800));
+    this.timers.push(setInterval(() => this.broadcastState(), 250));
+
+    console.log(`[开局] ${this.id} ${this.players.map(p => p.name).join(' vs ')}`);
+  }
+
+  startBot(bot) {
+    bot.botTimer = setInterval(() => {
+      if (!this.started || this.ended) return;
+      this.botMove(bot);
+    }, CONFIG.botSwapInterval + Math.random() * 400);
+  }
+
+  botMove(bot) {
+    const size = CONFIG.boardSize;
+    const moves = [];
+    for (let r = 0; r < size; r++) {
+      for (let c = 0; c < size; c++) {
+        if (c < size - 1) {
+          swap(bot.board, r, c, r, c + 1);
+          if (findMatches(bot.board).length > 0) moves.push([r, c, r, c + 1]);
+          swap(bot.board, r, c, r, c + 1);
+        }
+        if (r < size - 1) {
+          swap(bot.board, r, c, r + 1, c);
+          if (findMatches(bot.board).length > 0) moves.push([r, c, r + 1, c]);
+          swap(bot.board, r, c, r + 1, c);
+        }
+      }
+    }
+    if (moves.length === 0) { bot.board = generateBoard(); return; }
+    const [r1, c1, r2, c2] = moves[Math.floor(Math.random() * moves.length)];
+    this.handleSwap(bot.id, r1, c1, r2, c2);
+  }
+
+  handleSwap(playerId, r1, c1, r2, c2) {
+    const p = this.players.find(x => x.id === playerId);
+    if (!p || this.ended || !this.started) return;
+    if (Math.abs(r1 - r2) + Math.abs(c1 - c2) !== 1) {
+      p.send({ type: 'event', kind: 'invalid', r1, c1, r2, c2 });
+      return;
+    }
+
+    swap(p.board, r1, c1, r2, c2);
+    const first = findMatches(p.board);
     if (first.length === 0) {
-      swap(this.board, r1, c1, r2, c2);
-      this.send(player.ws, { type: 'event', kind: 'invalid', r1, c1, r2, c2 });
+      swap(p.board, r1, c1, r2, c2);
+      p.send({ type: 'event', kind: 'invalid', r1, c1, r2, c2 });
       return;
     }
 
     let chainLevel = 0;
     let current = first;
     let totalGain = 0;
-    const allEvents = [];
+    const events = [];
 
     while (current.length > 0) {
       const removeSet = new Set();
@@ -200,122 +257,337 @@ class Room {
       const chainMul = 1 + Math.min(chainLevel * CONFIG.chainBonusStep, CONFIG.chainBonusMax);
       const gained = Math.round(base * chainMul);
       totalGain += gained;
-
       const cells = [...removeSet].map(k => k.split(',').map(Number));
-      allEvents.push({ kind: 'match', cells, gain: gained, chain: chainLevel, by: playerId });
+      events.push({ kind: 'match', cells, gain: gained, chain: chainLevel, length: current[0].length });
 
-      cells.forEach(([r, c]) => { this.board[r][c] = null; });
-      applyGravity(this.board);
+      cells.forEach(([r, c]) => { p.board[r][c] = null; });
+      applyGravity(p.board);
 
-      current = findMatches(this.board);
+      current = findMatches(p.board);
       chainLevel++;
     }
 
-    player.score += totalGain;
-    player.foodProgress += totalGain;
-    while (player.foodProgress >= CONFIG.foodPerScore && player.foodStock < CONFIG.troughCap) {
-      player.foodStock++;
-      player.foodProgress -= CONFIG.foodPerScore;
+    p.score += totalGain;
+    p.foodProgress += totalGain;
+    while (p.foodProgress >= CONFIG.foodPerScore && p.foodStock < CONFIG.troughCap) {
+      p.foodStock++;
+      p.foodProgress -= CONFIG.foodPerScore;
     }
 
-    this.broadcastState();
-    this.broadcast({ type: 'event', kind: 'swap_result', events: allEvents, board: this.board });
+    p.send({ type: 'event', kind: 'swap_result', events, board: p.board });
+  }
+
+  tickCats() {
+    if (this.ended) return;
+    const now = Date.now();
+    for (const cat of this.cats) {
+      const elapsed = now - cat.stateStart;
+      switch (cat.state) {
+        case 'walking_to_food':
+          if (elapsed >= CONFIG.catPhases.walkingToFood) { cat.state = 'eating'; cat.stateStart = now; }
+          break;
+        case 'eating':
+          if (elapsed >= CONFIG.catPhases.eating) { cat.state = 'cleaning'; cat.stateStart = now; }
+          break;
+        case 'cleaning':
+          if (elapsed >= CONFIG.catPhases.cleaning) { cat.state = 'happy'; cat.stateStart = now; }
+          break;
+        case 'happy':
+          if (elapsed >= CONFIG.catPhases.happy) { cat.state = 'walking_to_home'; cat.stateStart = now; }
+          break;
+        case 'walking_to_home':
+          if (elapsed >= CONFIG.catPhases.walkingToHome) {
+            cat.state = 'sleeping'; cat.stateStart = now;
+            const owner = this.players.find(p => p.id === cat.ownerId);
+            if (owner) {
+              owner.returnedCats++;
+              owner.send({ type: 'event', kind: 'cat_return', catId: cat.id });
+            }
+          }
+          break;
+      }
+    }
+    if (this.cats.length > CONFIG.totalCatCap) {
+      this.cats = this.cats.slice(-CONFIG.totalCatCap);
+    }
+  }
+
+  trySpawnCat() {
+    if (this.ended || !this.started) return;
+    if (this.players.length < 2) return;
+
+    const catCount = {};
+    for (const p of this.players) catCount[p.id] = 0;
+    for (const c of this.cats) if (catCount[c.ownerId] !== undefined) catCount[c.ownerId]++;
+
+    const candidates = this.players.filter(p =>
+      p.foodStock > 0 && catCount[p.id] < CONFIG.maxCatsPerPlayer
+    );
+    if (candidates.length === 0) return;
+
+    const total = candidates.reduce((s, p) => s + p.foodStock, 0);
+    if (total <= 0) return;
+    let rnd = Math.random() * total;
+    let target = candidates[0];
+    for (const p of candidates) {
+      rnd -= p.foodStock;
+      if (rnd <= 0) { target = p; break; }
+    }
+
+    target.foodStock--;
+    this.cats.push({
+      id: this.catIdSeq++,
+      ownerId: target.id,
+      state: 'walking_to_food',
+      stateStart: Date.now(),
+      paletteIdx: Math.floor(Math.random() * 5),
+      slot: catCount[target.id]
+    });
   }
 
   broadcastState() {
-    const players = {};
-    for (const [id, p] of this.players) {
-      players[id] = {
-        name: p.name,
-        score: p.score,
-        foodStock: p.foodStock,
-        returnedCats: p.returnedCats
-      };
+    if (this.ended) return;
+    for (const p of this.players) {
+      if (p.isBot) continue;
+      const opp = this.players.find(x => x.id !== p.id);
+      p.send({
+        type: 'state',
+        started: this.started,
+        timeLeft: this.timeLeft,
+        myBoard: p.board,
+        myScore: p.score,
+        myFoodStock: p.foodStock,
+        myReturnedCats: p.returnedCats,
+        opponent: opp ? {
+          id: opp.id, name: opp.name, score: opp.score,
+          foodStock: opp.foodStock, returnedCats: opp.returnedCats, isBot: opp.isBot
+        } : null,
+        myCats: this.cats.filter(c => c.ownerId === p.id)
+      });
     }
+  }
+
+  endRound() {
+    if (this.ended) return;
+    this.ended = true;
+    this.started = false;
+    for (const t of this.timers) clearInterval(t);
+    this.timers = [];
+    for (const p of this.players) if (p.botTimer) clearInterval(p.botTimer);
+
+    const [p1, p2] = this.players;
+    let winnerId = null;
+    if (p1 && p2) {
+      if (p1.returnedCats > p2.returnedCats) winnerId = p1.id;
+      else if (p2.returnedCats > p1.returnedCats) winnerId = p2.id;
+      else if (p1.score > p2.score) winnerId = p1.id;
+      else if (p2.score > p1.score) winnerId = p2.id;
+    }
+
     this.broadcast({
-      type: 'state',
-      board: this.board,
-      timeLeft: this.timeLeft,
-      players,
-      cats: this.cats
+      type: 'round_end',
+      results: this.players.map(p => ({
+        id: p.id, name: p.name, score: p.score,
+        returnedCats: p.returnedCats, isBot: p.isBot
+      })),
+      winnerId
     });
+    console.log(`[结束] ${this.id} winner=${winnerId}`);
   }
 
   broadcast(msg) {
     const str = JSON.stringify(msg);
-    for (const p of this.players.values()) {
-      if (p.ws.readyState === 1) p.ws.send(str);
-    }
-  }
-
-  send(ws, msg) {
-    if (ws.readyState === 1) ws.send(JSON.stringify(msg));
-  }
-
-  endRound() {
-    if (this.timer) clearInterval(this.timer);
-    this.timer = null;
-    const results = {};
-    for (const [id, p] of this.players) {
-      results[id] = { score: p.score, returns: p.returnedCats, foodStock: p.foodStock };
-    }
-    this.broadcast({ type: 'round_end', results });
-    this.started = false;
-    this.board = generateBoard();
-    for (const p of this.players.values()) {
-      p.score = 0; p.foodStock = 0; p.foodProgress = 0; p.returnedCats = 0;
-      p.ready = false;
+    for (const p of this.players) {
+      if (!p.isBot && p.ws && p.ws.readyState === 1) {
+        try { p.ws.send(str); } catch (e) {}
+      }
     }
   }
 }
 
-// ============ WebSocket ============
+// ============ 匹配系统 ============
+const rooms = new Map();
+const playerRoom = new Map();
 let playerSeq = 1;
+let roomSeq = 1;
 
+function createRoom() {
+  const id = 'room_' + (roomSeq++);
+  const room = new BattleRoom(id);
+  rooms.set(id, room);
+  return room;
+}
+
+function leaveRoom(player) {
+  const roomId = playerRoom.get(player.id);
+  if (!roomId) return;
+  const room = rooms.get(roomId);
+  playerRoom.delete(player.id);
+  if (!room) return;
+
+  const idx = room.players.indexOf(player);
+  if (idx >= 0) room.players.splice(idx, 1);
+
+  for (const p of room.players) {
+    p.send({ type: 'opponent_left' });
+  }
+  if (!room.ended && room.players.length < 2) room.endRound();
+}
+
+function attachBotToRoom(room, forPlayer) {
+  if (room.players.length >= 2 || room.started || room.ended) return;
+  const bot = new Player('bot_' + Date.now(), null, '电脑�?�?', true);
+  room.addPlayer(bot);
+  forPlayer.send({ type: 'matched', opponent: { name: bot.name, isBot: true } });
+  room.start();
+}
+
+// 定期清理空房�?
+setInterval(() => {
+  for (const [id, room] of rooms) {
+    if (room.isEmpty() || (room.ended && Date.now() - room.startedAt > 60000)) {
+      for (const t of room.timers) clearInterval(t);
+      rooms.delete(id);
+    }
+  }
+}, 15000);
+
+// ============ WebSocket ============
 wss.on('connection', (ws) => {
   const playerId = 'p' + (playerSeq++);
-  let currentRoomId = null;
+  const player = new Player(playerId, ws, '玩�??' + playerSeq);
+  let botTimeout = null;
 
   console.log(`[连接] ${playerId}`);
+  player.send({ type: 'welcome', playerId, name: player.name });
 
   ws.on('message', (data) => {
     let msg;
     try { msg = JSON.parse(data); } catch { return; }
 
     switch (msg.type) {
-      case 'join': {
-        const roomId = msg.room || 'default';
-        let room = rooms.get(roomId);
-        if (!room) {
-          room = new Room(roomId);
-          rooms.set(roomId, room);
+      case 'set_name':
+        player.name = (msg.name || '').slice(0, 16) || player.name;
+        player.send({ type: 'name_set', name: player.name });
+        break;
+
+      case 'list_rooms': {
+        const list = [];
+        for (const [id, room] of rooms) {
+          if (room.ended) continue;
+          list.push({
+            id,
+            players: room.players.length,
+            maxPlayers: 2,
+            started: room.started,
+            hostName: room.players[0] ? room.players[0].name : '',
+            isBot: !!(room.players[0] && room.players[0].isBot)
+          });
         }
-        if (!room.join(playerId, ws, msg.name || playerId)) {
-          ws.send(JSON.stringify({ type: 'error', msg: '房间已满' }));
+        ws.send(JSON.stringify({ type: 'rooms', rooms: list }));
+        break;
+      }
+
+      case 'create_room': {
+        if (playerRoom.has(playerId)) return;
+        const room = createRoom();
+        room.addPlayer(player);
+        playerRoom.set(playerId, room.id);
+        player.send({ type: 'joined_room', roomId: room.id, role: 'host' });
+        botTimeout = setTimeout(() => {
+          if (room.players.length < 2 && !room.started && rooms.has(room.id)) {
+            attachBotToRoom(room, player);
+          }
+        }, CONFIG.botMatchDelay);
+        break;
+      }
+
+      case 'join_room': {
+        if (playerRoom.has(playerId)) return;
+        const room = rooms.get(msg.roomId);
+        if (!room || room.isFull() || room.started || room.ended) {
+          player.send({ type: 'error', msg: '房间不可加入' });
           return;
         }
-        currentRoomId = roomId;
-        room.send(ws, { type: 'joined', playerId, room: roomId, players: [...room.players.keys()] });
-        room.broadcastState();
-        console.log(`[加入] ${playerId} → ${roomId}`);
+        room.addPlayer(player);
+        playerRoom.set(playerId, room.id);
+        player.send({ type: 'joined_room', roomId: room.id, role: 'guest' });
+        room.players[0].send({ type: 'matched', opponent: { name: player.name, isBot: false } });
+        player.send({ type: 'matched', opponent: { name: room.players[0].name, isBot: room.players[0].isBot } });
+        room.start();
         break;
       }
-      case 'ready': {
-        const room = rooms.get(currentRoomId);
-        if (!room) return;
-        const p = room.players.get(playerId);
-        if (p) p.ready = true;
-        if ([...room.players.values()].every(x => x.ready)) {
-          room.start();
+
+      case 'quick_match': {
+        if (playerRoom.has(playerId)) return;
+        let found = null;
+        for (const [, room] of rooms) {
+          if (!room.started && !room.ended && room.players.length === 1 && !room.players[0].isBot) {
+            found = room;
+            break;
+          }
+        }
+        if (found) {
+          found.addPlayer(player);
+          playerRoom.set(playerId, found.id);
+          player.send({ type: 'joined_room', roomId: found.id, role: 'guest' });
+          found.players[0].send({ type: 'matched', opponent: { name: player.name, isBot: false } });
+          player.send({ type: 'matched', opponent: { name: found.players[0].name, isBot: false } });
+          found.start();
+        } else {
+          const room = createRoom();
+          room.addPlayer(player);
+          playerRoom.set(playerId, room.id);
+          player.send({ type: 'joined_room', roomId: room.id, role: 'host' });
+          botTimeout = setTimeout(() => {
+            if (room.players.length < 2 && !room.started && rooms.has(room.id)) {
+              attachBotToRoom(room, player);
+            }
+          }, CONFIG.botMatchDelay);
         }
         break;
       }
-      case 'swap': {
-        const room = rooms.get(currentRoomId);
-        if (!room || !room.started) return;
-        room.handleSwap(playerId, msg.r1, msg.c1, msg.r2, msg.c2, msg.seq);
+      case 'quick_match_human': {
+        if (playerRoom.has(playerId)) return;
+        // ֻ�����ڵ����˵ķ���
+        let found = null;
+        for (const [, room] of rooms) {
+          if (!room.started && !room.ended && room.players.length === 1 && !room.players[0].isBot) {
+            found = room;
+            break;
+          }
+        }
+        if (found) {
+          found.addPlayer(player);
+          playerRoom.set(playerId, found.id);
+          player.send({ type: 'joined_room', roomId: found.id, role: 'guest' });
+          found.players[0].send({ type: 'matched', opponent: { name: player.name, isBot: false } });
+          player.send({ type: 'matched', opponent: { name: found.players[0].name, isBot: false } });
+          found.start();
+        } else {
+          // �����·���ȴ�����**��**���� AI ����
+          const room = createRoom();
+          room.addPlayer(player);
+          playerRoom.set(playerId, room.id);
+          player.send({ type: 'joined_room', roomId: room.id, role: 'host' });
+        }
         break;
       }
+      case 'leave_room':
+        if (botTimeout) { clearTimeout(botTimeout); botTimeout = null; }
+        leaveRoom(player);
+        player.send({ type: 'left_room' });
+        break;
+
+      case 'swap': {
+        const roomId = playerRoom.get(playerId);
+        if (!roomId) return;
+        const room = rooms.get(roomId);
+        if (!room || !room.started || room.ended) return;
+        room.handleSwap(playerId, msg.r1, msg.c1, msg.r2, msg.c2);
+        break;
+      }
+
       case 'ping':
         ws.send(JSON.stringify({ type: 'pong', t: msg.t }));
         break;
@@ -323,12 +595,10 @@ wss.on('connection', (ws) => {
   });
 
   ws.on('close', () => {
-    console.log(`[断开] ${playerId}`);
-    if (currentRoomId) {
-      const room = rooms.get(currentRoomId);
-      if (room) room.leave(playerId);
-    }
+    console.log(`[�?开] ${playerId}`);
+    if (botTimeout) clearTimeout(botTimeout);
+    leaveRoom(player);
   });
 });
 
-console.log(`🚀 猫咪三消权威服务端已启动: ws://localhost:${PORT}`);
+console.log(`🚀 �?�?三消对战服务�?: ws://localhost:${PORT}`);
