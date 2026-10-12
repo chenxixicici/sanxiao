@@ -349,10 +349,18 @@ class BattleRoom {
       const gained = Math.round(base * chainMul);
       totalGain += gained;
       const cells = [...removeSet].map(k => k.split(',').map(Number));
-      events.push({ kind: 'match', cells, gain: gained, chain: chainLevel, length: current[0].length });
 
       cells.forEach(([r, c]) => { p.board[r][c] = null; });
       applyGravity(p.board);
+
+      events.push({
+        kind: 'match',
+        cells,
+        gain: gained,
+        chain: chainLevel,
+        length: current[0].length,
+        boardAfter: p.board.map(row => row.slice())   // 深拷贝快照
+      });
 
       current = findMatches(p.board);
       chainLevel++;
@@ -370,7 +378,7 @@ class BattleRoom {
       b.eaterCatId = null;
     }
 
-    p.send({ type: 'event', kind: 'swap_result', events, board: p.board });
+    p.send({ type: 'event', kind: 'swap_result', swap: { r1, c1, r2, c2 }, events, board: p.board });
   }
 
   tickCats() {

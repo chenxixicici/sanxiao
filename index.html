@@ -1206,6 +1206,7 @@
   let mode = 'single';
   let gameActive = false;
   let board = [], selected = null, isAnimating = false;
+  let pendingSwap = null;
   let score = 0, foodStock = 0, foodProgress = 0;
   let timeLeft = 90, returnedCats = 0;
   let cats = [], catIdSeq = 1;
@@ -1363,6 +1364,9 @@
       if (s.r === r && s.c === c) { selected = null; updateSelection(); return; }
       if (Math.abs(s.r - r) + Math.abs(s.c - c) !== 1) { selected = { r, c }; updateSelection(); return; }
       selected = null; updateSelection();
+      if (isAnimating) return;
+      isAnimating = true;
+      pendingSwap = { r1: s.r, c1: s.c, r2: r, c2: c };
       sendWS({ type: 'swap', r1: s.r, c1: s.c, r2: r, c2: c });
       return;
     }
@@ -1495,7 +1499,82 @@
     isAnimating = false;
     updateHUD();
   }
+  // ============ 联机模式的交换动画（复用单机的视觉，不动逻辑） ============
+  async function playOnlineSwap(sw, events) {
+    if (!gameActive) return;
+    const { r1, c1, r2, c2 } = sw;
+    const el1 = getTileEl(r1, c1);
+    const el2 = getTileEl(r2, c2);
+    if (!el1 || !el2) return;
 
+    // === 1) 交换动画：两格飞向对方 ===
+    const rect1 = el1.getBoundingClientRect();
+    const rect2 = el2.getBoundingClientRect();
+    const dx = rect2.left - rect1.left;
+    const dy = rect2.top - rect1.top;
+
+    el1.style.transition = 'transform .2s cubic-bezier(.4,0,.2,1)';
+    el2.style.transition = 'transform .2s cubic-bezier(.4,0,.2,1)';
+    el1.style.zIndex = '5';
+    el2.style.zIndex = '5';
+    el1.style.transform = `translate(${dx}px, ${dy}px)`;
+    el2.style.transform = `translate(${-dx}px, ${-dy}px)`;
+    await sleep(200);
+
+    el1.style.transition = 'none';
+    el2.style.transition = 'none';
+    el1.style.transform = '';
+    el2.style.transform = '';
+    el1.style.zIndex = '';
+    el2.style.zIndex = '';
+
+    // 本地数据层交换一下（视觉上和动画一致）
+    swap(board, r1, c1, r2, c2);
+    renderBoard();
+
+    // === 2) 按服务端的 events 逐轮播放消除 + 下落 ===
+    for (const ev of events) {
+      if (ev.kind !== 'match') continue;
+
+      // 2a) pop 动画
+      ev.cells.forEach(([r, c]) => {
+        const el = getTileEl(r, c);
+        if (el) {
+          el.classList.remove("drop-in");
+          void el.offsetWidth;
+          el.classList.add("pop");
+        }
+      });
+      spawnParticles(ev.cells);
+      shakeBoard();
+      SoundManager.match(ev.length || 3);
+      showFloatingScore(ev.gain || 0);
+      if (ev.chain > 0) showChainBanner(ev.chain);
+      await sleep(360);
+
+      // 2b) 用服务端的 boardAfter 替换本地 board，保证和服务端一致
+      if (ev.boardAfter) {
+        board = ev.boardAfter;
+      } else {
+        // 兜底：本地移除 + 重力
+        ev.cells.forEach(([r, c]) => { board[r][c] = null; });
+        applyGravity(board);
+      }
+      renderBoard();
+
+      // 2c) drop-in 动画
+      const dropCells = new Set();
+      for (const [r, c] of ev.cells) {
+        for (let rr = 0; rr <= r; rr++) dropCells.add(`${rr},${c}`);
+      }
+      dropCells.forEach(key => {
+        const [r, c] = key.split(",").map(Number);
+        const el = getTileEl(r, c);
+        if (el) el.classList.add("drop-in");
+      });
+      await sleep(300);
+    }
+  }
   function addScore(points) {
     score += points; foodProgress += points;
     let produced = false;
@@ -3151,13 +3230,38 @@
           SoundManager.match(msg.length || 3);
           showFloatingScore(msg.gain);
         } else if (msg.kind === 'swap_result') {
-          if (msg.board) board = msg.board;
-          renderBoard();
-          for (const ev of msg.events) {
-            if (ev.kind === 'match' && ev.chain > 0) showChainBanner(ev.chain);
+          const sw = msg.swap || pendingSwap;
+          pendingSwap = null;
+          if (sw) {
+            playOnlineSwap(sw, msg.events || []).then(() => {
+              isAnimating = false;
+              updateHUD();
+            });
+          } else {
+            // 兜底：没有坐标信息，直接应用结果
+            if (msg.board) board = msg.board;
+            renderBoard();
+            isAnimating = false;
+            updateHUD();
           }
         } else if (msg.kind === 'invalid') {
+          // 服务端判定交换无效
+          if (pendingSwap) {
+            const sw = pendingSwap;
+            pendingSwap = null;
+            const el1 = getTileEl(sw.r1, sw.c1);
+            const el2 = getTileEl(sw.r2, sw.c2);
+            if (el1 && el2) {
+              el1.classList.add("invalid");
+              el2.classList.add("invalid");
+              setTimeout(() => {
+                el1.classList.remove("invalid");
+                el2.classList.remove("invalid");
+              }, 320);
+            }
+          }
           SoundManager.invalid();
+          isAnimating = false;
         } else if (msg.kind === 'cat_return') {
           SoundManager.returnHome();
         }
