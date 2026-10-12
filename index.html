@@ -1366,8 +1366,16 @@
       selected = null; updateSelection();
       if (isAnimating) return;
       isAnimating = true;
-      pendingSwap = { r1: s.r, c1: s.c, r2: r, c2: c };
+      const mySwap = { r1: s.r, c1: s.c, r2: r, c2: c };
+      pendingSwap = mySwap;
       sendWS({ type: 'swap', r1: s.r, c1: s.c, r2: r, c2: c });
+      // 兜底解锁：3 秒内没收到服务端响应就强制解锁，防止永久卡死
+      setTimeout(() => {
+        if (isAnimating && pendingSwap === mySwap) {
+          isAnimating = false;
+          pendingSwap = null;
+        }
+      }, 3000);
       return;
     }
     if (selected === null) { selected = { r, c }; updateSelection(); return; }
@@ -3111,7 +3119,7 @@
       case 'state': {
         if (!gameActive) return;
         timeLeft = msg.timeLeft;
-        if (msg.myBoard) board = msg.myBoard;
+        // 注意：不再同步 myBoard，board 由 swap_result 的 boardAfter 驱动
         if (typeof msg.myScore === 'number') score = msg.myScore;
         if (typeof msg.myFoodStock === 'number') foodStock = msg.myFoodStock;
         if (typeof msg.myFoodProgress === 'number') foodProgress = msg.myFoodProgress;
@@ -3134,7 +3142,7 @@
             }));
           }
         }
-        renderBoard(); updateHUD();
+        updateHUD();   // 不再 renderBoard
         break;
       }
       case 'cat_event': {
@@ -3245,7 +3253,6 @@
             updateHUD();
           }
         } else if (msg.kind === 'invalid') {
-          // 服务端判定交换无效
           if (pendingSwap) {
             const sw = pendingSwap;
             pendingSwap = null;

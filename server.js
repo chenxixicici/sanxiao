@@ -319,9 +319,13 @@ class BattleRoom {
 
   handleSwap(playerId, r1, c1, r2, c2) {
     const p = this.players.find(x => x.id === playerId);
-    if (!p || this.ended || !this.started) return;
+    if (!p) return;
+    if (this.ended || !this.started) {
+      p.send({ type: 'event', kind: 'invalid' });
+      return;
+    }
     if (Math.abs(r1 - r2) + Math.abs(c1 - c2) !== 1) {
-      p.send({ type: 'event', kind: 'invalid', r1, c1, r2, c2 });
+      p.send({ type: 'event', kind: 'invalid' });
       return;
     }
 
@@ -329,7 +333,7 @@ class BattleRoom {
     const first = findMatches(p.board);
     if (first.length === 0) {
       swap(p.board, r1, c1, r2, c2);
-      p.send({ type: 'event', kind: 'invalid', r1, c1, r2, c2 });
+      p.send({ type: 'event', kind: 'invalid' });
       return;
     }
 
@@ -549,7 +553,6 @@ class BattleRoom {
         type: 'state',
         started: this.started,
         timeLeft: this.timeLeft,
-        myBoard: p.board,
         myScore: p.score,
         myFoodStock: p.foodStock,
         myFoodProgress: p.foodProgress,
@@ -559,8 +562,7 @@ class BattleRoom {
           id: opp.id, name: opp.name, score: opp.score,
           foodStock: opp.foodStock, returnedCats: opp.returnedCats, isBot: opp.isBot,
           bowls: opp.bowls.map(b => ({ filled: b.filled, eaten: b.eaten }))
-        } : null,
-        myCats: this.cats.filter(c => c.ownerId === p.id)
+        } : null
       });
     }
   }
