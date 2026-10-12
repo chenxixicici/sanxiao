@@ -77,11 +77,16 @@ function saveLeaderboardToCloud() {
 }
 
 function getLeaderboardTop100() {
+  const scoreOf = (e) => {
+    if (typeof e.score === 'number') return e.score;
+    if (typeof e.maxFoodStock === 'number') return e.maxFoodStock;  // 旧数据兼容
+    return 0;
+  };
   return leaderboardCache
     .slice()
     .sort((a, b) => {
       if (b.returnedCats !== a.returnedCats) return b.returnedCats - a.returnedCats;
-      if (b.maxFoodStock !== a.maxFoodStock) return b.maxFoodStock - a.maxFoodStock;
+      if (scoreOf(b) !== scoreOf(a)) return scoreOf(b) - scoreOf(a);
       return a.ts - b.ts;
     })
     .slice(0, 100);
@@ -98,11 +103,11 @@ setInterval(() => {
 const CONFIG = {
   boardSize: 8,
   tileTypes: ['paw', 'fish', 'yarn', 'cookie', 'milk'],
-  scoreTable: { 3: 30, 4: 45, 5: 60 },
-  score6Base: 60, score6Extra: 10,
+  scoreTable: { 3: 20, 4: 30, 5: 40 },
+  score6Base: 40, score6Extra: 8,
   chainBonusStep: 0.25, chainBonusMax: 0.75,
   foodPerScore: 90,
-  troughCap: 24,
+  troughCap: 6,
   roundTime: 90,
   catPhases: {
     walkingToFood: 1300,
@@ -214,12 +219,7 @@ function scoreForLength(len) {
 
 function maxConcurrentByFood(stock) {
   if (stock <= 0) return 0;
-  if (stock <= 3) return 1;
-  if (stock <= 6) return 2;
-  if (stock <= 9) return 3;
-  if (stock <= 12) return 4;
-  if (stock <= 15) return 5;
-  return 6;
+  return Math.min(stock, 6);
 }
 
 // ============ Player ============
@@ -235,6 +235,7 @@ class Player {
     this.foodProgress = 0;
     this.returnedCats = 0;
     this.botTimer = null;
+    this.bowls = Array.from({ length: 6 }, () => ({ filled: false, eaten: 0, eaterCatId: null }));
   }
   send(msg) {
     if (this.ws && this.ws.readyState === 1) {
@@ -282,7 +283,7 @@ class BattleRoom {
     this.timers.push(setInterval(() => this.tickCats(), 100));
     this.timers.push(setInterval(() => this.trySpawnWaitingCat(), 2500));
     this.timers.push(setInterval(() => this.trySendCatToEat(), 100));
-    this.timers.push(setInterval(() => this.broadcastState(), 250));
+    this.timers.push(setInterval(() => this.broadcastState(), 150));
 
     console.log(`[开局] ${this.id} ${this.players.map(p => p.name).join(' vs ')}`);
   }
@@ -360,8 +361,13 @@ class BattleRoom {
     p.score += totalGain;
     p.foodProgress += totalGain;
     while (p.foodProgress >= CONFIG.foodPerScore && p.foodStock < CONFIG.troughCap) {
+      const b = p.bowls.find(b => !b.filled && !b.eaterCatId);
+      if (!b) break;
       p.foodStock++;
       p.foodProgress -= CONFIG.foodPerScore;
+      b.filled = true;
+      b.eaten = 0;
+      b.eaterCatId = null;
     }
 
     p.send({ type: 'event', kind: 'swap_result', events, board: p.board });
@@ -377,14 +383,43 @@ class BattleRoom {
         case 'walking_to_food':
           if (elapsed >= CONFIG.catPhases.walkingToFood) nextState = 'eating';
           break;
-        case 'eating':
-          if (elapsed >= CONFIG.catPhases.eating) nextState = 'cleaning';
+        case 'eating': {
+          const total = CONFIG.catPhases.eating;
+          const prog = Math.min(2, Math.floor((elapsed / total) * 3));
+          if (cat.eatSlot >= 0) {
+            const owner = this.players.find(p => p.id === cat.ownerId);
+            if (owner && owner.bowls[cat.eatSlot]) {
+              owner.bowls[cat.eatSlot].eaten = prog;
+            }
+          }
+          if (elapsed >= total) {
+            // 吃完：碗里粮没了，但 eaterCatId 保留（猫还占着碗）
+            if (cat.eatSlot >= 0) {
+              const owner = this.players.find(p => p.id === cat.ownerId);
+              if (owner && owner.bowls[cat.eatSlot]) {
+                owner.bowls[cat.eatSlot].filled = false;
+                owner.bowls[cat.eatSlot].eaten = 0;
+              }
+            }
+            nextState = 'cleaning';
+          }
           break;
+        }
         case 'cleaning':
           if (elapsed >= CONFIG.catPhases.cleaning) nextState = 'happy';
           break;
         case 'happy':
-          if (elapsed >= CONFIG.catPhases.happy) nextState = 'walking_to_home';
+          if (elapsed >= CONFIG.catPhases.happy) {
+            // 猫离开进食位：释放它占的碗
+            if (cat.eatSlot >= 0) {
+              const owner = this.players.find(p => p.id === cat.ownerId);
+              if (owner && owner.bowls[cat.eatSlot]) {
+                owner.bowls[cat.eatSlot].eaterCatId = null;
+              }
+              cat.eatSlot = -1;
+            }
+            nextState = 'walking_to_home';
+          }
           break;
         case 'walking_to_home':
           if (elapsed >= CONFIG.catPhases.walkingToHome) nextState = 'sleeping';
@@ -400,13 +435,11 @@ class BattleRoom {
         this.broadcast({ type: 'cat_event', kind: 'state', catId: cat.id, state: nextState });
       }
     }
-    // 清理 sleeping 超时的猫
     const now2 = Date.now();
     this.cats = this.cats.filter(c => {
       if (c.state === 'sleeping' && now2 - c.stateStart > 8000) return false;
       return true;
     });
-    // 硬上限，防止极端情况
     if (this.cats.length > CONFIG.totalCatCap) {
       this.cats = this.cats.slice(-CONFIG.totalCatCap);
     }
@@ -425,7 +458,8 @@ class BattleRoom {
       state: 'waiting',
       stateStart: Date.now(),
       paletteIdx: Math.floor(Math.random() * 5),
-      slot: waitingCats.length
+      slot: waitingCats.length,
+      eatSlot: -1
     };
     this.cats.push(cat);
     this.broadcast({
@@ -440,13 +474,9 @@ class BattleRoom {
     if (this.ended || !this.started) return;
     if (this.players.length < 2) return;
 
-    // 找一只还在等待区的无主猫
     const waiter = this.cats.find(c => !c.ownerId && c.state === 'waiting');
     if (!waiter) return;
 
-    // 统计每个玩家"正在占用食槽"的猫数。
-    // 跟个人模式对齐：只算 walking_to_food / eating / cleaning / happy，
-    // 不算 walking_to_home（已经在回窝路上，已经离开食槽了）。
     const usingCount = {};
     for (const p of this.players) usingCount[p.id] = 0;
     for (const c of this.cats) {
@@ -456,16 +486,18 @@ class BattleRoom {
       }
     }
 
-    // 候选玩家：有粮，且流程中的猫数 < maxConcurrentByFood(foodStock)
-    // maxCatsPerPlayer 只作为硬上限兜底
-    const candidates = this.players.filter(p =>
-      p.foodStock > 0 &&
-      usingCount[p.id] < maxConcurrentByFood(p.foodStock) &&
-      usingCount[p.id] < CONFIG.maxCatsPerPlayer
-    );
+    // 候选玩家：有粮 + 有可用空碗 + 未达并发上限
+    const candidates = this.players.filter(p => {
+      if (p.foodStock <= 0) return false;
+      if (usingCount[p.id] >= maxConcurrentByFood(p.foodStock + usingCount[p.id])) return false;
+      if (usingCount[p.id] >= CONFIG.maxCatsPerPlayer) return false;
+      const hasFreeBowl = p.bowls.some(b => b.filled && !b.eaterCatId);
+      if (!hasFreeBowl) return false;
+      return true;
+    });
     if (candidates.length === 0) return;
 
-    // 加权随机：按各自粮的多少分配概率
+    // 加权随机
     const total = candidates.reduce((s, p) => s + p.foodStock, 0);
     if (total <= 0) return;
     let rnd = Math.random() * total;
@@ -475,8 +507,18 @@ class BattleRoom {
       if (rnd <= 0) { target = p; break; }
     }
 
+    // 找这个玩家第一个"有粮且未被占"的碗
+    let bowlIdx = -1;
+    for (let i = 0; i < 6; i++) {
+      const b = target.bowls[i];
+      if (b.filled && !b.eaterCatId) { bowlIdx = i; break; }
+    }
+    if (bowlIdx < 0) return;
+
     target.foodStock--;
+    target.bowls[bowlIdx].eaterCatId = waiter.id;
     waiter.ownerId = target.id;
+    waiter.eatSlot = bowlIdx;
     waiter.state = 'walking_to_food';
     waiter.stateStart = Date.now();
 
@@ -484,8 +526,10 @@ class BattleRoom {
       type: 'cat_event',
       kind: 'go_eat',
       catId: waiter.id,
-      ownerId: waiter.ownerId
+      ownerId: waiter.ownerId,
+      eatSlot: bowlIdx
     });
+    this.broadcastState();
   }
 
   broadcastState() {
@@ -502,9 +546,11 @@ class BattleRoom {
         myFoodStock: p.foodStock,
         myFoodProgress: p.foodProgress,
         myReturnedCats: p.returnedCats,
+        myBowls: p.bowls.map(b => ({ filled: b.filled, eaten: b.eaten })),
         opponent: opp ? {
           id: opp.id, name: opp.name, score: opp.score,
-          foodStock: opp.foodStock, returnedCats: opp.returnedCats, isBot: opp.isBot
+          foodStock: opp.foodStock, returnedCats: opp.returnedCats, isBot: opp.isBot,
+          bowls: opp.bowls.map(b => ({ filled: b.filled, eaten: b.eaten }))
         } : null,
         myCats: this.cats.filter(c => c.ownerId === p.id)
       });
@@ -739,24 +785,28 @@ wss.on('connection', (ws) => {
       case 'submit_score': {
         const name = String(msg.name || '').slice(0, 16).trim();
         const returnedCats = Math.max(0, Math.floor(Number(msg.returnedCats) || 0));
-        const maxFoodStock = Math.max(0, Math.floor(Number(msg.maxFoodStock) || 0));
+        const score = Math.max(0, Math.floor(Number(msg.score) || 0));
         if (!name) {
           ws.send(JSON.stringify({ type: 'score_result', ok: false, msg: '名字不能为空' }));
           break;
         }
+        const scoreOf = (e) => {
+          if (typeof e.score === 'number') return e.score;
+          if (typeof e.maxFoodStock === 'number') return e.maxFoodStock;
+          return 0;
+        };
         const idx = leaderboardCache.findIndex(e => e.name === name);
         if (idx >= 0) {
           const old = leaderboardCache[idx];
           if (returnedCats > old.returnedCats ||
-              (returnedCats === old.returnedCats && maxFoodStock > old.maxFoodStock)) {
-            leaderboardCache[idx] = { name, returnedCats, maxFoodStock, ts: Date.now() };
+              (returnedCats === old.returnedCats && score > scoreOf(old))) {
+            leaderboardCache[idx] = { name, returnedCats, score, ts: Date.now() };
             jsonbinDirty = true;
           }
         } else {
-          leaderboardCache.push({ name, returnedCats, maxFoodStock, ts: Date.now() });
+          leaderboardCache.push({ name, returnedCats, score, ts: Date.now() });
           jsonbinDirty = true;
         }
-        // 立即写云端（排行榜上传频率低，直接同步）
         saveLeaderboardToCloud();
         const top = getLeaderboardTop100();
         const rank = top.findIndex(e => e.name === name) + 1;
@@ -764,7 +814,7 @@ wss.on('connection', (ws) => {
           type: 'score_result', ok: true,
           rank: rank > 0 ? rank : null, list: top
         }));
-        console.log(`[排行榜] ${name}：回窝${returnedCats} 猫粮${maxFoodStock} 排名${rank}`);
+        console.log(`[排行榜] ${name}：回窝${returnedCats} 积分${score} 排名${rank}`);
         break;
       }
 

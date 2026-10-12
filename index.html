@@ -76,94 +76,346 @@
   #singleLayout { position: absolute; inset: 0; }
   #leftColumn { position: absolute; left: 6px; width: 70px;
     display: flex; flex-direction: column; align-items: center;
-    gap: 6px; z-index: 30; pointer-events: none; }
-  #foodMachine { position: relative; width: 62px; height: 78px;
-    filter: drop-shadow(0 5px 8px rgba(60, 90, 120, .3));
-    transform-origin: center bottom; pointer-events: auto; }
-  #foodMachine.producing { animation: machineProduce .55s cubic-bezier(.3,1.4,.5,1); }
-  @keyframes machineProduce { 0%{transform:scale(1)} 25%{transform:scale(1.08) rotate(-3deg)} 50%{transform:scale(1.12) rotate(3deg)} 100%{transform:scale(1)} }
-  .machine-body { position: absolute; inset: 12px 0 0 0;
-    background: linear-gradient(180deg, #f5e6cf 0%, #e8cfa8 45%, #d4b07a 100%);
-    border-radius: 10px;
-    box-shadow: inset 0 3px 0 rgba(255,255,255,.8), inset 0 -4px 8px rgba(0,0,0,.12); }
-  .mach-slot { position: absolute; top: 8px; left: 10px; right: 10px; height: 8px; border-radius: 5px;
-    background: rgba(60, 40, 20, .25); box-shadow: inset 0 2px 3px rgba(0,0,0,.4); }
-  .mach-light { position: absolute; top: 22px; right: 10px; width: 7px; height: 7px; border-radius: 50%;
-    background: #ffe082; box-shadow: 0 0 10px #ffd54f; animation: machBlink 1.6s ease-in-out infinite; }
-  @keyframes machBlink { 0%, 100% { opacity: 1; } 50% { opacity: .35; } }
-  .mach-label { position: absolute; top: 16px; left: 0; right: 0; text-align: center;
-    font-size: 7px; font-weight: 900; color: #8a6a40; }
-  .mach-spout { position: absolute; top: 2px; left: 50%; transform: translateX(-50%);
-    width: 22px; height: 12px;
-    background: linear-gradient(180deg, #d8c8a8, #b8a888);
-    border-radius: 6px 6px 2px 2px; z-index: 3; }
-  .mach-spout::before { content: ""; position: absolute;
-    top: 2px; left: 50%; transform: translateX(-50%);
-    width: 12px; height: 4px; background: #7a6a4a; border-radius: 2px; }
-  #progressTrack { position: relative; width: 20px; height: 260px;
-    background: linear-gradient(180deg, rgba(120,80,40,.15), rgba(120,80,40,.3));
-    border-radius: 11px; border: 2px solid #e8b87a; overflow: hidden; pointer-events: auto; }
-  #progressFill { position: absolute; left: 0; right: 0; bottom: 0; height: 0%;
-    background: linear-gradient(0deg, #e29a25 0%, #f6c34a 45%, #ffe082 100%);
-    border-radius: 9px; transition: height .3s cubic-bezier(.3,.8,.4,1);
-    box-shadow: 0 0 10px rgba(255,200,80,.7); z-index: 2; }
+    gap: 6px; z-index: 30; pointer-events: none;
+    max-height: calc(100vh - 40px); overflow: visible; }
 
-  #trough { position: absolute; z-index: 9; height: 34px; border-radius: 18px;
+  /* ============ 通用猫粮机样式（三个模式统一） ============ */
+.cat-feeder {
+  position: relative;
+  width: 64px;
+  height: 80px;
+  filter: drop-shadow(0 5px 8px rgba(60, 90, 120, .3));
+  transform-origin: center bottom;
+  pointer-events: auto;
+  z-index: 25;
+  flex: 0 0 auto;
+}
+.cat-feeder .feeder-body {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(180deg, #fdf8f0 0%, #e8dcc8 50%, #d0bca0 100%);
+  border-radius: 12px;
+  box-shadow:
+    inset 0 2px 0 rgba(255, 255, 255, 0.9),
+    inset 0 -6px 12px rgba(80, 50, 20, 0.15),
+    0 4px 10px rgba(90, 60, 30, 0.25);
+  border: 1.5px solid rgba(200, 170, 130, 0.6);
+  overflow: hidden;
+}
+.cat-feeder .feeder-body::before {
+  content: "";
+  position: absolute;
+  top: 6px; left: 8px; right: 8px; height: 3px;
+  background: rgba(255, 255, 255, 0.8);
+  border-radius: 2px;
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
+}
+.cat-feeder .feeder-spout {
+  position: absolute;
+  bottom: 12px; left: 50%;
+  transform: translateX(-50%);
+  width: 16px; height: 16px;
+  background: radial-gradient(circle at 50% 30%, #3a2408, #1a0d02);
+  border-radius: 50%;
+  box-shadow:
+    inset 0 3px 6px rgba(0, 0, 0, 0.8),
+    0 1px 2px rgba(255, 255, 255, 0.3);
+}
+.cat-feeder .feeder-light {
+  position: absolute;
+  top: 12px; right: 10px;
+  width: 6px; height: 6px;
+  border-radius: 50%;
+  background: #7ed957;
+  box-shadow: 0 0 6px #7ed957;
+  animation: feeder-light-breathe 2s ease-in-out infinite;
+}
+@keyframes feeder-light-breathe {
+  0%, 100% { opacity: 1; box-shadow: 0 0 6px #7ed957; }
+  50%      { opacity: .4; box-shadow: 0 0 2px #7ed957; }
+}
+  .cat-feeder .feeder-label {
+    position: absolute;
+    bottom: 28px; left: 0; right: 0;
+    text-align: center;
+    font-size: 9px;
+    font-weight: 900;
+    color: #6b4a28;
+    letter-spacing: 0;
+    text-shadow:
+      0 1px 0 rgba(255, 255, 255, 0.95),
+      0 0 2px rgba(255, 255, 255, 0.8);
+  }
+.cat-feeder.mini {
+  width: 52px;
+  height: 68px;
+}
+.cat-feeder.mini .feeder-spout {
+  width: 13px; height: 13px; bottom: 10px;
+}
+.cat-feeder.mini .feeder-light {
+  top: 10px; right: 8px; width: 5px; height: 5px;
+}
+  .cat-feeder.mini .feeder-label {
+    bottom: 24px;
+    font-size: 8px;
+  }
+.cat-feeder.producing {
+  animation: feeder-produce .6s cubic-bezier(.34,1.56,.64,1);
+}
+@keyframes feeder-produce {
+  0%   { transform: scale(1) translateY(0); }
+  35%  { transform: scale(1.12) translateY(-3px); }
+  70%  { transform: scale(0.98) translateY(1px); }
+  100% { transform: scale(1) translateY(0); }
+}
+    /* 进度条轨道：内凹 + 刻度 + 外圈柔光 */
+  #progressTrack { position: relative; width: 22px; height: 260px;
+    background: linear-gradient(180deg, rgba(80,120,60,.12), rgba(80,120,60,.28));
+    border-radius: 12px; border: 2px solid #a8d68e;
+    overflow: visible; pointer-events: auto;
+    box-shadow: inset 0 2px 6px rgba(60,90,40,.28), 0 2px 6px rgba(0,0,0,.08);
+    transition: border-color .25s ease, box-shadow .25s ease; }
+  /* 6 等分刻度线，每 3 份粮对应一格 */
+  #progressTrack::before {
+    content: ""; position: absolute; inset: 4px 3px;
+    background-image: repeating-linear-gradient(0deg,
+      transparent 0,
+      transparent calc(100% / 6 - 1.5px),
+      rgba(60,90,40,.22) calc(100% / 6 - 1.5px),
+      rgba(60,90,40,.22) calc(100% / 6));
+    border-radius: 8px; pointer-events: none; z-index: 3; }
+
+  /* 进度填充：绿色渐变 + 内发光 + 柔光外溢 */
+  #progressFill { position: absolute; left: 2px; right: 2px; bottom: 2px; height: 0%;
+    background: linear-gradient(0deg, #3fa020 0%, #7ed957 40%, #b8f088 75%, #e0ffb8 100%);
+    border-radius: 9px;
+    transition: height .3s cubic-bezier(.3,.8,.4,1), background .3s ease;
+    box-shadow: 0 0 12px rgba(126,217,87,.9), inset 0 0 10px rgba(255,255,255,.35);
+    z-index: 2; overflow: hidden; }
+  /* 填充上的流光：默认隐藏，只在满状态时才播放 */
+  #progressFill::after {
+    content: ""; position: absolute; left: 0; right: 0; top: 0; height: 30%;
+    background: linear-gradient(180deg, rgba(255,255,255,.7), transparent);
+    pointer-events: none; opacity: 0; }
+  #progressTrack.full #progressFill::after {
+    animation: fillShine 1.8s ease-in-out infinite; }
+  @keyframes fillShine {
+    0%, 100% { opacity: 0;    transform: translateY(-100%); }
+    50%      { opacity: .95;  transform: translateY(330%); }
+  }
+  /* 出粮瞬间的轨道闪光 */
+  #progressTrack.feeding {
+    animation: trackFeedFlash .5s ease-out;
+  }
+  @keyframes trackFeedFlash {
+    0%   { filter: brightness(1); }
+    30%  { filter: brightness(1.8) drop-shadow(0 0 8px rgba(126,217,87,.9)); }
+    100% { filter: brightness(1); }
+  }
+  /* ======= 满状态：轨道发光脉冲 + 填充高亮 + 外圈光晕呼吸 ======= */
+  #progressTrack.full {
+    border-color: #7ed957;
+    animation: trackFullPulse 1.4s ease-in-out infinite; }
+  #progressTrack.full::after {
+    content: ""; position: absolute; inset: -8px;
+    border-radius: 18px; pointer-events: none; z-index: 0;
+    background: radial-gradient(ellipse at center,
+      rgba(126,217,87,.55) 0%, rgba(126,217,87,.15) 45%, transparent 70%);
+    animation: fullGlow 1.4s ease-in-out infinite; }
+  #progressTrack.full #progressFill {
+    background: linear-gradient(0deg, #2f9010 0%, #7ed957 30%, #c8f5a0 65%, #f0ffd8 100%);
+    box-shadow: 0 0 22px rgba(126,217,87,1),
+                0 0 40px rgba(126,217,87,.6),
+                inset 0 0 14px rgba(255,255,255,.6); }
+  @keyframes trackFullPulse {
+    0%, 100% { box-shadow: inset 0 2px 6px rgba(60,90,40,.28),
+                          0 0 10px rgba(126,217,87,.5); }
+    50%      { box-shadow: inset 0 2px 6px rgba(60,90,40,.28),
+                          0 0 24px rgba(126,217,87,1),
+                          0 0 40px rgba(126,217,87,.55); }
+  }
+  @keyframes fullGlow {
+    0%, 100% { opacity: .55; transform: scale(1); }
+    50%      { opacity: 1;   transform: scale(1.1); }
+  }
+  #trough { position: absolute; z-index: 9; height: 54px; border-radius: 24px;
     background: linear-gradient(180deg, #e8c9a0 0%, #c9a06a 50%, #a87c48 100%);
-    padding: 3px;
+    padding: 2px;
     box-shadow: 0 4px 10px rgba(90,60,30,.35), inset 0 2px 0 rgba(255,255,255,.5); }
-  #troughInner { position: relative; width: 100%; height: 100%; border-radius: 15px;
-    background: linear-gradient(180deg, #5a4630, #2f2318); overflow: hidden;
-    box-shadow: inset 0 3px 6px rgba(0,0,0,.55); }
+  .miniTroughInner {
+    position: relative; width: 100%; height: 100%; border-radius: 22px;
+    background: linear-gradient(180deg, #4a3828, #2a1c10); overflow: hidden;
+    box-shadow: inset 0 2px 4px rgba(0,0,0,.5);
+  }
   #troughCells {
     position: absolute;
     inset: 0;
-    padding: 2px;
+    padding: 1px;
     display: grid;
     grid-template-columns: repeat(6, 1fr);
     gap: 2px;
   }
+
+  /* ============ 喂食碗 ============ */
+  /* 外层 cell 只是 grid 槽位 */
   .trough-cell {
     position: relative;
-    background: rgba(255, 255, 255, 0.06);
-    border-radius: 3px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    min-width: 0;
+    min-height: 0;
+  }
+  /* 白瓷圆碗 */
+  .trough-cell .bowl {
+    position: relative;
+    aspect-ratio: 1 / 1;
+    height: 100%;
+    width: auto;
+    max-width: 100%;
+    border-radius: 50%;
+    background:
+      radial-gradient(circle at 50% 38%, #ffffff 0%, #f2ead8 45%, #d8ccb0 78%, #b8a888 100%);
+    box-shadow:
+      inset 0 -2px 3px rgba(120,90,50,.28),
+      inset 0 2px 3px rgba(255,255,255,.85),
+      0 1px 2px rgba(0,0,0,.28);
     overflow: hidden;
-    box-shadow: inset 0 1px 2px rgba(0,0,0,.35);
+    transition: box-shadow .25s ease;
   }
-  .trough-cell-fill {
+  /* 碗内凹陷 */
+  .trough-cell .bowl::before {
+    content: "";
     position: absolute;
-    left: 0; right: 0; bottom: 0;
-    height: 0%;
-    background: linear-gradient(180deg, #f6c34a 0%, #e29a25 65%, #b8791a 100%);
-    transition: height .3s cubic-bezier(.3,.8,.4,1);
-    box-shadow: inset 0 -1px 0 rgba(0,0,0,.2);
+    inset: 14%;
+    border-radius: 50%;
+    background: radial-gradient(circle at 50% 42%, #4a3828 0%, #2a1c10 70%, #1a1008 100%);
+    box-shadow: inset 0 2px 3px rgba(0,0,0,.75);
+    pointer-events: none;
   }
-  .trough-cell.full .trough-cell-fill {
-    background: linear-gradient(180deg, #ffe082 0%, #f6c34a 45%, #e29a25 100%);
-    box-shadow: 0 0 6px rgba(255, 220, 120, .7), inset 0 -1px 0 rgba(0,0,0,.2);
+  /* 散落的猫粮：12 颗小金圆点铺在碗里 */
+  /* 散落的猫粮：分内中外三圈，独立控制 */
+  .trough-cell .scatter {
+    position: absolute;
+    inset: 14%;
+    border-radius: 50%;
+    pointer-events: none;
+    opacity: 0;
+    transform: scale(0.6);
+    transition: opacity .35s ease, transform .35s ease;
+    z-index: 2;
+    filter: drop-shadow(0 1px 1px rgba(80,50,10,.55));
   }
-
-  #bigHome { position: absolute; z-index: 5; border-radius: 50% / 42%;
-    background: radial-gradient(ellipse at 50% 20%, #f8d8a0 0%, #e8a860 35%, #c98840 70%, #a86b30 100%);
-    box-shadow: inset 0 14px 24px rgba(255,240,200,.55), inset 0 -16px 30px rgba(80,40,10,.35),
-      inset 0 0 0 6px rgba(210,160,90,.5), 0 12px 28px rgba(90,60,30,.48);
-    overflow: hidden; }
-  #bigHome::before { content: ""; position: absolute; inset: 0;
+  /* 碗有粮：整体出现 */
+  .trough-cell .bowl.filled .scatter {
+    opacity: 1;
+    transform: scale(1);
+  }
+  /* 外圈 10 颗 */
+  .trough-cell .scatter.outer {
     background-image:
-      repeating-linear-gradient(0deg, rgba(120,70,25,.12) 0 4px, transparent 4px 12px),
-      repeating-linear-gradient(90deg, rgba(120,70,25,.08) 0 6px, transparent 6px 14px);
-    border-radius: inherit; opacity: 0.7; pointer-events: none; }
-  #bigHomeInner { position: absolute; left: 11%; right: 11%; top: 17%; bottom: 22%;
-    border-radius: 50% / 38%;
-    background: radial-gradient(ellipse at 50% 30%, #55402a, #2a1f14);
-    box-shadow: inset 0 10px 22px rgba(0,0,0,.8); overflow: hidden; }
-  #bigHomeCushion { position: absolute; left: 12%; right: 12%; top: 22%; bottom: 26%;
-    border-radius: 50% / 42%;
-    background: radial-gradient(ellipse at 50% 25%, #fff1c8 0%, #ffd88a 45%, #e8a860 100%);
-    box-shadow: inset 0 -5px 12px rgba(150,90,30,.45); }
-  #bigHomeLabel { position: absolute; top: 5%; left: 0; right: 0; text-align: center;
-    font-size: 10px; font-weight: 900; color: #7a4d1f; letter-spacing: 1px; z-index: 3; }
+      radial-gradient(circle at 92% 50%, #e8b850 0 3px, transparent 3px),
+      radial-gradient(circle at 84% 24%, #f5cc70 0 3px, transparent 3px),
+      radial-gradient(circle at 63% 9%,  #e0a840 0 3px, transparent 3px),
+      radial-gradient(circle at 37% 9%,  #ffd980 0 3px, transparent 3px),
+      radial-gradient(circle at 16% 24%, #e8b850 0 3px, transparent 3px),
+      radial-gradient(circle at 8%  50%, #f5cc70 0 3px, transparent 3px),
+      radial-gradient(circle at 16% 76%, #e0a840 0 3px, transparent 3px),
+      radial-gradient(circle at 37% 91%, #ffd980 0 3px, transparent 3px),
+      radial-gradient(circle at 63% 91%, #e8b850 0 3px, transparent 3px),
+      radial-gradient(circle at 84% 76%, #f5cc70 0 3px, transparent 3px);
+  }
+  /* 中圈 6 颗 */
+  .trough-cell .scatter.mid {
+    background-image:
+      radial-gradient(circle at 80% 50%, #e0a840 0 3px, transparent 3px),
+      radial-gradient(circle at 65% 24%, #ffd980 0 3px, transparent 3px),
+      radial-gradient(circle at 35% 24%, #e8b850 0 3px, transparent 3px),
+      radial-gradient(circle at 20% 50%, #f5cc70 0 3px, transparent 3px),
+      radial-gradient(circle at 35% 76%, #e0a840 0 3px, transparent 3px),
+      radial-gradient(circle at 65% 76%, #ffd980 0 3px, transparent 3px);
+  }
+  /* 内圈 4 颗 */
+  .trough-cell .scatter.inner {
+    background-image:
+      radial-gradient(circle at 65% 50%, #ffd980 0 3px, transparent 3px),
+      radial-gradient(circle at 50% 65%, #e8b850 0 3px, transparent 3px),
+      radial-gradient(circle at 35% 50%, #f5cc70 0 3px, transparent 3px),
+      radial-gradient(circle at 50% 35%, #e0a840 0 3px, transparent 3px);
+  }
+  /* 吃粮进度：外圈先没，然后中圈 */
+  .trough-cell .bowl.filled.eaten-1 .scatter.outer { opacity: 0; }
+  .trough-cell .bowl.filled.eaten-2 .scatter.outer,
+  .trough-cell .bowl.filled.eaten-2 .scatter.mid   { opacity: 0; }
+  /* 有粮时：散落颗粒放大淡入 */
+  .trough-cell .bowl.filled .bowl-scatter {
+    opacity: 1;
+    transform: scale(1);
+  }
+  /* 有粮时碗沿金色描边 */
+  .trough-cell .bowl.filled {
+    box-shadow:
+      inset 0 -2px 3px rgba(120,90,50,.28),
+      inset 0 2px 3px rgba(255,255,255,.85),
+      0 0 0 1.5px rgba(255,200,80,.85),
+      0 0 7px rgba(255,200,80,.55);
+  }
 
+  /* ============ 大猫窝：露天猫抓板造型 ============ */
+  /* ============ 大猫窝：藤编碗形 ============ */
+  #bigHome {
+    position: absolute; z-index: 5;
+    border-radius: 50% / 42%;
+    /* 外圈藤编：一圈圈的编织绳纹 */
+    background: repeating-radial-gradient(ellipse at 50% 50%,
+      #d8b080 0 2.5px,
+      #a87c48 2.5px 4px,
+      #c9a06a 4px 6px,
+      #e0b888 6px 8px);
+    box-shadow:
+      0 10px 24px rgba(90,60,30,.42),
+      inset 0 -8px 14px rgba(80,40,10,.38),
+      inset 0 8px 12px rgba(255,220,160,.4);
+    overflow: visible;
+  }
+  /* 内圈软垫 */
+  #bigHomeInner {
+    position: absolute;
+    inset: 16%;
+    border-radius: 50% / 45%;
+    background: radial-gradient(ellipse at 50% 38%,
+      #fff8e0 0%,
+      #f5e8c8 45%,
+      #e8d0a0 85%,
+      #d8bc88 100%);
+    box-shadow:
+      inset 0 10px 18px rgba(140,90,40,.4),
+      inset 0 -6px 10px rgba(255,255,255,.45),
+      0 0 0 3px rgba(150,100,50,.3);
+    overflow: visible;
+  }
+  /* 垫子上的蓬松高光 */
+  #bigHomeCushion {
+    position: absolute;
+    inset: 22%;
+    border-radius: 50%;
+    background:
+      radial-gradient(ellipse at 38% 32%, rgba(255,255,255,.55) 0%, transparent 55%),
+      radial-gradient(ellipse at 65% 72%, rgba(180,140,90,.2) 0%, transparent 60%);
+    pointer-events: none;
+  }
+  #bigHomeLabel {
+    position: absolute;
+    top: 2%; left: 0; right: 0;
+    text-align: center;
+    font-size: 10px; font-weight: 900;
+    color: #7a4a1a;
+    letter-spacing: 1.5px; z-index: 3;
+    text-shadow:
+      0 1px 0 rgba(255,240,200,.95),
+      0 -1px 1px rgba(120,80,40,.4);
+  }
   /* ============ 对战模式布局 ============ */
   #battleLayout { position: absolute; inset: 0; display: none; }
   #topArea.battleMode #battleLayout { display: block; }
@@ -182,7 +434,8 @@
     position: absolute;
     left: 50%; transform: translateX(-50%);
     width: 140px;
-    top: 58px; bottom: 8px;
+    top: 58px;
+    height: calc(48% - 30px);
     background: rgba(255, 255, 255, .35);
     border: 2px dashed rgba(255, 255, 255, .8);
     border-radius: 16px; z-index: 7;
@@ -208,6 +461,20 @@
     display: flex; flex-direction: column;
     gap: 0;
     z-index: 8;
+    overflow: visible;
+  }
+  /* 只让喂食盆横向延伸，猫粮机 / 库存保持原样 */
+  #battleLeftCol > .miniTrough {
+    width: calc(100% + 76px);
+    flex-shrink: 0;
+  }
+  #battleLeftCol > .cat-feeder.mini {
+    align-self: center;
+    flex: 0 0 auto;
+    width: 52px;
+    height: 68px;
+    max-width: 52px;
+    max-height: 68px;
   }
   #battleRightCol {
     position: absolute;
@@ -217,6 +484,20 @@
     display: flex; flex-direction: column;
     gap: 0;
     z-index: 8;
+    overflow: visible;
+  }
+  #battleRightCol > .miniTrough {
+    width: calc(100% + 76px);
+    flex-shrink: 0;
+    margin-left: -76px;
+  }
+  #battleRightCol > .cat-feeder.mini {
+    align-self: center;
+    flex: 0 0 auto;
+    width: 52px;
+    height: 68px;
+    max-width: 52px;
+    max-height: 68px;
   }
   #battleLeftCol > .battleSpacer,
   #battleRightCol > .battleSpacer { flex: 1 1 auto; }
@@ -224,43 +505,56 @@
   #battleCats { position: absolute; inset: 0; z-index: 10; pointer-events: none; }
 
   /* 迷你猫窝 */
+  /* ============ 迷你猫窝：同款等比缩小 ============ */
   .miniHome {
     position: relative;
     height: 88px;
     border-radius: 50% / 42%;
-    background: radial-gradient(ellipse at 50% 20%, #f8d8a0 0%, #e8a860 35%, #c98840 70%, #a86b30 100%);
-    box-shadow: inset 0 8px 16px rgba(255,240,200,.55),
-                inset 0 -10px 18px rgba(80,40,10,.35),
-                inset 0 0 0 4px rgba(210,160,90,.5),
-                0 6px 14px rgba(90,60,30,.42);
-    overflow: hidden;
+    background: repeating-radial-gradient(ellipse at 50% 50%,
+      #d8b080 0 2.5px,
+      #a87c48 2.5px 4px,
+      #c9a06a 4px 6px,
+      #e0b888 6px 8px);
+    box-shadow:
+      0 6px 14px rgba(90,60,30,.4),
+      inset 0 -6px 10px rgba(80,40,10,.35),
+      inset 0 6px 10px rgba(255,220,160,.4);
     flex: 0 0 auto;
     margin-bottom: 6px;
-  }
-  .miniHome::before {
-    content: ""; position: absolute; inset: 0;
-    background-image:
-      repeating-linear-gradient(0deg, rgba(120,70,25,.12) 0 3px, transparent 3px 9px),
-      repeating-linear-gradient(90deg, rgba(120,70,25,.08) 0 5px, transparent 5px 11px);
-    border-radius: inherit; opacity: 0.7; pointer-events: none;
+    overflow: visible;
   }
   .miniHomeInner {
-    position: absolute; left: 12%; right: 12%; top: 18%; bottom: 22%;
-    border-radius: 50% / 38%;
-    background: radial-gradient(ellipse at 50% 30%, #55402a, #2a1f14);
-    box-shadow: inset 0 6px 14px rgba(0,0,0,.8); overflow: hidden;
+    position: absolute;
+    inset: 16%;
+    border-radius: 50% / 45%;
+    background: radial-gradient(ellipse at 50% 38%,
+      #fff8e0 0%,
+      #f5e8c8 45%,
+      #e8d0a0 85%,
+      #d8bc88 100%);
+    box-shadow:
+      inset 0 8px 14px rgba(140,90,40,.38),
+      inset 0 -5px 8px rgba(255,255,255,.42),
+      0 0 0 2px rgba(150,100,50,.28);
+    overflow: visible;
   }
   .miniHomeCushion {
-    position: absolute; left: 14%; right: 14%; top: 24%; bottom: 26%;
-    border-radius: 50% / 42%;
-    background: radial-gradient(ellipse at 50% 25%, #fff1c8 0%, #ffd88a 45%, #e8a860 100%);
-    box-shadow: inset 0 -3px 8px rgba(150,90,30,.45);
+    position: absolute;
+    inset: 22%;
+    border-radius: 50%;
+    background:
+      radial-gradient(ellipse at 38% 32%, rgba(255,255,255,.5) 0%, transparent 55%),
+      radial-gradient(ellipse at 65% 72%, rgba(180,140,90,.2) 0%, transparent 60%);
   }
   .miniHomeLabel {
-    position: absolute; top: 3%; left: 0; right: 0; text-align: center;
-    font-size: 9px; font-weight: 900; color: #7a4d1f;
+    position: absolute;
+    top: 2%; left: 0; right: 0;
+    text-align: center;
+    font-size: 9px; font-weight: 900; color: #7a4a1a;
     letter-spacing: .5px; z-index: 3;
-    text-shadow: 0 1px 0 rgba(255,255,255,.7);
+    text-shadow:
+      0 1px 0 rgba(255,240,200,.95),
+      0 -1px 1px rgba(120,80,40,.35);
   }
   .miniHomeCats {
     position: absolute; inset: 15% 10% 20% 10%;
@@ -271,82 +565,34 @@
   /* 迷你食槽（更长） */
   .miniTrough {
     position: relative;
-    height: 32px;
-    border-radius: 16px;
+    height: 46px;
+    border-radius: 22px;
     background: linear-gradient(180deg, #e8c9a0 0%, #c9a06a 50%, #a87c48 100%);
-    padding: 3px;
+    padding: 2px;
     box-shadow: 0 3px 8px rgba(90,60,30,.32), inset 0 1px 0 rgba(255,255,255,.4);
     flex: 0 0 auto;
     margin-bottom: 0;
     width: 100%;
   }
   .miniTroughInner {
-    position: relative; width: 100%; height: 100%; border-radius: 13px;
-    background: linear-gradient(180deg, #5a4630, #2f2318); overflow: hidden;
+    position: relative; width: 100%; height: 100%; border-radius: 20px;
+    background: linear-gradient(180deg, #4a3828, #2a1c10); overflow: hidden;
     box-shadow: inset 0 2px 4px rgba(0,0,0,.5);
   }
   .miniTroughCells {
     position: absolute;
     inset: 0;
-    padding: 2px;
+    padding: 1px;
     display: grid;
     grid-template-columns: repeat(6, 1fr);
     gap: 1px;
   }
+  /* 对战模式：盆自动缩小，颗粒也缩一档 */
   .miniTroughCells .trough-cell {
-    position: relative;
-    background: rgba(255, 255, 255, 0.06);
-    border-radius: 3px;
-    overflow: hidden;
-    box-shadow: inset 0 1px 2px rgba(0,0,0,.35);
-  }
-  .miniTroughCells .trough-cell-fill {
-    position: absolute;
-    left: 0; right: 0; bottom: 0;
-    height: 0%;
-    background: linear-gradient(180deg, #f6c34a 0%, #e29a25 65%, #b8791a 100%);
-    transition: height .3s cubic-bezier(.3,.8,.4,1);
-  }
-  .miniTroughCells .trough-cell.full .trough-cell-fill {
-    background: linear-gradient(180deg, #ffe082 0%, #f6c34a 45%, #e29a25 100%);
-    box-shadow: 0 0 4px rgba(255, 220, 120, .7);
+    --kibble-size: 4px;
   }
 
-  /* 迷你猫粮机（和个人模式一样大：62×78） */
-  .miniMachine {
-    position: relative;
-    height: 78px;
-    flex: 0 0 auto;
-    margin-top: -2px;
-  }
-   .miniMachine.producing { animation: machineProduce .55s cubic-bezier(.3,1.4,.5,1); }
-  .miniMachineBody {
-    position: absolute;
-    left: 50%; transform: translateX(-50%);
-    top: 12px;
-    width: 62px;
-    height: 66px;
-    background: linear-gradient(180deg, #f5e6cf 0%, #e8cfa8 45%, #d4b07a 100%);
-    border-radius: 10px;
-    box-shadow: inset 0 2px 0 rgba(255,255,255,.8), inset 0 -3px 6px rgba(0,0,0,.12);
-  }
-  .miniMachineSpout {
-    position: absolute; top: 2px; left: 50%; transform: translateX(-50%);
-    width: 22px; height: 14px;
-    background: linear-gradient(180deg, #d8c8a8, #b8a888);
-    border-radius: 6px 6px 2px 2px; z-index: 3;
-    box-shadow: 0 1px 2px rgba(0,0,0,.15);
-  }
-  .miniMachineSpout::before {
-    content: ""; position: absolute;
-    top: 2px; left: 50%; transform: translateX(-50%);
-    width: 12px; height: 4px; background: #7a6a4a; border-radius: 2px;
-  }
-  .miniMachineLabel {
-    position: absolute; top: 18px; left: 0; right: 0;
-    text-align: center; font-size: 7px; font-weight: 900; color: #8a6a40;
-    z-index: 4;
-  }
+
 
   .miniStock {
     text-align: center; font-size: 10px; font-weight: 900;
@@ -449,9 +695,20 @@
   .tile.selected { transform: scale(1.10); border-color: #ff9f43;
     box-shadow: 0 0 0 2px #ff9f43 inset, 0 0 14px rgba(255,159,67,.7); }
   .tile.invalid { animation: shake .3s ease; }
-  .tile.pop { animation: popBig .32s cubic-bezier(.4,0,.7,1) forwards; }
+  .tile.pop { animation: popBig .34s cubic-bezier(.34,1.56,.64,1) forwards; z-index: 20; }
+  .tile.drop-in { animation: tileDropIn .3s cubic-bezier(.34,1.56,.64,1); }
   @keyframes shake { 0%,100%{transform:translateX(0)} 25%{transform:translateX(-3px)} 75%{transform:translateX(3px)} }
-  @keyframes popBig { 0%{transform:scale(1);opacity:1} 40%{transform:scale(1.35) rotate(8deg);opacity:1;box-shadow:0 0 20px 6px rgba(255,220,120,.9)} 100%{transform:scale(0) rotate(-25deg);opacity:0} }
+  @keyframes popBig {
+    0%   { transform: scale(1) rotate(0);        opacity: 1; }
+    30%  { transform: scale(1.38) rotate(7deg);  opacity: 1; }
+    60%  { transform: scale(1.12) rotate(-4deg); opacity: .95; }
+    100% { transform: scale(0.25) rotate(22deg); opacity: 0; }
+  }
+  @keyframes tileDropIn {
+    0%   { transform: translateY(-80px); opacity: 0; }
+    60%  { opacity: 1; }
+    100% { transform: translateY(0);     opacity: 1; }
+  }
   #bottomBar { height: 30px; flex: 0 0 auto;
     display: flex; gap: 12px; align-items: center; justify-content: center;
     font-size: 12px; color: #6b5a44; white-space: nowrap;
@@ -535,10 +792,31 @@
     box-shadow: 0 4px 0 #d97d1f, 0 6px 14px rgba(217,125,31,.35); cursor: pointer; }
   .result-card button:active { transform: translateY(2px); box-shadow: 0 2px 0 #d97d1f; }
 
-  .feed-particle { position: fixed; width: 8px; height: 8px; border-radius: 50%;
-    background: radial-gradient(circle at 35% 30%, #ffd977, #e29a25 75%, #8d5a10);
-    box-shadow: 0 0 8px #ffd54f; z-index: 100; pointer-events: none;
-    transition: transform .72s cubic-bezier(.5,.05,.7,.25), opacity .72s ease-out; }
+  .feed-particle { position: fixed; width: 11px; height: 11px; border-radius: 50%;
+    background: radial-gradient(circle at 35% 30%, #e8ffc8, #7ed957 55%, #3fa020);
+    box-shadow: 0 0 14px rgba(126, 217, 87, 1), 0 0 6px rgba(200, 255, 160, .95);
+    z-index: 100; pointer-events: none;
+    transition: transform .8s cubic-bezier(.35,.05,.6,.35), opacity .8s ease-out; }
+    /* 出粮粒：从出粮口掉下的猫粮 */
+  .kibble {
+    position: fixed; left: 0; top: 0;
+    width: 9px; height: 9px; border-radius: 50%;
+    background: radial-gradient(circle at 32% 28%, #e8c070 0%, #b8883a 55%, #6a4818 100%);
+    box-shadow:
+      inset 0 -1px 2px rgba(0,0,0,.5),
+      inset 0 1px 1px rgba(255,220,150,.5),
+      0 2px 4px rgba(0,0,0,.3);
+    z-index: 110; pointer-events: none;
+    will-change: transform, opacity;
+  }
+  /* 猫粮粒中间的小凹陷纹路 */
+  .kibble::before {
+    content: ""; position: absolute; inset: 2px;
+    border-radius: 50%;
+    background: radial-gradient(circle at 50% 50%,
+      rgba(0,0,0,.15) 0%, rgba(0,0,0,.15) 30%, transparent 60%);
+  }
+
   .spark { position: fixed; width: 18px; height: 18px; border-radius: 50%;
     background: radial-gradient(circle, rgba(255,255,220,.95) 0%, rgba(255,210,120,.6) 40%, transparent 70%);
     z-index: 95; pointer-events: none; transform: translate(-50%, -50%);
@@ -740,12 +1018,13 @@
             <div class="miniTroughCells" id="myMiniTroughCells"></div>
           </div>
         </div>
-        <div class="miniMachine" id="myMiniMachine">
-          <div class="miniMachineSpout"></div>
-          <div class="miniMachineBody"></div>
-          <div class="miniMachineLabel">猫粮机</div>
-        </div>
-        <div class="miniStock" id="myMiniStock">0/24</div>
+          <div class="cat-feeder mini" id="myMiniMachine">
+            <div class="feeder-body">
+              <div class="feeder-light"></div>
+              <div class="feeder-spout"></div>
+              <div class="feeder-label">猫粮机</div>
+            </div>
+          </div>
       </div>
 
       <!-- 中栏：等待区 -->
@@ -767,12 +1046,13 @@
             <div class="miniTroughCells" id="oppMiniTroughCells"></div>
           </div>
         </div>
-        <div class="miniMachine" id="oppMiniMachine">
-          <div class="miniMachineSpout"></div>
-          <div class="miniMachineBody"></div>
-          <div class="miniMachineLabel">猫粮机</div>
+        <div class="cat-feeder mini" id="oppMiniMachine">
+          <div class="feeder-body">
+            <div class="feeder-light"></div>
+            <div class="feeder-spout"></div>
+            <div class="feeder-label">猫粮机</div>
+          </div>
         </div>
-        <div class="miniStock" id="oppMiniStock">0/24</div>
       </div>
 
       <!-- 对战 HUD -->
@@ -791,15 +1071,16 @@
     <div id="board"></div>
     <div id="bottomBar">
       <div>⭐ 积分 <strong id="scoreText">0</strong></div>
-      <div>🥣 猫粮 <strong id="foodText">0</strong></div>
     </div>
   </div>
 
   <div id="leftColumn">
-    <div id="foodMachine">
-      <div class="mach-spout"></div>
-      <div class="machine-body"><div class="mach-slot"></div><div class="mach-light"></div><div class="mach-label">猫粮机</div></div>
-      <div class="mach-drip"></div>
+    <div class="cat-feeder" id="foodMachine">
+      <div class="feeder-body">
+        <div class="feeder-light"></div>
+        <div class="feeder-spout"></div>
+        <div class="feeder-label">猫粮机</div>
+      </div>
     </div>
     <div id="progressTrack"><div id="progressFill"></div></div>
   </div>
@@ -913,11 +1194,9 @@
   const topArea = $('topArea'), boardArea = $('boardArea'), leftColumn = $('leftColumn');
   const boardEl = $('board');
   const timeText = $('timeText'), returnText = $('returnText');
-  const scoreText = $('scoreText'), foodText = $('foodText');
+  const scoreText = $('scoreText');
   const battleTimeText = $('battleTimeText'), myReturnText = $('myReturnText');
   const oppReturnText = $('oppReturnText'), oppNameLabel = $('oppNameLabel');
-  // 已废弃：猫粮槽改用 updateTroughCells
-  const myMiniStock = $('myMiniStock'), oppMiniStock = $('oppMiniStock');
   const myMiniHomeCats = $('myMiniHomeCats'), oppMiniHomeCats = $('oppMiniHomeCats');
   const battleCatsEl = $('battleCats');
   const waitOverlay = $('waitOverlay'), waitTimer = $('waitTimer');
@@ -930,9 +1209,13 @@
   let score = 0, foodStock = 0, foodProgress = 0;
   let timeLeft = 90, returnedCats = 0;
   let cats = [], catIdSeq = 1;
-  let progressAnimating = false;
+  let myBowlState = [];
+  let oppBowlState = [];
+
+  function makeEmptyBowls() {
+    return Array.from({ length: 6 }, () => ({ filled: false, eaten: 0, eaterCatId: null }));
+  }
   let tickSecond = -1;
-  let maxFoodStockThisRound = 0;
   const timers = { countdown: null, gameTick: null, spawnTimer: null };
 
   let opponent = { name: '对手', score: 0, foodStock: 0, returnedCats: 0, isBot: false,
@@ -1028,10 +1311,11 @@
     }
   }
   function scoreForLength(len) {
-    if (len === 3) return 30;
-    if (len === 4) return 45;
-    if (len === 5) return 60;
-    return 60 + (len - 6) * 10;
+    if (len === 3) return 20;
+    if (len === 4) return 30;
+    if (len === 5) return 40;
+    if (len === 6) return 40;
+    return 40 + (len - 6) * 8;
   }
 
   function renderBoard() {
@@ -1093,16 +1377,65 @@
   async function trySwap(r1, c1, r2, c2) {
     if (!gameActive) return;
     isAnimating = true;
+
+    // 清除选中
+    selected = null;
+    updateSelection();
+
+    const el1 = getTileEl(r1, c1);
+    const el2 = getTileEl(r2, c2);
+    if (!el1 || !el2) { isAnimating = false; return; }
+
+    // === 交换动画：两个方块在视觉上飞向对方 ===
+    const rect1 = el1.getBoundingClientRect();
+    const rect2 = el2.getBoundingClientRect();
+    const dx = rect2.left - rect1.left;
+    const dy = rect2.top - rect1.top;
+
+    el1.style.transition = 'transform .2s cubic-bezier(.4,0,.2,1)';
+    el2.style.transition = 'transform .2s cubic-bezier(.4,0,.2,1)';
+    el1.style.zIndex = '5';
+    el2.style.zIndex = '5';
+    el1.style.transform = `translate(${dx}px, ${dy}px)`;
+    el2.style.transform = `translate(${-dx}px, ${-dy}px)`;
+    await sleep(200);
+
+    // === 数据层交换，判断是否能消除 ===
     swap(board, r1, c1, r2, c2);
     const first = findMatches(board);
+
     if (first.length === 0) {
-      swap(board, r1, c1, r2, c2); renderBoard();
+      // 不能消除：动画返位，数据也还原
+      swap(board, r1, c1, r2, c2);
+      el1.style.transform = '';
+      el2.style.transform = '';
+      await sleep(200);
+      el1.style.transition = '';
+      el2.style.transition = '';
+      el1.style.zIndex = '';
+      el2.style.zIndex = '';
       SoundManager.invalid();
-      const el = getTileEl(r1, c1);
-      if (el) { el.classList.add("invalid"); setTimeout(() => el.classList.remove("invalid"), 320); }
+      el1.classList.add("invalid");
+      el2.classList.add("invalid");
+      setTimeout(() => {
+        el1.classList.remove("invalid");
+        el2.classList.remove("invalid");
+      }, 320);
       isAnimating = false;
       return;
     }
+
+    // 交换成功：清掉 transform，然后直接 renderBoard 全量重建，
+    // DOM 与 board 数据完全同步，后续 getTileEl / getBoundingClientRect 一定正确。
+    el1.style.transition = 'none';
+    el2.style.transition = 'none';
+    el1.style.transform = '';
+    el2.style.transform = '';
+    el1.style.zIndex = '';
+    el2.style.zIndex = '';
+    renderBoard();
+
+    // === 连锁消除 ===
     let chainLevel = 0, current = first;
     while (current.length > 0) {
       const removeSet = new Set(); let base = 0;
@@ -1114,21 +1447,51 @@
       const gained = Math.round(base * chainMul);
       addScore(gained);
       SoundManager.match(current[0].length);
+
+      // 粒子飞向进度条
       const cells = [...removeSet].map(k => k.split(",").map(Number));
-      spawnParticles(cells); shakeBoard();
+      spawnParticles(cells);
+      shakeBoard();
+
+      // 消除动画：先移除 drop-in，强制 reflow，再加 pop
+      // 否则 CSS 里 .tile.drop-in 定义在 .tile.pop 之后，会覆盖 pop 动画
       removeSet.forEach(k => {
         const [r, c] = k.split(",").map(Number);
-        const el = getTileEl(r, c); if (el) el.classList.add("pop");
+        const el = getTileEl(r, c);
+        if (el) {
+          el.classList.remove("drop-in");
+          void el.offsetWidth;
+          el.classList.add("pop");
+        }
       });
-      await sleep(280);
+      await sleep(360);
+
+      // 数据层消除 + 重力
       removeSet.forEach(k => {
         const [r, c] = k.split(",").map(Number);
         board[r][c] = null;
       });
-      applyGravity(board); renderBoard(); await sleep(160);
+      applyGravity(board);
+      renderBoard();
+
+      // 下落动画：每一列，从被消除位置的最下方一路到顶部，所有格子都加 drop-in
+      // 不再判断"值是否变化"，因为即使图案恰好相同，视觉上也应看到下落
+      const dropCells = new Set();
+      for (const k of removeSet) {
+        const [r, c] = k.split(",").map(Number);
+        for (let rr = 0; rr <= r; rr++) dropCells.add(`${rr},${c}`);
+      }
+      dropCells.forEach(key => {
+        const [r, c] = key.split(",").map(Number);
+        const el = getTileEl(r, c);
+        if (el) el.classList.add("drop-in");
+      });
+      await sleep(300);
+
       current = findMatches(board); chainLevel++;
-      if (current.length > 0) { showChainBanner(chainLevel); await sleep(400); }
+      if (current.length > 0) { showChainBanner(chainLevel); await sleep(360); }
     }
+
     isAnimating = false;
     updateHUD();
   }
@@ -1136,92 +1499,161 @@
   function addScore(points) {
     score += points; foodProgress += points;
     let produced = false;
-    while (foodProgress >= 90 && foodStock < 24) { foodStock++; foodProgress -= 90; produced = true; }
-    maxFoodStockThisRound = Math.max(maxFoodStockThisRound, foodStock);
-    if (produced) animateMachineProduce();
+    while (foodProgress >= 90 && foodStock < 6) {
+      // 先找可用的碗，找不到就不扣进度、不增 foodStock
+      const b = myBowlState.find(b => !b.filled && !b.eaterCatId);
+      if (!b) break;
+      foodProgress -= 90; produced = true;
+      foodStock++;
+      b.filled = true; b.eaten = 0; b.eaterCatId = null;
+    }
+    if (produced) triggerFeeder();
     updateProgressBar();
     updateHUD();
     showFloatingScore(points);
   }
-  function updateProgressBar() {
-    if (progressAnimating) return;
-    const pt = document.getElementById('progressTrack');
-    const pf = document.getElementById('progressFill');
-    if (!pt || !pf) return;
-    let pct;
-    if (foodStock >= 24) pct = 100;
-    else pct = Math.min(100, (foodProgress / 90) * 100);
-    pf.style.height = pct + "%";
-    pt.classList.toggle("full", foodStock >= 24);
-  }
-  function animateMachineProduce() {
+    // ============ 猫粮机统一逻辑 ============
+  function triggerFeeder() {
     SoundManager.feed();
+
+    let machineEl, troughEl;
     if (mode === 'single') {
-      const m = document.getElementById('foodMachine');
-      if (m) {
-        m.classList.remove("producing");
-        void m.offsetWidth;
-        m.classList.add("producing");
-        setTimeout(() => m.classList.remove("producing"), 600);
-      }
+      machineEl = document.getElementById('foodMachine');
+      troughEl = document.getElementById('trough');
     } else {
-      // 对战/联机模式：动我方猫粮机
-      const m = document.getElementById('myMiniMachine');
-      if (m) {
-        m.classList.remove("producing");
-        void m.offsetWidth;
-        m.classList.add("producing");
-        setTimeout(() => m.classList.remove("producing"), 600);
+      machineEl = document.getElementById('myMiniMachine');
+      troughEl = document.getElementById('myMiniTrough');
+    }
+
+    if (machineEl) {
+      machineEl.classList.remove('producing');
+      void machineEl.offsetWidth;
+      machineEl.classList.add('producing');
+      setTimeout(() => machineEl.classList.remove('producing'), 700);
+      // 5 粒粮落在"当前正在填的那个盆"里
+      if (troughEl) {
+        const bowls = troughEl.querySelectorAll('.trough-cell .bowl');
+        let bowlIdx = 0;
+        for (let i = 0; i < 6; i++) {
+          if (myBowlState[i] && myBowlState[i].filled && !myBowlState[i].eaterCatId) bowlIdx = i;
+        }
+        const targetBowl = bowls[bowlIdx];
+        if (targetBowl) spawnKibbles(machineEl, targetBowl, 5);
       }
     }
-    {
-      progressAnimating = true;
-      const pf = document.getElementById('progressFill');
-      const pt = document.getElementById('progressTrack');
-      if (pf && pt) {
-        pf.style.transition = "height .25s cubic-bezier(.3,.8,.4,1)";
-        pf.style.height = "100%";
-        pt.classList.add("full");
-        setTimeout(() => {
-          pt.classList.remove("full");
-          pf.style.transition = "height .5s cubic-bezier(.3,.8,.4,1)";
-          const pct = foodStock >= 24 ? 100 : Math.min(100, (foodProgress / 90) * 100);
-          pf.style.height = pct + "%";
-          progressAnimating = false;
-        }, 400);
-      }
+
+    // 出粮瞬间：轨道闪一下，不再临时冲满
+    const pt = document.getElementById('progressTrack');
+    if (pt) {
+      pt.classList.remove('feeding');
+      void pt.offsetWidth;
+      pt.classList.add('feeding');
+      setTimeout(() => pt.classList.remove('feeding'), 500);
+    }
+    updateProgressBar();
+  }
+
+  function spawnKibbles(machineEl, targetBowl, count) {
+    if (!machineEl || !targetBowl) return;
+    const spoutEl = machineEl.querySelector('.feeder-spout');
+    if (!spoutEl) return;
+
+    const spoutRect = spoutEl.getBoundingClientRect();
+    const bowlRect = targetBowl.getBoundingClientRect();
+    const startX = spoutRect.left + spoutRect.width / 2;
+    const startY = spoutRect.bottom;
+
+    for (let i = 0; i < count; i++) {
+      setTimeout(() => {
+        const kibble = document.createElement('div');
+        kibble.className = 'kibble';
+        document.body.appendChild(kibble);
+
+        // 落点：盆内中下部
+        const endX = bowlRect.left + bowlRect.width * (0.3 + Math.random() * 0.4);
+        const endY = bowlRect.top + bowlRect.height * 0.55;
+        const duration = 450 + Math.random() * 150;
+        const startTime = performance.now();
+        const rotation = (Math.random() > 0.5 ? 1 : -1) * (240 + Math.random() * 240);
+
+        function step(now) {
+          const t = Math.min(1, (now - startTime) / duration);
+          const x = startX + (endX - startX) * t;
+          const y = startY + (endY - startY) * (t * t);   // 重力加速
+          const rot = t * rotation;
+          kibble.style.transform = `translate(${x}px, ${y}px) translate(-50%, -50%) rotate(${rot}deg)`;
+          if (t < 1) {
+            requestAnimationFrame(step);
+          } else {
+            // 落地：淡出 120ms，不做回弹、不生成灰尘
+            kibble.animate([
+              { opacity: 1 },
+              { opacity: 0 }
+            ], { duration: 120, easing: 'ease-out' });
+            setTimeout(() => kibble.remove(), 130);
+          }
+        }
+        requestAnimationFrame(step);
+      }, i * 65);
     }
   }
 
+  function updateProgressBar() {
+    const pt = document.getElementById('progressTrack');
+    const pf = document.getElementById('progressFill');
+    if (!pt || !pf) return;
+    // 单次出粮进度：foodProgress / 90
+    // 粮仓满（foodStock >= 6）时进度条保持满格 + 发光
+    let pct;
+    if (foodStock >= 6) {
+      pct = 100;
+    } else {
+      pct = Math.min(100, (foodProgress / 90) * 100);
+    }
+    pf.style.height = pct + "%";
+    pt.classList.toggle("full", foodStock >= 6);
+  }
+
+
+
   function spawnParticles(cells) {
     if (!cells || !cells.length) return;
-    const m = mode === 'single' ? document.getElementById('foodMachine') : document.querySelector('.miniMachine');
-    if (!m) return;
-    const mRect = m.getBoundingClientRect();
-    const endX = mRect.left + mRect.width / 2;
-    const endY = mRect.top + mRect.height / 2;
-    const chosen = [...cells].sort(() => Math.random() - 0.5).slice(0, Math.min(5, cells.length));
-    chosen.forEach(([r, c], i) => {
+    // 粒子飞向左侧进度条
+    const target = document.getElementById('progressTrack');
+    if (!target) return;
+    const tRect = target.getBoundingClientRect();
+    const endX = tRect.left + tRect.width / 2;
+    const endY = tRect.top + 20;
+
+    cells.forEach(([r, c], idx) => {
       const el = getTileEl(r, c); if (!el) return;
       const rect = el.getBoundingClientRect();
-      const sx = rect.left + rect.width / 2, sy = rect.top + rect.height / 2;
-      const sp = document.createElement("div");
-      sp.className = "spark"; sp.style.left = sx + "px"; sp.style.top = sy + "px";
-      document.body.appendChild(sp); setTimeout(() => sp.remove(), 420);
-      setTimeout(() => {
-        const p = document.createElement("div");
-        p.className = "feed-particle";
-        p.style.left = sx + "px"; p.style.top = sy + "px";
-        p.style.transform = "translate(-50%, -50%) scale(1)";
-        document.body.appendChild(p);
-        requestAnimationFrame(() => {
-          p.style.transform = `translate(calc(-50% + ${endX - sx}px), calc(-50% + ${endY - sy}px)) scale(0.35)`;
-          p.style.opacity = "0";
-        });
-        setTimeout(() => p.remove(), 780);
-      }, i * 40);
+      const sx = rect.left + rect.width / 2;
+      const sy = rect.top + rect.height / 2;
+
+      // 每个格子生成 3 个粒子，错开时间出现，更密集更明显
+      for (let k = 0; k < 3; k++) {
+        setTimeout(() => {
+          const p = document.createElement("div");
+          p.className = "feed-particle";
+          p.style.left = sx + "px";
+          p.style.top = sy + "px";
+          const jx = (Math.random() - 0.5) * 18;
+          const jy = (Math.random() - 0.5) * 18;
+          p.style.transform = `translate(calc(-50% + ${jx}px), calc(-50% + ${jy}px)) scale(1.2)`;
+          document.body.appendChild(p);
+          requestAnimationFrame(() => {
+            const dx = endX - sx + (Math.random() - 0.5) * 16;
+            const dy = endY - sy + (Math.random() - 0.5) * 16;
+            p.style.transform = `translate(calc(-50% + ${dx}px), calc(-50% + ${dy}px)) scale(0.35)`;
+            p.style.opacity = "0";
+          });
+          setTimeout(() => p.remove(), 850);
+        }, idx * 25 + k * 55);
+      }
     });
   }
+
   function shakeBoard() { boardEl.classList.add("shake"); setTimeout(() => boardEl.classList.remove("shake"), 220); }
   function showChainBanner(level) {
     const el = document.createElement("div");
@@ -1245,12 +1677,12 @@
   }
 
     // ============ 排行榜 ============
-  const LB_KEY_BEST = 'cat_match3_best';
+  const LB_KEY_BEST = 'cat_match3_best_v2';
   const LB_KEY_NAME = 'cat_match3_name';
 
   function getLocalBest() {
     try { const raw = localStorage.getItem(LB_KEY_BEST); if (raw) return JSON.parse(raw); } catch (e) {}
-    return { returnedCats: 0, maxFoodStock: 0 };
+    return { returnedCats: 0, maxScore: 0 };
   }
   function setLocalBest(b) {
     try { localStorage.setItem(LB_KEY_BEST, JSON.stringify(b)); } catch (e) {}
@@ -1285,12 +1717,12 @@
     });
   }
 
-  function uploadScoreToServer(name, returnedCats, maxFoodStock) {
+  function uploadScoreToServer(name, returnedCats, score) {
     return new Promise((resolve, reject) => {
       let s;
       try { s = new WebSocket(wsUrlForLeaderboard()); } catch (e) { return reject(e); }
       const t = setTimeout(() => { try { s.close(); } catch (e) {} reject(new Error('连接超时')); }, 12000);
-      s.onopen = () => { s.send(JSON.stringify({ type: 'submit_score', name, returnedCats, maxFoodStock })); };
+      s.onopen = () => { s.send(JSON.stringify({ type: 'submit_score', name, returnedCats, score })); };
       s.onmessage = (e) => {
         try {
           const m = JSON.parse(e.data);
@@ -1309,19 +1741,19 @@
     if (!sec) return;
     const best = getLocalBest();
     const isNew = (returnedCats > best.returnedCats) ||
-                  (returnedCats === best.returnedCats && maxFoodStockThisRound > best.maxFoodStock);
+                  (returnedCats === best.returnedCats && score > best.maxScore);
     if (isNew) {
       setLocalBest({
         returnedCats: Math.max(returnedCats, best.returnedCats),
-        maxFoodStock: Math.max(maxFoodStockThisRound, best.maxFoodStock)
+        maxScore: Math.max(score, best.maxScore)
       });
     }
     sec.classList.remove('hidden');
     const info = sec.querySelector('.upload-info');
     const bestShown = getLocalBest();
     info.innerHTML = `
-      <div>本次：回窝 <b>${returnedCats}</b> 只 · 最大猫粮 <b>${maxFoodStockThisRound}</b> 份</div>
-      <div>历史最佳：回窝 <b>${bestShown.returnedCats}</b> 只 · 最大猫粮 <b>${bestShown.maxFoodStock}</b> 份</div>
+      <div>本次：回窝 <b>${returnedCats}</b> 只 · 积分 <b>${score}</b></div>
+      <div>历史最佳：回窝 <b>${bestShown.returnedCats}</b> 只 · 积分 <b>${bestShown.maxScore}</b></div>
       ${isNew ? '<div style="color:#e67e22;font-weight:900;margin-top:4px;">🎉 刷新最佳成绩！</div>' : ''}
     `;
     const btn = document.getElementById('btnUploadScore');
@@ -1347,7 +1779,7 @@
     }
     btn.disabled = true;
     btn.textContent = '上传中…';
-    uploadScoreToServer(name, returnedCats, maxFoodStockThisRound).then((res) => {
+    uploadScoreToServer(name, returnedCats, score).then((res) => {
       if (res.ok) {
         btn.textContent = res.rank ? `✅ 已上传（排名第 ${res.rank}）` : '✅ 已上传';
         showToast(res.rank ? `上传成功！你排第 ${res.rank} 名` : '上传成功！');
@@ -1388,7 +1820,7 @@
     if (top10.length === 0) {
       content.innerHTML = '<div class="lb-empty-virtual"><span class="star">🏆</span>虚位以待<br><span style="font-size:12px;font-weight:600;">快来成为第一个上榜的玩家吧！</span></div>';
     } else {
-      const rows = ['<div class="lb-row head"><div class="rank">#</div><div class="name">玩家</div><div class="val">回窝</div><div class="val2">猫粮</div></div>'];
+      const rows = ['<div class="lb-row head"><div class="rank">#</div><div class="name">玩家</div><div class="val">回窝</div><div class="val2">积分</div></div>'];
       top10.forEach((entry, idx) => {
         let rankCls = '';
         if (idx === 0) rankCls = 'top1';
@@ -1397,11 +1829,14 @@
         const isMe = myName && entry.name === myName;
         const rowCls = isMe ? ' me' : '';
         const name = (entry.name || '匿名').slice(0, 16);
+        // 兼容旧数据：老记录用 maxFoodStock 字段，新记录用 score
+        const scoreVal = (typeof entry.score === 'number') ? entry.score
+                       : (typeof entry.maxFoodStock === 'number') ? entry.maxFoodStock : 0;
         rows.push(`<div class="lb-row${rowCls}">
           <div class="rank ${rankCls}">${idx + 1}</div>
           <div class="name">${escapeHtml(name)}${isMe ? ' 👈' : ''}</div>
           <div class="val">${entry.returnedCats || 0}</div>
-          <div class="val2">${entry.maxFoodStock || 0}</div>
+          <div class="val2">${scoreVal}</div>
         </div>`);
       });
       content.innerHTML = rows.join('');
@@ -1412,11 +1847,13 @@
     const myEntry = myName ? (list || []).find(e => e.name === myName) : null;
     const localBest = getLocalBest();
     let recReturns = localBest.returnedCats || 0;
-    let recFood = localBest.maxFoodStock || 0;
+    let recScore = localBest.maxScore || 0;
     let rankText = '';
     if (myEntry) {
       recReturns = Math.max(recReturns, myEntry.returnedCats || 0);
-      recFood = Math.max(recFood, myEntry.maxFoodStock || 0);
+      const entryScore = (typeof myEntry.score === 'number') ? myEntry.score
+                       : (typeof myEntry.maxFoodStock === 'number') ? myEntry.maxFoodStock : 0;
+      recScore = Math.max(recScore, entryScore);
       const rank = (list || []).findIndex(e => e.name === myName) + 1;
       rankText = rank > 0 ? ` · 排名第 ${rank}` : '';
     }
@@ -1425,7 +1862,7 @@
         <div class="rec-title">📌 我的最佳记录</div>
         <div class="rec-stats">
           <div><b>${recReturns}</b><br><span>回窝</span></div>
-          <div><b>${recFood}</b><br><span>最大猫粮</span></div>
+          <div><b>${recScore}</b><br><span>积分</span></div>
         </div>
         <div style="font-size:11px;color:#a08a6a;margin-top:6px;">上传成绩后可以显示昵称</div>
       `;
@@ -1434,7 +1871,7 @@
         <div class="rec-title">📌 我的最佳记录${rankText}</div>
         <div class="rec-stats">
           <div><b>${recReturns}</b><br><span>回窝</span></div>
-          <div><b>${recFood}</b><br><span>最大猫粮</span></div>
+          <div><b>${recScore}</b><br><span>积分</span></div>
         </div>
       `;
     }
@@ -1646,17 +2083,15 @@
     bigHome.style.top = homeTop + "px";
     bigHome.style.width = homeW + "px";
     bigHome.style.height = homeH + "px";
+    POS.home = { x: homeLeft, y: homeTop, w: homeW, h: homeH };
     POS.eating = [];
     const catW = 84;
-    const troughTopY = H - 42 - 34;
+    const troughTopY = H - 42 - 54;
     const eatY = troughTopY - 60;
-    const eatLeft = troughLeft + 6;
-    const eatRight = troughLeft + troughWidth - catW - 6;
-    const eatWidth = Math.max(80, eatRight - eatLeft);
-    let n = Math.max(2, Math.min(6, Math.floor(eatWidth / 72) + 1));
-    for (let i = 0; i < n; i++) {
-      const t = n === 1 ? 0.5 : i / (n - 1);
-      POS.eating.push({ x: eatLeft + (eatWidth - catW) * t, y: eatY });
+    // 6 个进食位，和 6 个碗 1:1 对齐
+    for (let i = 0; i < 6; i++) {
+      const cx = troughLeft + (i + 0.5) * (troughWidth / 6);
+      POS.eating.push({ x: cx - catW / 2, y: eatY });
     }
     POS.waiting = [];
     const catH = 50;
@@ -1674,14 +2109,6 @@
     for (let row = 0; row < rows; row++) for (let col = 0; col < cols; col++) {
       POS.waiting.push({ x: waitLeft + cellW * (col + 0.5) - catW / 2, y: baseY + row * cellH });
     }
-    POS.sleepSpots = [];
-    const sCellW = homeW / 4, sCellH = homeH / 5;
-    for (let row = 0; row < 4; row++) for (let col = 0; col < 4; col++) {
-      POS.sleepSpots.push({
-        x: homeLeft + sCellW * (col + 0.5) - catW / 2,
-        y: homeTop + sCellH * (row + 1) - 18
-      });
-    }
     const gameRect = gameRoot.getBoundingClientRect();
     const topAreaRect = topArea.getBoundingClientRect();
     const topAreaBottomRel = topAreaRect.bottom - gameRect.top;
@@ -1691,30 +2118,42 @@
   }
 
     // 猫粮槽渲染：6 格，每 3 份铺满一格
-  function updateTroughCells(cellsEl, stock) {
+  // 猫粮盆渲染：6 盆 × 每盆 3 份
+  const KIBBLES_PER_BOWL = 3;
+  // 每盆最多 3 颗顶部颗粒的固定位置（相对碗的百分比）
+
+
+  // 猫粮碗渲染：6 碗，每碗 1 份；三圈猫粮按 eaten 逐圈消失
+  function updateTroughCells(cellsEl, state) {
     if (!cellsEl) return;
-    // 首次生成 6 个格子
-    if (cellsEl.children.length !== 6) {
+    if (cellsEl.dataset.bowlVersion !== "6") {
       cellsEl.innerHTML = "";
       for (let i = 0; i < 6; i++) {
         const cell = document.createElement("div");
         cell.className = "trough-cell";
-        const fill = document.createElement("div");
-        fill.className = "trough-cell-fill";
-        cell.appendChild(fill);
+        const bowl = document.createElement("div");
+        bowl.className = "bowl";
+        for (const cls of ["scatter outer", "scatter mid", "scatter inner"]) {
+          const s = document.createElement("div");
+          s.className = cls;
+          bowl.appendChild(s);
+        }
+        cell.appendChild(bowl);
         cellsEl.appendChild(cell);
       }
+      cellsEl.dataset.bowlVersion = "6";
     }
-    // 更新每格填充度：格子 i 装的是 [i*3+1, (i+1)*3] 这 3 份
     for (let i = 0; i < 6; i++) {
       const cell = cellsEl.children[i];
-      const fill = cell.querySelector(".trough-cell-fill");
-      const inCell = Math.max(0, Math.min(3, stock - i * 3));
-      const pct = (inCell / 3) * 100;
-      fill.style.height = pct + "%";
-      cell.classList.toggle("full", inCell >= 3);
+      const bowl = cell.querySelector(".bowl");
+      if (!bowl) continue;
+      const s = (state && state[i]) || { filled: false, eaten: 0 };
+      bowl.classList.toggle("filled", !!s.filled);
+      bowl.classList.toggle("eaten-1", !!s.filled && s.eaten === 1);
+      bowl.classList.toggle("eaten-2", !!s.filled && s.eaten >= 2);
     }
   }
+
 
 
   // ===================== 个人模式猫咪 =====================
@@ -1743,7 +2182,7 @@
   function moveCat(cat, x, y) { cat.el.style.left = x + "px"; cat.el.style.top = y + "px"; }
 
   function getFreeWaitingSlot() {
-    const used = new Set(cats.filter(c => c.waitingSlot >= 0).map(c => c.waitingSlot));
+    const used = new Set(cats.filter(c => c.poolSlot >= 0).map(c => c.poolSlot));
     for (let i = 0; i < POS.waiting.length; i++) if (!used.has(i)) return i;
     return -1;
   }
@@ -1758,41 +2197,108 @@
     for (let i = 0; i < POS.sleepSpots.length; i++) if (!used.has(i)) return i;
     return -1;
   }
-  function spawnSingleWaitingCat() {
-    // 只统计非 sleeping 的猫（回窝睡觉的不算占用名额）
+    // ============ 猫窝睡眠位置 ============
+  // 前 10 只：2 列 × 5 行，随机分配不重叠的槽位
+  // 10 只以后：用索引派生的伪随机位置，允许重叠
+  function computeHomeSlotPos(home, index) {
+    if (!home) return { x: 0, y: 0 };
+    const catW = 68, catH = 60;
+    const innerLeft = home.x + home.w * 0.15;
+    const innerWidth = home.w * 0.7;
+    const innerTop = home.y + home.h * 0.18;
+    const innerHeight = home.h * 0.64;
+    if (index < 10) {
+      const col = index % 2;
+      const row = Math.floor(index / 2);
+      const colSpacing = innerWidth / 2;
+      const rowSpacing = innerHeight / 5;
+      return {
+        x: innerLeft + col * colSpacing + colSpacing / 2 - catW / 2,
+        y: innerTop + row * rowSpacing + rowSpacing / 2 - catH / 2
+      };
+    }
+    // 溢出猫：伪随机位置（用 index 派生，保证同一只猫每次都算到同一位置）
+    const seed = index;
+    const r1 = ((seed * 9301 + 49297) % 233280) / 233280;
+    const r2 = ((seed * 49297 + 9301) % 233280) / 233280;
+    return {
+      x: innerLeft + r1 * innerWidth - catW / 2,
+      y: innerTop + r2 * innerHeight - catH / 2
+    };
+  }
+
+  // 单人模式：根据索引取坐标
+  function getSingleHomeSlotPos(index) {
+    return computeHomeSlotPos(POS.home, index);
+  }
+
+  // 从 0-9 中随机挑一个未被占用的槽位；10 个都占满则返回 10+ 的溢出索引
+  function pickFreeHomeSlot(cat, ownerFilter) {
+    const used = new Set();
+    for (const c of cats) {
+      if (c === cat) continue;
+      if (ownerFilter !== undefined && c.owner !== ownerFilter) continue;
+      if ((c.state === "walking_to_home" || c.state === "sleeping") && c.homeSlot >= 0) {
+        used.add(c.homeSlot);
+      }
+    }
+    const free = [];
+    for (let i = 0; i < 10; i++) if (!used.has(i)) free.push(i);
+    if (free.length > 0) return free[Math.floor(Math.random() * free.length)];
+    return 10 + Math.floor(Math.random() * 1000);
+  }
+  // ============ 通用补猫（三个模式共用） ============
+  // pool: 等待位数组  makeCat: 造猫函数  getFreeSlot: 找空等待位的函数
+  function spawnWaitingCatCommon(pool, makeCat, getFreeSlot) {
     const activeCats = cats.filter(c => c.state !== "sleeping").length;
     if (activeCats >= 18) return;
     const wCount = cats.filter(c => c.state === "waiting" || c.state === "waiting_walk").length;
     if (wCount >= 10) return;
-    if (POS.waiting.length === 0) return;
-    const slot = getFreeWaitingSlot();
+    if (pool.length === 0) return;
+    const slot = getFreeSlot();
     if (slot < 0) return;
-    const cat = makeSingleCat();
-    cat.waitingSlot = slot;
-    const p = POS.waiting[slot];
-    cat.el.style.left = p.x + "px";
-    cat.el.style.top = p.y + "px";
+    const cat = makeCat(slot);
     cats.push(cat);
   }
 
-  function tickSingleCats() {
+  function spawnSingleWaitingCat() {
+    spawnWaitingCatCommon(POS.waiting, (slot) => {
+      const cat = makeSingleCat();
+      cat.owner = null;
+      cat.poolSlot = slot;
+      const p = POS.waiting[slot];
+      cat.el.style.left = p.x + "px";
+      cat.el.style.top = p.y + "px";
+      return cat;
+    }, getFreeWaitingSlot);
+  }
+
+  // ============ 通用状态机（三个模式共用） ============
+  // hooks 提供模式相关的动作：
+  //   refreshCat(cat)      重新渲染猫的 SVG
+  //   getHomeSlot(cat)     找该猫可用的猫窝位下标
+  //   getHomePos(cat, idx) 该猫窝位的坐标
+  //   moveCat(cat, x, y)   把猫放到坐标
+  //   onReturn(cat)        猫回窝时的回调（计数 + 音效）
+  //   getPoolPos(cat)      猫在等待区的坐标（waiting 散步回来用）
+  //   clampWalkX(x)        散步 x 坐标夹取范围
+  function tickCatsCommon(hooks) {
     const now = performance.now();
     for (const cat of cats) {
       const e = now - cat.stateStart;
       switch (cat.state) {
         case "waiting":
           if (now >= cat.nextIdleChange) {
-            const p = POS.waiting[cat.waitingSlot];
+            const p = hooks.getPoolPos(cat);
             if (p && Math.random() < 0.55) {
               cat.state = "waiting_walk";
               cat.stateStart = now;
               cat.walkDir = Math.random() < 0.5 ? "left" : "right";
               cat.nextIdleChange = now + rand(1800, 3500);
               const offset = (cat.walkDir === "right" ? 1 : -1) * (10 + Math.random() * 14);
-              let nx = p.x + offset;
-              nx = Math.max(70, Math.min(POS.W - 106 - 56, nx));
-              moveCat(cat, nx, p.y);
-              refreshSingleCatVisual(cat);
+              const nx = hooks.clampWalkX(p.x + offset);
+              hooks.moveCat(cat, nx, p.y);
+              hooks.refreshCat(cat);
             } else {
               cat.nextIdleChange = now + rand(3000, 7000);
             }
@@ -1800,85 +2306,184 @@
           break;
         case "waiting_walk":
           if (now >= cat.nextIdleChange) {
-            const p = POS.waiting[cat.waitingSlot];
-            if (p) moveCat(cat, p.x, p.y);
+            const p = hooks.getPoolPos(cat);
+            if (p) hooks.moveCat(cat, p.x, p.y);
             cat.state = "waiting";
             cat.stateStart = now;
             cat.nextIdleChange = now + rand(3000, 7000);
-            refreshSingleCatVisual(cat);
+            hooks.refreshCat(cat);
           }
           break;
         case "walking_to_food":
           if (e >= DUR.walkingToFood) {
-            cat.state = "eating";
-            cat.stateStart = now;
-            refreshSingleCatVisual(cat);
+            cat.state = "eating"; cat.stateStart = now;
+            hooks.refreshCat(cat);
           }
           break;
-        case "eating":
-          if (e >= DUR.eating) { cat.state = "cleaning"; cat.stateStart = now; cat.dirty = false; refreshSingleCatVisual(cat); }
+        case "eating": {
+          const total = DUR.eating;
+          const prog = Math.min(2, Math.floor((e / total) * 3));   // 0,1,2
+          if (cat.bowlRef) cat.bowlRef.eaten = prog;
+          if (e >= total) {
+            if (cat.bowlRef) {
+              // 吃完：碗里粮没了，但猫还占着这个碗（eaterCatId 保留）
+              cat.bowlRef.filled = false;
+              cat.bowlRef.eaten = 0;
+            }
+            cat.state = "cleaning"; cat.stateStart = now; cat.dirty = false;
+            hooks.refreshCat(cat);
+          }
           break;
+        }
         case "cleaning":
-          if (e >= DUR.cleaning) { cat.state = "happy"; cat.stateStart = now; refreshSingleCatVisual(cat); }
+          if (e >= DUR.cleaning) {
+            cat.state = "happy"; cat.stateStart = now;
+            hooks.refreshCat(cat);
+          }
           break;
         case "happy":
           if (e >= DUR.happy) {
-            const slot = getFreeSleepSlot();
-            const idx = slot >= 0 ? slot : Math.floor(Math.random() * POS.sleepSpots.length);
-            cat.sleepSlot = idx; cat.eatingSlot = -1;
-            cat.state = "walking_to_home"; cat.stateStart = now;
-            refreshSingleCatVisual(cat);
-            const p = POS.sleepSpots[idx];
-            moveCat(cat, p.x, p.y);
+            // 猫离开进食位：释放它占的碗
+            if (cat.bowlRef) {
+              cat.bowlRef.eaterCatId = null;
+              cat.bowlRef = null;
+            }
+            const idx = hooks.getHomeSlot(cat);
+            cat.homeSlot = idx;
+            cat.eatSlot = -1;
+            cat.state = "walking_to_home";
+            cat.stateStart = now;
+            hooks.refreshCat(cat);
+            const p = hooks.getHomePos(cat, idx);
+            hooks.moveCat(cat, p.x, p.y);
           }
           break;
         case "walking_to_home":
           if (e >= DUR.walkingToHome) {
             cat.state = "sleeping"; cat.stateStart = now;
-            refreshSingleCatVisual(cat); returnedCats++;
-            SoundManager.returnHome();
-            updateHUD();
+            hooks.refreshCat(cat);
+            hooks.onReturn(cat);
           }
           break;
       }
     }
-    trySendSingleCat();
   }
-  function trySendSingleCat() {
+
+  function tickSingleCats() {
+    tickCatsCommon({
+      refreshCat: refreshSingleCatVisual,
+      getPoolPos: (cat) => POS.waiting[cat.poolSlot] || null,
+      clampWalkX: (x) => Math.max(70, Math.min(POS.W - 106 - 56, x)),
+      getHomeSlot: (cat) => pickFreeHomeSlot(cat, undefined),
+      getHomePos: (cat, idx) => getSingleHomeSlotPos(idx),
+      moveCat: moveCat,
+      onReturn: (cat) => {
+        returnedCats++;
+        SoundManager.returnHome();
+        updateHUD();
+      }
+    });
+    trySendSingleCat();
+    updateHUD();
+  }
+  // ============ 通用派猫（三个模式共用） ============
+  // players: [{ id, get foodStock, set foodStock }, ...]
+  // getEatSlots(playerId) → 进食位数组
+  // getFreeSlot(playerId, usedSet) → 该玩家的空进食位下标
+  // applyCat(cat, playerId, slot) → 把猫移到槽位的回调
+  function trySendCatCommon(players, getEatSlots, getFreeSlot, applyCat) {
     if (!gameActive) return;
-    const using = cats.filter(c => c.state === "eating" || c.state === "cleaning" ||
-      c.state === "happy" || c.state === "walking_to_food").length;
-    if (using >= 6) return;
-    if (foodStock <= 0) return;
-    const maxConcurrent = maxConcurrentByFood(foodStock);
-    if (using >= maxConcurrent) return;
-    const waiter = cats.find(c => c.state === "waiting" || c.state === "waiting_walk");
+    // 找等待中的无主猫
+    const waiter = cats.find(c =>
+      (c.state === "waiting" || c.state === "waiting_walk") && !c.owner);
     if (!waiter) return;
-    const slot = getFreeEatingSlot();
+
+    // 统计每个玩家"正在占用食槽"的猫
+    const using = {};
+    for (const p of players) using[p.id] = 0;
+    for (const c of cats) {
+      if (c.owner && ["walking_to_food", "eating", "cleaning", "happy"].includes(c.state)) {
+        if (using[c.owner] !== undefined) using[c.owner]++;
+      }
+    }
+
+    // 候选玩家：有粮 + 未达并发上限（并发上限 = 已派出的猫 + 剩余粮，上限 6）
+    const candidates = players.filter(p =>
+      p.foodStock > 0 &&
+      using[p.id] < maxConcurrentByFood(p.foodStock + using[p.id]));
+
+    // 按粮多的概率高来抽一个
+    const total = candidates.reduce((s, p) => s + p.foodStock, 0);
+    if (total <= 0) return;
+    let rnd = Math.random() * total;
+    let target = candidates[0];
+    for (const p of candidates) {
+      rnd -= p.foodStock;
+      if (rnd <= 0) { target = p; break; }
+    }
+
+    // 找这个玩家空着的进食位
+    const usedSet = new Set(cats
+      .filter(c => c.owner === target.id && c.eatSlot >= 0 &&
+        ["walking_to_food", "eating", "cleaning", "happy"].includes(c.state))
+      .map(c => c.eatSlot));
+    const slot = getFreeSlot(target.id, usedSet);
     if (slot < 0) return;
-    foodStock--;
-    waiter.eatingSlot = slot; waiter.waitingSlot = -1;
-    waiter.state = "walking_to_food"; waiter.stateStart = performance.now();
-    refreshSingleCatVisual(waiter);
-    const p = POS.eating[slot];
-    moveCat(waiter, p.x, p.y);
+
+    // 扣粮、派猫
+    target.foodStock--;
+    waiter.owner = target.id;
+    waiter.eatSlot = slot;
+    waiter.poolSlot = -1;
+    waiter.state = "walking_to_food";
+    waiter.stateStart = performance.now();
+    applyCat(waiter, target.id, slot);
+
     SoundManager.meow();
     updateHUD();
+  }
+
+  function trySendSingleCat() {
+    const me = { id: 'me', get foodStock() { return foodStock; },
+      set foodStock(v) { foodStock = v; } };
+    trySendCatCommon(
+      [me],
+      () => POS.eating,
+      (id, used) => {
+        // 只挑"碗里有粮且碗未被占用"的进食位（进食位索引 = 碗索引）
+        for (let i = 0; i < POS.eating.length; i++) {
+          if (used.has(i)) continue;
+          const b = myBowlState[i];
+          if (b && b.filled && !b.eaterCatId) return i;
+        }
+        return -1;
+      },
+      (cat, id, slot) => {
+        const b = myBowlState[slot];
+        if (b && b.filled && !b.eaterCatId) {
+          b.eaterCatId = cat.id;
+          cat.bowlRef = b;
+        }
+        refreshSingleCatVisual(cat);
+        const p = POS.eating[slot];
+        if (p) moveCat(cat, p.x, p.y);
+      }
+    );
   }
 
   // ===================== 对战模式位置 =====================
   function computeBattlePositions() {
     const W = topArea.clientWidth, H = topArea.clientHeight;
 
-    // ============ 中栏等待区（只有 2 列） ============
+    // ============ 中栏等待区（缩短到红框范围） ============
     BATTLE_POS.pool = [];
     const poolWidth = 140;
     const poolLeft = (W - poolWidth) / 2;
-    const poolTop = 66, poolBottom = H - 12;
-    const poolH = Math.max(120, poolBottom - poolTop);
+    const poolTop = 66;
+    const poolH = Math.max(120, (H - poolTop - 12) * 0.52);
     const catW = 68, catH = 60;
     const cols = 2;
-    const rows = Math.max(4, Math.floor(poolH / 66));
+    const rows = 3;   // 固定 3 行 × 2 列 = 6 个位
     for (let r = 0; r < rows; r++) {
       for (let c = 0; c < cols; c++) {
         BATTLE_POS.pool.push({
@@ -1888,7 +2493,7 @@
       }
     }
 
-    // ============ 左右栏：自适应宽度 ============
+    // ============ 左右栏：猫窝保持原宽，喂食盆延伸到中栏中心 ============
     const leftColX = 6;
     const gapToPool = 6;
     const leftColW = (W - poolWidth) / 2 - gapToPool - 6;
@@ -1897,8 +2502,8 @@
     const colTop = 58;
     const colBottom = H - 8;
     const HOME_H = 88;
-    const TROUGH_H = 32;
-    const MACHINE_H = 78;
+    const TROUGH_H = 46;
+    const MACHINE_H = 68;
     const STOCK_H = 24;
 
     const homeTop = colTop;
@@ -1909,20 +2514,23 @@
     BATTLE_POS.myHome = { x: leftColX, y: homeTop, w: leftColW, h: HOME_H };
     BATTLE_POS.oppHome = { x: rightColX, y: homeTop, w: leftColW, h: HOME_H };
 
-    // 进食位：固定 6 个（允许横向轻微堆叠）
+    // 喂食盆实际宽度 = 左右栏宽 + 中栏一半（和 CSS 对齐）
+    const eatAreaW = leftColW + 76;
     const eatY = troughTop - catH + 10;
     const eatCount = 6;
     BATTLE_POS.myEat = [];
     BATTLE_POS.oppEat = [];
     for (let i = 0; i < eatCount; i++) {
       const t = (i + 0.5) / eatCount;
+      // 我的：从左栏左边到中栏中心
       BATTLE_POS.myEat.push({
-        x: leftColX + leftColW * t - catW / 2,
+        x: leftColX + eatAreaW * t - catW / 2,
         y: eatY,
         z: i
       });
+      // 对手：从中栏中心到右栏右边（镜像）
       BATTLE_POS.oppEat.push({
-        x: rightColX + leftColW * t - catW / 2,
+        x: (rightColX - 76) + eatAreaW * t - catW / 2,
         y: eatY,
         z: i
       });
@@ -1932,31 +2540,19 @@
   }
   function positionLeftColumnForBattle() {
     const gameRect = gameRoot.getBoundingClientRect();
-    const topAreaRect = topArea.getBoundingClientRect();
-    const topAreaBottomRel = topAreaRect.bottom - gameRect.top;
-    // 进度条在 topArea 底部稍下方
-    leftColumn.style.top = (topAreaBottomRel + 8) + "px";
+    const boardRect = boardArea.getBoundingClientRect();
+    // 直接对齐棋盘顶部
+    leftColumn.style.top = (boardRect.top - gameRect.top + 4) + "px";
     const pt = document.getElementById('progressTrack');
-    if (pt) pt.style.height = (boardEl.offsetHeight || 260) + "px";
+    if (pt) {
+      // 高度严格等于棋盘高度
+      pt.style.height = (boardEl.offsetHeight || 300) + "px";
+    }
   }
   // 猫窝内叠放位置：每 3 只一层，一层一层往上叠
   function getHomeSlotPos(owner, index) {
     const home = owner === 'me' ? BATTLE_POS.myHome : BATTLE_POS.oppHome;
-    if (!home) return { x: 0, y: 0 };
-    const catW = 68, catH = 60;
-    // 只展示前 12 个位置（4 行 × 3 列），超过的叠在最后一排
-    const cappedIndex = Math.min(index, 11);
-    const row = Math.floor(cappedIndex / 3);
-    const col = cappedIndex % 3;
-    const innerLeft = home.x + home.w * 0.14;
-    const innerBottom = home.y + home.h * 0.72;
-    const innerW = home.w * 0.72;
-    const colSpacing = innerW / 3;
-    const rowSpacing = 8;
-    return {
-      x: innerLeft + col * colSpacing + colSpacing / 2 - catW / 2,
-      y: innerBottom - row * rowSpacing - catH * 0.4
-    };
+    return computeHomeSlotPos(home, index);
   }
   // ===================== 对战猫咪 =====================
   // 服务器事件同步时：cat.paletteIdx 由服务器给
@@ -2011,11 +2607,6 @@
     return -1;
   }
 
-  function getFreeBattleHomeSlot(owner) {
-    // 无限叠：返回当前已占用数量
-    return cats.filter(c => c.owner === owner &&
-      (c.state === "walking_to_home" || c.state === "sleeping")).length;
-  }
 
   function refreshBattleCatVisual(cat) {
     cat.el.className = "cat state-" + cat.state;
@@ -2040,180 +2631,109 @@
 
   // 尝试让中间等待的猫去某侧食槽
   function trySendBattleCat() {
-    if (!gameActive) return;
     if (mode === 'online') return;
-    // 检查双方是否有空位
-    const myEating = cats.filter(c => c.owner === 'me' &&
-      ["eating", "cleaning", "happy", "walking_to_food"].includes(c.state)).length;
-    const oppEating = cats.filter(c => c.owner === 'opp' &&
-      ["eating", "cleaning", "happy", "walking_to_food"].includes(c.state)).length;
 
-    // 我方可以再吸引猫
-    const maxEat = BATTLE_POS.myEat.length;
-    const myCanReceive = myEating < maxEat && myEating < maxConcurrentByFood(foodStock) && foodStock > 0;
-    const oppCanReceive = oppEating < maxEat && oppEating < maxConcurrentByFood(opponent.foodStock) && opponent.foodStock > 0;
+    const me = { id: 'me',
+      get foodStock() { return foodStock; },
+      set foodStock(v) { foodStock = v; } };
+    const opp = { id: 'opp',
+      get foodStock() { return opponent.foodStock; },
+      set foodStock(v) { opponent.foodStock = v; } };
 
-    const waitingList = cats.filter(c => c.state === "waiting" || c.state === "waiting_walk");
-    if (waitingList.length === 0) return;
-    // 至少保留 6 只在中栏
-    const targetKeep = 3;
-    if (waitingList.length <= targetKeep) return;
-
-    // 优先给库存多的一方
-    let chosenOwner = null;
-    if (myCanReceive && oppCanReceive) {
-      chosenOwner = foodStock >= opponent.foodStock ? 'me' : 'opp';
-    } else if (myCanReceive) chosenOwner = 'me';
-    else if (oppCanReceive) chosenOwner = 'opp';
-    if (!chosenOwner) return;
-
-    const cat = waitingList[0];
-    const eatSlot = getFreeBattleEatSlot(chosenOwner);
-    if (eatSlot < 0) return;
-
-    // 扣粮
-    if (chosenOwner === 'me') foodStock--;
-    else opponent.foodStock--;
-
-    cat.poolSlot = -1;
-    cat.eatSlot = eatSlot;
-    cat.owner = chosenOwner;      // ← 新增
-    cat.state = "walking_to_food";
-    cat.stateStart = performance.now();
-    refreshBattleCatVisual(cat);
-
-    const target = (chosenOwner === 'me' ? BATTLE_POS.myEat : BATTLE_POS.oppEat)[eatSlot];
-    if (target) {
-      cat.el.style.left = target.x + "px";
-      cat.el.style.top = target.y + "px";
-    }
-
-    SoundManager.meow();
-    updateHUD();
+    trySendCatCommon(
+      [me, opp],
+      (id) => id === 'me' ? BATTLE_POS.myEat : BATTLE_POS.oppEat,
+      (id, used) => {
+        const bowlArr = id === 'me' ? myBowlState : oppBowlState;
+        const arr = id === 'me' ? BATTLE_POS.myEat : BATTLE_POS.oppEat;
+        for (let i = 0; i < arr.length; i++) {
+          if (used.has(i)) continue;
+          const b = bowlArr[i];
+          if (b && b.filled && !b.eaterCatId) return i;
+        }
+        return -1;
+      },
+      (cat, id, slot) => {
+        const bowlArr = id === 'me' ? myBowlState : oppBowlState;
+        const b = bowlArr[slot];
+        if (b && b.filled && !b.eaterCatId) {
+          b.eaterCatId = cat.id;
+          cat.bowlRef = b;
+        }
+        refreshBattleCatVisual(cat);
+        const arr = id === 'me' ? BATTLE_POS.myEat : BATTLE_POS.oppEat;
+        const p = arr[slot];
+        if (p) moveCat(cat, p.x, p.y);
+      }
+    );
   }
 
 
 
   function maxConcurrentByFood(stock) {
     if (stock <= 0) return 0;
-    if (stock <= 3) return 1;
-    if (stock <= 6) return 2;
-    if (stock <= 9) return 3;
-    if (stock <= 12) return 4;
-    if (stock <= 15) return 5;
-    return 6;
+    return Math.min(stock, 6);
   }
 
   function tickBattleCats() {
-    const now = performance.now();
-    for (const cat of cats) {
-      const e = now - cat.stateStart;
-      switch (cat.state) {
-        case "waiting":
-          if (now >= cat.nextIdleChange) {
-            const p = BATTLE_POS.pool[cat.poolSlot];
-            if (p && Math.random() < 0.55) {
-              cat.state = "waiting_walk";
-              cat.stateStart = now;
-              cat.walkDir = Math.random() < 0.5 ? "left" : "right";
-              cat.nextIdleChange = now + rand(1500, 3000);
-              const offset = (cat.walkDir === "right" ? 1 : -1) * (8 + Math.random() * 10);
-              let nx = p.x + offset;
-              nx = Math.max(104 + 2, Math.min(topArea.clientWidth - 104 - 56, nx));
-              cat.el.style.left = nx + "px";
-              cat.el.style.top = p.y + "px";
-              refreshBattleCatVisual(cat);
-            } else {
-              cat.nextIdleChange = now + rand(3000, 6500);
-            }
-          }
-          break;
-        case "waiting_walk":
-          if (now >= cat.nextIdleChange) {
-            const p = BATTLE_POS.pool[cat.poolSlot];
-            if (p) {
-              cat.el.style.left = p.x + "px";
-              cat.el.style.top = p.y + "px";
-            }
-            cat.state = "waiting";
-            cat.stateStart = now;
-            cat.nextIdleChange = now + rand(2500, 5500);
-            refreshBattleCatVisual(cat);
-          }
-          break;
-        case "walking_to_food":
-          if (e >= DUR.walkingToFood) {
-            cat.state = "eating";
-            cat.stateStart = now;
-            refreshBattleCatVisual(cat);
-          }
-          break;
-        case "eating":
-          if (e >= DUR.eating) {
-            cat.state = "cleaning"; cat.stateStart = now; cat.dirty = false;
-            refreshBattleCatVisual(cat);
-          }
-          break;
-        case "cleaning":
-          if (e >= DUR.cleaning) {
-            cat.state = "happy"; cat.stateStart = now;
-            refreshBattleCatVisual(cat);
-          }
-          break;
-        case "happy":
-          if (e >= DUR.happy) {
-            // 走向同侧猫窝
-            cat.homeSlot = getFreeBattleHomeSlot(cat.owner);
-            cat.eatSlot = -1;
-            cat.state = "walking_to_home";
-            cat.stateStart = now;
-            refreshBattleCatVisual(cat);
-            const pos = getHomeSlotPos(cat.owner, cat.homeSlot);
-            cat.el.style.left = pos.x + "px";
-            cat.el.style.top = pos.y + "px";
-          }
-          break;
-        case "walking_to_home":
-          if (e >= DUR.walkingToHome) {
-            cat.state = "sleeping";
-            cat.stateStart = now;
-            refreshBattleCatVisual(cat);
-            if (cat.owner === 'me') {
-              returnedCats++;
-              SoundManager.returnHome();
-            } else {
-              opponent.returnedCats++;
-            }
-            updateHUD();
-          }
-          break;
-        case "sleeping":
-          // 睡觉的猫保留在猫窝里，视觉上限 12 只，超出移除最早的
-          break;
-      }
+    if (mode === 'online') {
+      // 联机模式：位置由客户端维护，但粮和主归服务器权威
+      // 这里先只做本地动画推进 + 视觉清理（下一轮做服务端对齐时再动）
+      tickCatsCommon({
+        refreshCat: refreshBattleCatVisual,
+        getPoolPos: (cat) => BATTLE_POS.pool[cat.poolSlot] || null,
+        clampWalkX: (x) => Math.max(104 + 2, Math.min(topArea.clientWidth - 104 - 56, x)),
+      getHomeSlot: (cat) => pickFreeHomeSlot(cat, cat.owner),
+        getHomePos: (cat, idx) => getHomeSlotPos(cat.owner, idx),
+        moveCat: moveCat,
+        onReturn: () => {}
+      });
+      // 清理 12 只视觉上限
+      cleanupSleepingCats();
+      return;
     }
-    // 清理逻辑：每侧最多保留 12 只 sleeping 猫，超出的移除 DOM 和数组
-    const sleepingByOwner = { me: [], opp: [] };
+
+    // 本地对战：完全复用单人的逻辑
+    tickCatsCommon({
+      refreshCat: refreshBattleCatVisual,
+      getPoolPos: (cat) => BATTLE_POS.pool[cat.poolSlot] || null,
+      clampWalkX: (x) => Math.max(104 + 2, Math.min(topArea.clientWidth - 104 - 56, x)),
+      getHomeSlot: (cat) => pickFreeHomeSlot(cat, cat.owner),
+      getHomePos: (cat, idx) => getHomeSlotPos(cat.owner, idx),
+      moveCat: moveCat,
+      onReturn: (cat) => {
+        if (cat.owner === 'me') {
+          returnedCats++;
+          SoundManager.returnHome();
+        } else if (cat.owner === 'opp') {
+          opponent.returnedCats++;
+        }
+        updateHUD();
+      }
+    });
+    cleanupSleepingCats();
+    trySendBattleCat();
+    updateHUD();
+  }
+
+  function cleanupSleepingCats() {
+    const byOwner = { me: [], opp: [] };
     for (const c of cats) {
       if (c.state === 'sleeping' && (c.owner === 'me' || c.owner === 'opp')) {
-        sleepingByOwner[c.owner].push(c);
+        byOwner[c.owner].push(c);
       }
     }
     for (const owner of ['me', 'opp']) {
-      const list = sleepingByOwner[owner];
+      const list = byOwner[owner];
       if (list.length > 12) {
         list.sort((a, b) => a.stateStart - b.stateStart);
-        const toRemove = list.slice(0, list.length - 12);
-        for (const c of toRemove) {
+        for (const c of list.slice(0, list.length - 12)) {
           if (c.el && c.el.parentNode) c.el.parentNode.removeChild(c.el);
           c._dead = true;
         }
       }
     }
-    if (cats.some(c => c._dead)) {
-      cats = cats.filter(c => !c._dead);
-    }
-    trySendBattleCat();
+    if (cats.some(c => c._dead)) cats = cats.filter(c => !c._dead);
   }
 
   // ===================== 对战：等待区补充 =====================
@@ -2228,7 +2748,7 @@
       // 补 1 只
       const slot = getFreeBattlePoolSlot();
       if (slot < 0) return;
-      const cat = makeBattleCat(catIdSeq++, Math.random() < 0.5 ? 'me' : 'opp',
+      const cat = makeBattleCat(catIdSeq++, null,
         Math.floor(Math.random() * CAT_PALETTES.length), slot);
       cats.push(cat);
     }, 800);
@@ -2282,8 +2802,12 @@
     }
     opponent.score += totalGain;
     opponent.foodProgress += totalGain;
-    while (opponent.foodProgress >= 90 && opponent.foodStock < 24) {
-      opponent.foodStock++; opponent.foodProgress -= 90;
+    while (opponent.foodProgress >= 90 && opponent.foodStock < 6) {
+      const b = oppBowlState.find(b => !b.filled && !b.eaterCatId);
+      if (!b) break;
+      opponent.foodProgress -= 90;
+      opponent.foodStock++;
+      b.filled = true; b.eaten = 0; b.eaterCatId = null;
     }
     updateHUD();
   }
@@ -2294,21 +2818,19 @@
       timeText.textContent = Math.ceil(Math.max(0, timeLeft));
       returnText.textContent = returnedCats;
       scoreText.textContent = score;
-      foodText.textContent = foodStock;
-      updateTroughCells(document.getElementById('troughCells'), foodStock);
+      updateTroughCells(document.getElementById('troughCells'), myBowlState);
       updateProgressBar();
     } else {
       battleTimeText.textContent = Math.ceil(Math.max(0, timeLeft));
       myReturnText.textContent = returnedCats;
       oppReturnText.textContent = opponent.returnedCats;
       scoreText.textContent = score;
-      foodText.textContent = foodStock;
-      if (myMiniStock) myMiniStock.textContent = foodStock + "/24";
-      if (oppMiniStock) oppMiniStock.textContent = opponent.foodStock + "/24";
-      updateTroughCells(document.getElementById('myMiniTroughCells'), foodStock);
-      updateTroughCells(document.getElementById('oppMiniTroughCells'), opponent.foodStock);
+      updateTroughCells(document.getElementById('myMiniTroughCells'), myBowlState);
+      updateTroughCells(document.getElementById('oppMiniTroughCells'), oppBowlState);
+      updateProgressBar();
     }
   }
+
 
   function renderMiniKibbles(parent, stock) {
     if (!parent) return;
@@ -2347,10 +2869,10 @@
     document.getElementById('catsLayer').innerHTML = "";
     cats = []; catIdSeq = 1;
     score = 0; foodStock = 0; foodProgress = 0;
-    maxFoodStockThisRound = 0;
+    myBowlState = makeEmptyBowls();
+    oppBowlState = makeEmptyBowls();
     timeLeft = 90; returnedCats = 0;
     gameActive = true; isAnimating = false; selected = null;
-    progressAnimating = false; tickSecond = -1;
 
     board = generateBoard();
     renderBoard();
@@ -2371,10 +2893,10 @@
     battleCatsEl.innerHTML = "";
     cats = []; catIdSeq = 1;
     score = 0; foodStock = 0; foodProgress = 0;
-    maxFoodStockThisRound = 0;
+    myBowlState = makeEmptyBowls();
+    oppBowlState = makeEmptyBowls();
     timeLeft = 90; returnedCats = 0;
     gameActive = true; isAnimating = false; selected = null;
-    progressAnimating = false; tickSecond = -1;
 
     opponent = { name: isOnline ? (opponent.name || '对手') : '电脑猫娘',
       score: 0, foodStock: 0,
@@ -2384,28 +2906,52 @@
     board = generateBoard();
     renderBoard();
 
-    // 多重保险，确保布局稳定后再摆放猫咪
-    const initBattleLayout = () => {
-      computeBattlePositions();
+    // 初始化对战布局（带重试 + 兜底）
+    const initBattleLayout = (retry) => {
+      if (retry === undefined) retry = 0;
+      try {
+        computeBattlePositions();
+      } catch (err) {
+        console.error('computeBattlePositions 出错:', err);
+      }
+      // 兜底：如果 pool 位置为空，手动生成 6 个
+      if (!BATTLE_POS.pool || BATTLE_POS.pool.length === 0) {
+        const W = topArea.clientWidth, H = topArea.clientHeight;
+        const poolWidth = 140;
+        const poolLeft = (W - poolWidth) / 2;
+        const poolTop = 66;
+        const poolH = Math.max(120, (H - poolTop - 12) * 0.52);
+        BATTLE_POS.pool = [];
+        for (let r = 0; r < 3; r++) {
+          for (let c = 0; c < 2; c++) {
+            BATTLE_POS.pool.push({
+              x: poolLeft + (c + 0.5) * (poolWidth / 2) - 34,
+              y: poolTop + (r + 0.5) * (poolH / 3) - 30
+            });
+          }
+        }
+      }
       // 清空已存在的猫
       battleCatsEl.innerHTML = "";
       cats = [];
-      // 初始填充 6 只等待猫
+      // 填充 6 只等待猫
       for (let i = 0; i < 6; i++) {
         const slot = getFreeBattlePoolSlot();
         if (slot < 0) break;
-        const cat = makeBattleCat(catIdSeq++,
-          Math.random() < 0.5 ? 'me' : 'opp',
+        const cat = makeBattleCat(catIdSeq++, null,
           Math.floor(Math.random() * CAT_PALETTES.length), slot);
         cats.push(cat);
       }
       updateHUD();
+      // 如果没生成满 6 只，再试一次
+      if (cats.length < 6 && retry < 4) {
+        setTimeout(() => initBattleLayout(retry + 1), 200);
+      }
     };
-    // 连续多次尝试，确保生效
+    // 多次尝试，确保布局稳定
     requestAnimationFrame(() => requestAnimationFrame(() => {
-      setTimeout(initBattleLayout, 60);
-      setTimeout(computeBattlePositions, 300);
-      setTimeout(computeBattlePositions, 800);
+      setTimeout(() => initBattleLayout(0), 60);
+      setTimeout(() => { if (cats.length < 6) initBattleLayout(5); }, 400);
     }));
 
     showStartBanner();
@@ -2488,12 +3034,14 @@
         timeLeft = msg.timeLeft;
         if (msg.myBoard) board = msg.myBoard;
         if (typeof msg.myScore === 'number') score = msg.myScore;
-        if (typeof msg.myFoodStock === 'number') {
-          foodStock = msg.myFoodStock;
-          maxFoodStockThisRound = Math.max(maxFoodStockThisRound, foodStock);
-        }
+        if (typeof msg.myFoodStock === 'number') foodStock = msg.myFoodStock;
         if (typeof msg.myFoodProgress === 'number') foodProgress = msg.myFoodProgress;
         if (typeof msg.myReturnedCats === 'number') returnedCats = msg.myReturnedCats;
+        if (msg.myBowls) {
+          myBowlState = msg.myBowls.map(b => ({
+            filled: !!b.filled, eaten: b.eaten || 0, eaterCatId: null
+          }));
+        }
         if (msg.opponent) {
           opponent.name = msg.opponent.name;
           oppNameLabel.textContent = msg.opponent.name;
@@ -2501,6 +3049,11 @@
           opponent.score = msg.opponent.score || 0;
           opponent.foodStock = msg.opponent.foodStock || 0;
           opponent.returnedCats = msg.opponent.returnedCats || 0;
+          if (msg.opponent.bowls) {
+            oppBowlState = msg.opponent.bowls.map(b => ({
+              filled: !!b.filled, eaten: b.eaten || 0, eaterCatId: null
+            }));
+          }
         }
         renderBoard(); updateHUD();
         break;
@@ -2524,7 +3077,9 @@
           if (cat && (cat.state === 'waiting' || cat.state === 'waiting_walk')) {
             const owner = msg.ownerId === myPlayerId ? 'me' : 'opp';
             cat.owner = owner;
-            const eatSlot = getFreeBattleEatSlot(owner);
+            // 优先用服务端指定的碗位；没有就用本地推断兜底
+            const eatSlot = (typeof msg.eatSlot === 'number' && msg.eatSlot >= 0)
+              ? msg.eatSlot : getFreeBattleEatSlot(owner);
             if (eatSlot >= 0) {
               cat.eatSlot = eatSlot;
               cat.poolSlot = -1;
@@ -2544,7 +3099,7 @@
           if (cat) {
             if (msg.state === 'walking_to_home') {
               cat.eatSlot = -1;
-              cat.homeSlot = getFreeBattleHomeSlot(cat.owner);
+              cat.homeSlot = pickFreeHomeSlot(cat, cat.owner);
               cat.state = 'walking_to_home';
               cat.stateStart = performance.now();
               refreshBattleCatVisual(cat);
