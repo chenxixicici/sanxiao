@@ -950,6 +950,560 @@
   }
   #uploadSection button:active { transform: translateY(2px); box-shadow: 0 1px 0 #2e7d1a; }
   #uploadSection button:disabled { opacity: 0.6; cursor: not-allowed; }
+
+
+  /* ====== UI polish pass: warm cream, honey wood, soft ceramic ====== */
+  :root {
+    color-scheme: light;
+  }
+
+  html, body {
+    background: #f5e3c6;
+    color: #543923;
+  }
+
+  #modeSelect {
+    background:
+      radial-gradient(ellipse at 18% 12%, rgba(255,255,235,.62), transparent 34%),
+      radial-gradient(ellipse at 82% 26%, rgba(255,225,173,.42), transparent 32%),
+      linear-gradient(180deg, #b8dce9 0%, #d8e9d5 42%, #a9c987 72%, #7da765 100%);
+  }
+
+  #modeSelect h1 {
+    color: #684321;
+    letter-spacing: 1.8px;
+    text-shadow: 0 2px 0 #fff8e8, 0 5px 14px rgba(100, 69, 35, .14);
+  }
+
+  #modeSelect .sub {
+    color: #765b3d;
+    text-shadow: 0 1px 0 rgba(255,255,255,.55);
+  }
+
+  .mode-card {
+    background: linear-gradient(155deg, #fffef9 0%, #fff5e3 56%, #f8dfb8 100%);
+    border: 1.5px solid #e4bd83;
+    border-radius: 23px;
+    box-shadow: 0 5px 0 rgba(174, 124, 65, .34), 0 12px 26px rgba(83, 66, 38, .17), inset 0 2px 0 rgba(255,255,255,.96);
+    transition: transform .15s ease, box-shadow .15s ease, filter .15s ease;
+  }
+
+  .mode-card:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 7px 0 rgba(174, 124, 65, .28), 0 16px 30px rgba(83, 66, 38, .22), inset 0 2px 0 rgba(255,255,255,.98);
+    filter: saturate(1.04);
+  }
+
+  .mode-card:active {
+    transform: translateY(2px);
+    box-shadow: 0 2px 0 rgba(174, 124, 65, .3), 0 5px 12px rgba(83, 66, 38, .15), inset 0 2px 0 rgba(255,255,255,.85);
+  }
+
+  .mode-icon {
+    filter: drop-shadow(0 3px 2px rgba(117, 77, 36, .14));
+  }
+
+  .mode-title {
+    color: #63401f;
+    letter-spacing: .25px;
+  }
+
+  .mode-desc {
+    color: #8b6b47;
+  }
+
+  #game {
+    background: linear-gradient(180deg, #fff0d5 0%, #f7e5c8 100%);
+  }
+
+  #topArea {
+    background:
+      radial-gradient(ellipse at 82% 12%, rgba(255,246,192,.55), transparent 18%),
+      linear-gradient(180deg, #a9d8ed 0%, #c8e6e7 19%, #dcebd0 34%, #c8dfaa 48%, #9fca7c 72%, #78ad5e 100%);
+    box-shadow: 0 7px 18px rgba(79, 103, 53, .2), inset 0 -2px 0 rgba(255,255,255,.28);
+  }
+
+  .cloud {
+    background: rgba(255, 255, 248, .96);
+    box-shadow: 0 3px 8px rgba(95, 133, 147, .12);
+  }
+
+  #sun {
+    background: radial-gradient(circle at 32% 27%, #fffde2 0%, #ffe58b 34%, #ffc653 70%, #f0a73b 100%);
+    box-shadow: 0 0 0 5px rgba(255, 229, 139, .15), 0 0 25px rgba(255, 206, 87, .62);
+  }
+
+  #grass {
+    background: linear-gradient(180deg, rgba(190, 220, 148, 0) 0%, rgba(169, 207, 119, .76) 19%, #82b766 100%);
+  }
+
+  .hud-item {
+    background: linear-gradient(180deg, #fffef8 0%, #fff3d9 58%, #f8dfb7 100%);
+    border-color: #e8c48d;
+    box-shadow: 0 3px 0 #d2a568, 0 6px 14px rgba(100, 69, 35, .15), inset 0 2px 0 rgba(255,255,255,.96);
+  }
+
+  .hud-label {
+    color: #987246;
+    letter-spacing: .2px;
+  }
+
+  .hud-value {
+    color: #573719;
+    text-shadow: 0 1px 0 rgba(255,255,255,.55);
+  }
+
+  .hud-item.me {
+    border-color: #9acb78;
+  }
+
+  .hud-item.opp {
+    border-color: #eaa0a0;
+    background: linear-gradient(180deg, #fff9f5, #f9ded7);
+  }
+
+  #boardArea {
+    background:
+      radial-gradient(ellipse at 50% 0%, rgba(255,255,250,.98) 0%, rgba(255,246,226,.98) 45%, #f3dfbd 100%);
+  }
+
+  #board {
+    background: linear-gradient(145deg, #f0d4a5 0%, #d9b17b 42%, #b98650 100%);
+    border: 1px solid rgba(164, 112, 58, .52);
+    border-radius: 21px;
+    box-shadow: 0 8px 18px rgba(111, 76, 39, .22), inset 0 2px 0 rgba(255,255,255,.82), inset 0 -3px 0 rgba(123, 77, 35, .18);
+  }
+
+  .tile {
+    border-radius: 12px;
+    box-shadow: inset 0 2px 0 rgba(255,255,255,.9), inset 0 -2px 0 rgba(120, 81, 43, .08), 0 1px 2px rgba(110, 78, 43, .12);
+  }
+
+  .tile[data-type="paw"] {
+    background: linear-gradient(145deg, #ffe9e0 0%, #ffcbbb 100%);
+    border-color: rgba(226, 150, 127, .2);
+  }
+
+  .tile[data-type="fish"] {
+    background: linear-gradient(145deg, #e0f2ff 0%, #b5dcf3 100%);
+    border-color: rgba(104, 165, 202, .22);
+  }
+
+  .tile[data-type="yarn"] {
+    background: linear-gradient(145deg, #e6f6d8 0%, #bfe29d 100%);
+    border-color: rgba(117, 168, 82, .2);
+  }
+
+  .tile[data-type="cookie"] {
+    background: linear-gradient(145deg, #fff4cf 0%, #ffdfa0 100%);
+    border-color: rgba(214, 161, 67, .2);
+  }
+
+  .tile[data-type="milk"] {
+    background: linear-gradient(145deg, #f3e9ff 0%, #d7c8eb 100%);
+    border-color: rgba(151, 126, 183, .2);
+  }
+
+  .tile.selected {
+    border-color: #ff9f43;
+    box-shadow: inset 0 2px 0 rgba(255,255,255,.95), 0 0 0 2px #fff4d6, 0 0 0 4px rgba(255, 159, 67, .88), 0 0 16px rgba(255, 159, 67, .52);
+  }
+
+  .cat-feeder {
+    filter: drop-shadow(0 6px 7px rgba(103, 73, 42, .23));
+  }
+
+  .cat-feeder .feeder-body {
+    background: linear-gradient(100deg, #f8edda 0%, #fffaf0 23%, #ead6b8 58%, #c9a77c 100%);
+    border-color: rgba(173, 132, 82, .66);
+    box-shadow: inset 0 2px 0 rgba(255,255,255,.98), inset 0 -6px 12px rgba(116, 77, 37, .16), 0 4px 10px rgba(96, 64, 33, .22);
+  }
+
+  .cat-feeder .feeder-body::before {
+    background: linear-gradient(90deg, rgba(255,255,255,.55), rgba(255,255,255,.96), rgba(255,255,255,.5));
+  }
+
+  .cat-feeder .feeder-spout {
+    background: radial-gradient(circle at 42% 28%, #5d4228 0%, #2c1b0c 58%, #160d05 100%);
+    box-shadow: inset 0 3px 6px rgba(0,0,0,.72), 0 1px 0 rgba(255,255,255,.52);
+  }
+
+  .cat-feeder .feeder-light {
+    background: radial-gradient(circle at 32% 28%, #d9ffb9 0%, #8edb5d 46%, #4c9e30 100%);
+    box-shadow: 0 0 7px rgba(126,217,87,.85), inset 0 1px 1px rgba(255,255,255,.8);
+  }
+
+  #progressTrack {
+    background: linear-gradient(180deg, rgba(113, 145, 82, .14), rgba(96, 129, 64, .25));
+    border-color: #a9c989;
+    box-shadow: inset 0 2px 6px rgba(75, 98, 46, .22), 0 3px 7px rgba(74, 91, 47, .1);
+  }
+
+  #progressFill {
+    background: linear-gradient(0deg, #4b9b32 0%, #83cf5b 43%, #b8e98d 76%, #edffd8 100%);
+    box-shadow: 0 0 10px rgba(126,217,87,.52), inset 0 0 8px rgba(255,255,255,.5);
+  }
+
+  #trough {
+    background: linear-gradient(180deg, #f0d6ad 0%, #d3ad78 45%, #a87945 100%);
+    box-shadow: 0 5px 12px rgba(93, 60, 29, .27), inset 0 2px 0 rgba(255,255,255,.7), inset 0 -2px 0 rgba(111, 70, 31, .22);
+  }
+
+  .miniTroughInner {
+    background: linear-gradient(180deg, #58422e, #332215);
+    box-shadow: inset 0 3px 6px rgba(0,0,0,.42), inset 0 1px 0 rgba(255,255,255,.12);
+  }
+
+  .trough-cell .bowl {
+    background: radial-gradient(circle at 36% 25%, #fffefa 0%, #f9f5e9 36%, #e3d8c2 73%, #b7a587 100%);
+    box-shadow: inset 0 -2px 3px rgba(116, 88, 51, .22), inset 0 2px 3px rgba(255,255,255,.98), 0 2px 3px rgba(75, 52, 30, .24);
+  }
+
+  .trough-cell .bowl::before {
+    background: radial-gradient(circle at 50% 42%, #5a432d 0%, #332316 68%, #21150b 100%);
+    box-shadow: inset 0 2px 4px rgba(0,0,0,.62), 0 1px 0 rgba(255,255,255,.12);
+  }
+
+  .trough-cell .bowl.filled {
+    box-shadow: inset 0 -2px 3px rgba(116,88,51,.2), inset 0 2px 3px rgba(255,255,255,.98), 0 0 0 1.5px rgba(255,204,94,.95), 0 0 8px rgba(255,195,75,.48);
+  }
+
+  #bigHome {
+    background: repeating-radial-gradient(ellipse at 50% 50%, #e1bd8d 0 2.5px, #b78751 2.5px 4px, #d4aa73 4px 6px, #efd0a0 6px 8px);
+    box-shadow: 0 9px 20px rgba(94, 61, 31, .32), inset 0 -8px 14px rgba(80,40,10,.3), inset 0 8px 12px rgba(255,232,184,.55);
+  }
+
+  #bigHomeInner {
+    background: radial-gradient(ellipse at 50% 35%, #fffaf0 0%, #f8ebd0 47%, #e4c99b 100%);
+    box-shadow: inset 0 8px 16px rgba(140,90,40,.28), inset 0 -6px 10px rgba(255,255,255,.58), 0 0 0 3px rgba(150,100,50,.24);
+  }
+
+  #bigHomeLabel {
+    color: #70491f;
+    text-shadow: 0 1px 0 rgba(255,248,222,.98), 0 -1px 1px rgba(120,80,40,.24);
+  }
+
+  #battlePool {
+    background: rgba(255, 250, 234, .4);
+    border-color: rgba(255, 252, 235, .88);
+    box-shadow: inset 0 2px 8px rgba(93, 102, 65, .12), 0 2px 8px rgba(84, 95, 58, .08);
+  }
+
+  #battlePoolLabel {
+    background: linear-gradient(180deg, #fffef9, #ffefd5);
+    border-color: #e8c48d;
+    color: #86613a;
+  }
+
+  #bottomBar {
+    background: linear-gradient(180deg, #fffaf0 0%, #ffedcf 100%);
+    border-color: #e3bd83;
+    box-shadow: 0 3px 0 rgba(190, 143, 79, .25), 0 5px 12px rgba(100, 69, 35, .1), inset 0 1px 0 rgba(255,255,255,.96);
+    color: #806344;
+  }
+
+  #bottomBar strong {
+    color: #573719;
+    text-shadow: 0 1px 0 rgba(255,255,255,.65);
+  }
+
+  #btnBack {
+    background: linear-gradient(145deg, #fffef9 0%, #fff0d2 100%);
+    border-color: #e8c48d;
+    box-shadow: 0 3px 0 #d2a568, 0 5px 10px rgba(100, 69, 35, .15), inset 0 1px 0 rgba(255,255,255,.98);
+  }
+
+  .wait-card, .result-card, .leaderboard-card {
+    background: linear-gradient(150deg, #fffef9 0%, #fff5e3 58%, #f8e2bd 100%);
+    border: 1px solid rgba(225, 188, 132, .8);
+    box-shadow: 0 16px 38px rgba(72, 48, 25, .24), inset 0 2px 0 rgba(255,255,255,.96);
+  }
+
+  .wait-card h2, .leaderboard-card h2 {
+    color: #b96c2b;
+    text-shadow: 0 1px 0 rgba(255,255,255,.8);
+  }
+
+  .result-card .pscore {
+    background: linear-gradient(145deg, #fffaf0, #ffedcf);
+    border-color: #e3bd83;
+    box-shadow: inset 0 1px 0 rgba(255,255,255,.9);
+  }
+
+  .leaderboard-btn {
+    background: linear-gradient(180deg, #ffe9a0 0%, #ffc65a 56%, #f2a33c 100%);
+    box-shadow: 0 4px 0 #c58a35, 0 8px 18px rgba(190, 130, 38, .25), inset 0 1px 0 rgba(255,255,255,.85);
+  }
+
+  .leaderboard-card button {
+    background: linear-gradient(180deg, #ffbd70 0%, #f69a49 100%);
+    box-shadow: 0 4px 0 #cf792e, 0 5px 12px rgba(154, 89, 34, .12), inset 0 1px 0 rgba(255,255,255,.55);
+  }
+
+  #uploadSection {
+    background: linear-gradient(145deg, #fffaf0, #ffedcf);
+    border-color: #dfb77e;
+  }
+
+  #uploadSection button {
+    background: linear-gradient(180deg, #91d96d 0%, #5eb33d 100%);
+    box-shadow: 0 3px 0 #428b2b, inset 0 1px 0 rgba(255,255,255,.45);
+  }
+
+  button, .leaderboard-btn, #btnBack {
+    transition: transform .12s ease, box-shadow .12s ease, filter .12s ease;
+  }
+
+  button:hover, .leaderboard-btn:hover {
+    filter: brightness(1.025) saturate(1.04);
+  }
+
+  button:active, .leaderboard-btn:active, #btnBack:active {
+    transform: translateY(2px);
+    filter: brightness(.99);
+  }
+
+  button:focus-visible, .mode-card:focus-visible {
+    outline: 3px solid rgba(255, 159, 67, .8);
+    outline-offset: 3px;
+  }
+
+
+  /* 美术升级：暖阳 3D 微缩花园背景，内嵌 SVG，不依赖外部资源 */
+  #topArea {
+    background-color: #c5dcb0;
+    background-image: url("data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSI5NjAiIGhlaWdodD0iNzIwIiB2aWV3Qm94PSIwIDAgOTYwIDcyMCI+CjxkZWZzPgogPGxpbmVhckdyYWRpZW50IGlkPSJza3kiIHgxPSIwIiB5MT0iMCIgeDI9IjAiIHkyPSIxIj48c3RvcCBzdG9wLWNvbG9yPSIjOWRjZmUyIi8+PHN0b3Agb2Zmc2V0PSIuMzgiIHN0b3AtY29sb3I9IiNjZGU3ZGYiLz48c3RvcCBvZmZzZXQ9Ii43MiIgc3RvcC1jb2xvcj0iI2U3ZThjNiIvPjxzdG9wIG9mZnNldD0iMSIgc3RvcC1jb2xvcj0iI2M2ZGJhNSIvPjwvbGluZWFyR3JhZGllbnQ+CiA8cmFkaWFsR3JhZGllbnQgaWQ9InN1bndhc2giPjxzdG9wIHN0b3AtY29sb3I9IiNmZmY0YzgiIHN0b3Atb3BhY2l0eT0iLjk1Ii8+PHN0b3Agb2Zmc2V0PSIuMzUiIHN0b3AtY29sb3I9IiNmZmU1YTAiIHN0b3Atb3BhY2l0eT0iLjUiLz48c3RvcCBvZmZzZXQ9IjEiIHN0b3AtY29sb3I9IiNmZmU1YTAiIHN0b3Atb3BhY2l0eT0iMCIvPjwvcmFkaWFsR3JhZGllbnQ+CiA8bGluZWFyR3JhZGllbnQgaWQ9ImZlbmNlIiB4MT0iMCIgeTE9IjAiIHgyPSIwIiB5Mj0iMSI+PHN0b3Agc3RvcC1jb2xvcj0iI2M4OTQ1YyIvPjxzdG9wIG9mZnNldD0iLjIyIiBzdG9wLWNvbG9yPSIjYjc3ZDQ5Ii8+PHN0b3Agb2Zmc2V0PSIxIiBzdG9wLWNvbG9yPSIjODI1MzMxIi8+PC9saW5lYXJHcmFkaWVudD4KIDxsaW5lYXJHcmFkaWVudCBpZD0iZmVuY2VMaWdodCIgeDE9IjAiIHkxPSIwIiB4Mj0iMSIgeTI9IjAiPjxzdG9wIHN0b3AtY29sb3I9IiNlMGIxN2IiLz48c3RvcCBvZmZzZXQ9Ii4yNSIgc3RvcC1jb2xvcj0iI2M5OTU1ZCIvPjxzdG9wIG9mZnNldD0iLjciIHN0b3AtY29sb3I9IiNhOTcwNDAiLz48c3RvcCBvZmZzZXQ9IjEiIHN0b3AtY29sb3I9IiM4NzU4MzQiLz48L2xpbmVhckdyYWRpZW50PgogPGxpbmVhckdyYWRpZW50IGlkPSJwYXRoIiB4MT0iMCIgeTE9IjAiIHgyPSIwIiB5Mj0iMSI+PHN0b3Agc3RvcC1jb2xvcj0iI2QyYzI5ZiIvPjxzdG9wIG9mZnNldD0iMSIgc3RvcC1jb2xvcj0iI2FkOTg3NyIvPjwvbGluZWFyR3JhZGllbnQ+CiA8bGluZWFyR3JhZGllbnQgaWQ9InN0b25lIiB4MT0iMCIgeTE9IjAiIHgyPSIwLjgiIHkyPSIxIj48c3RvcCBzdG9wLWNvbG9yPSIjZjBkZmJjIi8+PHN0b3Agb2Zmc2V0PSIuNDgiIHN0b3AtY29sb3I9IiNkNWMyOWYiLz48c3RvcCBvZmZzZXQ9IjEiIHN0b3AtY29sb3I9IiNiYmE1ODMiLz48L2xpbmVhckdyYWRpZW50PgogPGxpbmVhckdyYWRpZW50IGlkPSJwb3QiIHgxPSIwIiB5MT0iMCIgeDI9IjEiIHkyPSIxIj48c3RvcCBzdG9wLWNvbG9yPSIjYzg3ZDRmIi8+PHN0b3Agb2Zmc2V0PSIuNCIgc3RvcC1jb2xvcj0iI2E2NWYzZCIvPjxzdG9wIG9mZnNldD0iMSIgc3RvcC1jb2xvcj0iIzc5NDMyZSIvPjwvbGluZWFyR3JhZGllbnQ+CiA8bGluZWFyR3JhZGllbnQgaWQ9InBvdHJpbSIgeDE9IjAiIHkxPSIwIiB4Mj0iMCIgeTI9IjEiPjxzdG9wIHN0b3AtY29sb3I9IiNkZmEyNzYiLz48c3RvcCBvZmZzZXQ9IjEiIHN0b3AtY29sb3I9IiNhOTYxNDAiLz48L2xpbmVhckdyYWRpZW50PgogPGxpbmVhckdyYWRpZW50IGlkPSJsZWFmIiB4MT0iMCIgeTE9IjAiIHgyPSIxIiB5Mj0iMSI+PHN0b3Agc3RvcC1jb2xvcj0iI2E2Yzg2YiIvPjxzdG9wIG9mZnNldD0iLjQ4IiBzdG9wLWNvbG9yPSIjNWQ5MzRiIi8+PHN0b3Agb2Zmc2V0PSIxIiBzdG9wLWNvbG9yPSIjMzE1ZDM3Ii8+PC9saW5lYXJHcmFkaWVudD4KIDxsaW5lYXJHcmFkaWVudCBpZD0ibGVhZkxpZ2h0IiB4MT0iMCIgeTE9IjAiIHgyPSIxIiB5Mj0iMSI+PHN0b3Agc3RvcC1jb2xvcj0iI2QwZGY4ZCIvPjxzdG9wIG9mZnNldD0iMSIgc3RvcC1jb2xvcj0iIzZjOWY0YSIvPjwvbGluZWFyR3JhZGllbnQ+CiA8ZmlsdGVyIGlkPSJzb2Z0U2hhZG93IiB4PSItMzAlIiB5PSItMzAlIiB3aWR0aD0iMTYwJSIgaGVpZ2h0PSIxNzAlIj48ZmVHYXVzc2lhbkJsdXIgc3RkRGV2aWF0aW9uPSI5Ii8+PC9maWx0ZXI+CiA8ZmlsdGVyIGlkPSJkZXB0aEJsdXIiPjxmZUdhdXNzaWFuQmx1ciBzdGREZXZpYXRpb249IjMuMiIvPjwvZmlsdGVyPgogPHBhdHRlcm4gaWQ9InN0b25lVGV4dHVyZSIgd2lkdGg9Ijg4IiBoZWlnaHQ9IjYyIiBwYXR0ZXJuVW5pdHM9InVzZXJTcGFjZU9uVXNlIj48cGF0aCBkPSJNNCA0IEw0MCAyIEw0OSAyNSBMMzcgNDIgTDcgMzhaIE01MyA1IEw4MiA4IEw4NSAzNCBMNjMgNDAgTDQ5IDI1WiBNOSA0NiBMMzcgNDMgTDQ5IDU4IEwxNCA2MVoiIGZpbGw9Im5vbmUiIHN0cm9rZT0iIzhmN2Q2MiIgc3Ryb2tlLW9wYWNpdHk9Ii4yMiIgc3Ryb2tlLXdpZHRoPSIyIi8+PHBhdGggZD0iTTEwIDggTDM4IDYgTTU4IDExIEw3OCAxMyBNMTMgNTAgTDMxIDQ4IiBzdHJva2U9IiNmZmYxY2YiIHN0cm9rZS1vcGFjaXR5PSIuNDIiIHN0cm9rZS13aWR0aD0iMiIvPjwvcGF0dGVybj4KIDxnIGlkPSJsZWFmQ2x1c3RlciI+PGVsbGlwc2UgY3g9IjAiIGN5PSIwIiByeD0iMjIiIHJ5PSI5IiBmaWxsPSJ1cmwoI2xlYWYpIiB0cmFuc2Zvcm09InJvdGF0ZSgtMzQpIi8+PGVsbGlwc2UgY3g9IjE4IiBjeT0iLTExIiByeD0iMjIiIHJ5PSI5IiBmaWxsPSJ1cmwoI2xlYWZMaWdodCkiIHRyYW5zZm9ybT0icm90YXRlKDIyIDE4IC0xMSkiLz48ZWxsaXBzZSBjeD0iLTE2IiBjeT0iLTEzIiByeD0iMTkiIHJ5PSI4IiBmaWxsPSJ1cmwoI2xlYWYpIiB0cmFuc2Zvcm09InJvdGF0ZSgtNTAgLTE2IC0xMykiLz48ZWxsaXBzZSBjeD0iNyIgY3k9Ii0yNSIgcng9IjIwIiByeT0iOCIgZmlsbD0idXJsKCNsZWFmTGlnaHQpIiB0cmFuc2Zvcm09InJvdGF0ZSg1MiA3IC0yNSkiLz48L2c+CiA8ZyBpZD0iZmxvd2VyUGluayI+PHBhdGggZD0iTTAgMCBMMCAtMTUiIHN0cm9rZT0iIzRkNzgzYiIgc3Ryb2tlLXdpZHRoPSIzIi8+PGcgZmlsbD0iI2YyYThiNyIgc3Ryb2tlPSIjZDg4MTk4IiBzdHJva2Utd2lkdGg9IjEiPjxlbGxpcHNlIGN5PSItMjAiIHJ4PSI2IiByeT0iOSIvPjxlbGxpcHNlIGN5PSItMjAiIHJ4PSI2IiByeT0iOSIgdHJhbnNmb3JtPSJyb3RhdGUoNzIpIi8+PGVsbGlwc2UgY3k9Ii0yMCIgcng9IjYiIHJ5PSI5IiB0cmFuc2Zvcm09InJvdGF0ZSgxNDQpIi8+PGVsbGlwc2UgY3k9Ii0yMCIgcng9IjYiIHJ5PSI5IiB0cmFuc2Zvcm09InJvdGF0ZSgyMTYpIi8+PGVsbGlwc2UgY3k9Ii0yMCIgcng9IjYiIHJ5PSI5IiB0cmFuc2Zvcm09InJvdGF0ZSgyODgpIi8+PC9nPjxjaXJjbGUgY3k9Ii0yMCIgcj0iNSIgZmlsbD0iI2Y3ZDc2ZiIvPjwvZz4KIDxnIGlkPSJmbG93ZXJDcmVhbSI+PHBhdGggZD0iTTAgMCBMMCAtMTMiIHN0cm9rZT0iIzUwNzczYSIgc3Ryb2tlLXdpZHRoPSIyLjUiLz48ZyBmaWxsPSIjZmZmNGQ2IiBzdHJva2U9IiNlMmNkYTAiIHN0cm9rZS13aWR0aD0iLjgiPjxlbGxpcHNlIGN5PSItMTgiIHJ4PSI1IiByeT0iOCIvPjxlbGxpcHNlIGN5PSItMTgiIHJ4PSI1IiByeT0iOCIgdHJhbnNmb3JtPSJyb3RhdGUoNjApIi8+PGVsbGlwc2UgY3k9Ii0xOCIgcng9IjUiIHJ5PSI4IiB0cmFuc2Zvcm09InJvdGF0ZSgxMjApIi8+PGVsbGlwc2UgY3k9Ii0xOCIgcng9IjUiIHJ5PSI4IiB0cmFuc2Zvcm09InJvdGF0ZSgxODApIi8+PGVsbGlwc2UgY3k9Ii0xOCIgcng9IjUiIHJ5PSI4IiB0cmFuc2Zvcm09InJvdGF0ZSgyNDApIi8+PGVsbGlwc2UgY3k9Ii0xOCIgcng9IjUiIHJ5PSI4IiB0cmFuc2Zvcm09InJvdGF0ZSgzMDApIi8+PC9nPjxjaXJjbGUgY3k9Ii0xOCIgcj0iNCIgZmlsbD0iI2VkYmY1MCIvPjwvZz4KPC9kZWZzPgo8IS0tIGJyaWdodCwgc29mdCBnYXJkZW4gYWlyIC0tPgo8cmVjdCB3aWR0aD0iOTYwIiBoZWlnaHQ9IjcyMCIgZmlsbD0idXJsKCNza3kpIi8+CjxlbGxpcHNlIGN4PSI3ODAiIGN5PSI3NCIgcng9IjI1NSIgcnk9IjIxMCIgZmlsbD0idXJsKCNzdW53YXNoKSIvPgo8cGF0aCBkPSJNMCAxODAgUTExMCAxMTYgMjE1IDE2NCBUNDMwIDE2MCBUNjUwIDE1MCBUOTYwIDEyNSBMOTYwIDMzMCBMMCAzMzBaIiBmaWxsPSIjOGRiNDc3IiBvcGFjaXR5PSIuNTIiLz4KPHBhdGggZD0iTTAgMjE4IFExMzAgMTY4IDI1MCAyMDYgVDQ4MCAyMDIgVDczMCAxOTAgVDk2MCAxODAgTDk2MCAzNzggTDAgMzc4WiIgZmlsbD0iIzZmOWU2MCIgb3BhY2l0eT0iLjQyIi8+CjwhLS0gbGVhZnkgY2Fub3B5LCBrZXB0IGF0IGVkZ2VzIHNvIHRoZSBjZW50ZXIgc3RheXMgY2FsbSAtLT4KPGcgb3BhY2l0eT0iLjk1Ij4KIDxwYXRoIGQ9Ik0wIDAgSDI1MCBRMjA1IDQzIDE5MSAxMDEgUTEyOSA3MiA5NiAxMTkgUTU3IDg0IDAgMTExWiIgZmlsbD0iIzQyNmYzYyIvPgogPHVzZSBocmVmPSIjbGVhZkNsdXN0ZXIiIHRyYW5zZm9ybT0idHJhbnNsYXRlKDI1IDIzKSBzY2FsZSgxLjcpIi8+PHVzZSBocmVmPSIjbGVhZkNsdXN0ZXIiIHRyYW5zZm9ybT0idHJhbnNsYXRlKDkwIDE2KSBzY2FsZSgxLjUpIi8+PHVzZSBocmVmPSIjbGVhZkNsdXN0ZXIiIHRyYW5zZm9ybT0idHJhbnNsYXRlKDE2NiAyNSkgc2NhbGUoMS40NSkiLz48dXNlIGhyZWY9IiNsZWFmQ2x1c3RlciIgdHJhbnNmb3JtPSJ0cmFuc2xhdGUoMjMwIDQ1KSBzY2FsZSgxLjE1KSIvPgogPHBhdGggZD0iTTk2MCAwIEg3MzUgUTc2MiA0NSA3NzkgOTIgUTg0MSA1MyA4ODAgMTA4IFE5MTcgNjggOTYwIDkxWiIgZmlsbD0iIzQyNmUzZCIvPgogPHVzZSBocmVmPSIjbGVhZkNsdXN0ZXIiIHRyYW5zZm9ybT0idHJhbnNsYXRlKDk0MiAxOSkgc2NhbGUoMS42NSkiLz48dXNlIGhyZWY9IiNsZWFmQ2x1c3RlciIgdHJhbnNmb3JtPSJ0cmFuc2xhdGUoODgwIDE1KSBzY2FsZSgxLjUpIi8+PHVzZSBocmVmPSIjbGVhZkNsdXN0ZXIiIHRyYW5zZm9ybT0idHJhbnNsYXRlKDgxOCAzNSkgc2NhbGUoMS4zNSkiLz48dXNlIGhyZWY9IiNsZWFmQ2x1c3RlciIgdHJhbnNmb3JtPSJ0cmFuc2xhdGUoNzU1IDE1KSBzY2FsZSgxLjEpIi8+CiA8ZyBmaWxsPSIjZDZlNGEwIiBvcGFjaXR5PSIuNTIiPjxjaXJjbGUgY3g9IjQ1IiBjeT0iNzgiIHI9IjQiLz48Y2lyY2xlIGN4PSIxMjQiIGN5PSI0NSIgcj0iMyIvPjxjaXJjbGUgY3g9IjIwMCIgY3k9IjcwIiByPSI0Ii8+PGNpcmNsZSBjeD0iODU1IiBjeT0iNzIiIHI9IjQiLz48Y2lyY2xlIGN4PSI5MTMiIGN5PSIzNyIgcj0iMyIvPjxjaXJjbGUgY3g9Ijc4NiIgY3k9Ijg4IiByPSIzIi8+PC9nPgo8L2c+CjwhLS0gZGlzdGFudCBzaHJ1YnMgLS0+CjxnIGZpbHRlcj0idXJsKCNkZXB0aEJsdXIpIiBvcGFjaXR5PSIuNzIiPgogPGcgZmlsbD0iIzU5ODI0ZCI+PGNpcmNsZSBjeD0iMjgiIGN5PSIyMDAiIHI9Ijc2Ii8+PGNpcmNsZSBjeD0iMTA1IiBjeT0iMTc4IiByPSI3MiIvPjxjaXJjbGUgY3g9IjE4OSIgY3k9IjIwNSIgcj0iNjUiLz48Y2lyY2xlIGN4PSI3NzAiIGN5PSIxOTAiIHI9IjY4Ii8+PGNpcmNsZSBjeD0iODU1IiBjeT0iMTc0IiByPSI4NCIvPjxjaXJjbGUgY3g9Ijk0NiIgY3k9IjIwNSIgcj0iNjUiLz48L2c+CiA8ZyBmaWxsPSIjOWZiZDczIj48Y2lyY2xlIGN4PSI3MCIgY3k9IjE3MyIgcj0iMzEiLz48Y2lyY2xlIGN4PSIxNDciIGN5PSIxODMiIHI9IjI3Ii8+PGNpcmNsZSBjeD0iODIyIiBjeT0iMTU5IiByPSIzMCIvPjxjaXJjbGUgY3g9IjkxMSIgY3k9IjE3OSIgcj0iMzEiLz48L2c+CjwvZz4KPCEtLSB3b29kZW4gcGlja2V0IGZlbmNlIGFyb3VuZCB0aGUgYmFjayBlZGdlIC0tPgo8ZyBvcGFjaXR5PSIuOTgiPgogPHBhdGggZD0iTTAgMjQxIFE0ODAgMjE5IDk2MCAyMzggTDk2MCAzNzkgUTQ4MCAzNjUgMCAzODRaIiBmaWxsPSIjNmY0YjMxIiBvcGFjaXR5PSIuMjIiLz4KIDxyZWN0IHg9IjAiIHk9IjI1MSIgd2lkdGg9Ijk2MCIgaGVpZ2h0PSIyOCIgcng9IjUiIGZpbGw9InVybCgjZmVuY2UpIiBzdHJva2U9IiM4YzViMzUiIHN0cm9rZS13aWR0aD0iMyIvPgogPHJlY3QgeD0iMCIgeT0iMzMwIiB3aWR0aD0iOTYwIiBoZWlnaHQ9IjMwIiByeD0iNSIgZmlsbD0idXJsKCNmZW5jZSkiIHN0cm9rZT0iIzhjNWIzNSIgc3Ryb2tlLXdpZHRoPSIzIi8+CiA8ZyBmaWxsPSJ1cmwoI2ZlbmNlTGlnaHQpIiBzdHJva2U9IiM4ODU3MmYiIHN0cm9rZS13aWR0aD0iMyI+CiAgPHBhdGggZD0iTS0xNCAyNTcgTC0xNCAyMDIgUTYgMTc0IDI2IDIwMiBMMjYgMzM5IEwtMTQgMzM5WiIvPjxwYXRoIGQ9Ik0zNSAyNTcgTDM1IDE5MyBRNTUgMTY2IDc1IDE5MyBMNzUgMzQxIEwzNSAzNDFaIi8+PHBhdGggZD0iTTg0IDI1NyBMODQgMjAxIFExMDQgMTc1IDEyNCAyMDEgTDEyNCAzNDIgTDg0IDM0MloiLz48cGF0aCBkPSJNMTMzIDI1NyBMMTMzIDE5MSBRMTUzIDE2NSAxNzMgMTkxIEwxNzMgMzQzIEwxMzMgMzQzWiIvPjxwYXRoIGQ9Ik0xODIgMjU3IEwxODIgMjAyIFEyMDIgMTc2IDIyMiAyMDIgTDIyMiAzNDMgTDE4MiAzNDNaIi8+PHBhdGggZD0iTTIzMSAyNTcgTDIzMSAxOTMgUTI1MSAxNjcgMjcxIDE5MyBMMjcxIDM0NCBMMjMxIDM0NFoiLz48cGF0aCBkPSJNMjgwIDI1NyBMMjgwIDIwMCBRMzAwIDE3NCAzMjAgMjAwIEwzMjAgMzQ0IEwyODAgMzQ0WiIvPjxwYXRoIGQ9Ik0zMjkgMjU3IEwzMjkgMTkyIFEzNDkgMTY2IDM2OSAxOTIgTDM2OSAzNDUgTDMyOSAzNDVaIi8+PHBhdGggZD0iTTM3OCAyNTcgTDM3OCAyMDEgUTM5OCAxNzUgNDE4IDIwMSBMNDE4IDM0NSBMMzc4IDM0NVoiLz48cGF0aCBkPSJNNDI3IDI1NyBMNDI3IDE5NCBRNDQ3IDE2OCA0NjcgMTk0IEw0NjcgMzQ2IEw0MjcgMzQ2WiIvPjxwYXRoIGQ9Ik00NzYgMjU3IEw0NzYgMjAxIFE0OTYgMTc1IDUxNiAyMDEgTDUxNiAzNDYgTDQ3NiAzNDZaIi8+PHBhdGggZD0iTTUyNSAyNTcgTDUyNSAxOTMgUTU0NSAxNjcgNTY1IDE5MyBMNTY1IDM0NiBMNTI1IDM0NloiLz48cGF0aCBkPSJNNTc0IDI1NyBMNTc0IDIwMSBRNTk0IDE3NSA2MTQgMjAxIEw2MTQgMzQ3IEw1NzQgMzQ3WiIvPjxwYXRoIGQ9Ik02MjMgMjU3IEw2MjMgMTkzIFE2NDMgMTY3IDY2MyAxOTMgTDY2MyAzNDcgTDYyMyAzNDdaIi8+PHBhdGggZD0iTTY3MiAyNTcgTDY3MiAyMDIgUTY5MiAxNzYgNzEyIDIwMiBMNzEyIDM0OCBMNjcyIDM0OFoiLz48cGF0aCBkPSJNNzIxIDI1NyBMNzIxIDE5MSBRNzQxIDE2NSA3NjEgMTkxIEw3NjEgMzQ4IEw3MjEgMzQ4WiIvPjxwYXRoIGQ9Ik03NzAgMjU3IEw3NzAgMjAxIFE3OTAgMTc1IDgxMCAyMDEgTDgxMCAzNDkgTDc3MCAzNDlaIi8+PHBhdGggZD0iTTgxOSAyNTcgTDgxOSAxOTMgUTgzOSAxNjcgODU5IDE5MyBMODU5IDM0OSBMODE5IDM0OVoiLz48cGF0aCBkPSJNODY4IDI1NyBMODY4IDIwMSBRODg4IDE3NSA5MDggMjAxIEw5MDggMzUwIEw4NjggMzUwWiIvPjxwYXRoIGQ9Ik05MTcgMjU3IEw5MTcgMTk0IFE5MzcgMTY4IDk1NyAxOTQgTDk1NyAzNTAgTDkxNyAzNTBaIi8+PHBhdGggZD0iTTk2NiAyNTcgTDk2NiAyMDMgUTk4NiAxNzcgMTAwNiAyMDMgTDEwMDYgMzUwIEw5NjYgMzUwWiIvPgogPC9nPgogPGcgc3Ryb2tlPSIjZjBjMThhIiBzdHJva2Utb3BhY2l0eT0iLjQ2IiBzdHJva2Utd2lkdGg9IjMiPjxwYXRoIGQ9Ik04IDIxOSBWMzE1IE01NyAyMDggVjMxNyBNMTA2IDIxOCBWMzE4IE0xNTUgMjA3IFYzMTkgTTIwNCAyMTkgVjMxOSBNMjUzIDIwOSBWMzIwIE0zMDIgMjE3IFYzMjEgTTM1MSAyMDggVjMyMiBNNDAwIDIxOCBWMzIyIE00NDkgMjEwIFYzMjMgTTQ5OCAyMTggVjMyMyBNNTQ3IDIwOSBWMzI0IE01OTYgMjE4IFYzMjQgTTY0NSAyMDkgVjMyNSBNNjk0IDIxOSBWMzI2IE03NDMgMjA4IFYzMjYgTTc5MiAyMTggVjMyNyBNODQxIDIwOSBWMzI3IE04OTAgMjE4IFYzMjggTTkzOSAyMTAgVjMyOCIvPjwvZz4KPC9nPgo8IS0tIHN0b25lIHBhdGlvLCBvcGVuIHRocm91Z2ggdGhlIG1pZGRsZSBmb3IgbW92aW5nIGNoYXJhY3RlcnMgLS0+CjxwYXRoIGQ9Ik0wIDM2OCBRMTgwIDM1MCAzNTAgMzcwIFQ2OTAgMzY3IFQ5NjAgMzYwIEw5NjAgNzIwIEwwIDcyMFoiIGZpbGw9InVybCgjcGF0aCkiLz4KPHBhdGggZD0iTTAgMzc0IFExODAgMzU2IDM1MCAzNzYgVDY5MCAzNzMgVDk2MCAzNjYgTDk2MCA3MjAgTDAgNzIwWiIgZmlsbD0idXJsKCNzdG9uZVRleHR1cmUpIiBvcGFjaXR5PSIuOSIvPgo8ZyBmaWxsPSJ1cmwoI3N0b25lKSIgc3Ryb2tlPSIjYTg5NTc1IiBzdHJva2Utd2lkdGg9IjMiIG9wYWNpdHk9Ii45MyI+CiA8cGF0aCBkPSJNLTIyIDM5OCBRMzggMzgwIDk4IDM5NSBMMTExIDQ0MCBRNjYgNDUyIDUgNDM4WiIvPjxwYXRoIGQ9Ik0xMTkgMzkxIEwyMTEgMzg5IEwyMjkgNDMwIEwyMDIgNDU0IEwxMjUgNDQwWiIvPjxwYXRoIGQ9Ik0yMzcgMzkxIEwzMzAgMzkyIEwzNDQgNDMzIEwzMTMgNDUxIEwyMzYgNDM4WiIvPjxwYXRoIGQ9Ik0zNTggMzkwIEw0NDUgMzg5IEw0NTcgNDI1IEw0MzUgNDUwIEwzNTkgNDM2WiIvPjxwYXRoIGQ9Ik00NzAgMzkwIEw1NTkgMzg3IEw1NzggNDIzIEw1NTUgNDQ3IEw0NzMgNDM0WiIvPjxwYXRoIGQ9Ik01OTYgMzg4IEw2ODIgMzgzIEw3MDMgNDIwIEw2ODIgNDQ0IEw2MDIgNDM0WiIvPjxwYXRoIGQ9Ik03MTkgMzg1IEw4MTMgMzgxIEw4MzQgNDIwIEw4MDMgNDQwIEw3MjYgNDI5WiIvPjxwYXRoIGQ9Ik04NDggMzc5IEw5NTEgMzc2IEw5ODAgNDE4IEw5NTMgNDQxIEw4NTcgNDI2WiIvPgogPHBhdGggZD0iTTI1IDQ2MiBMMTA2IDQ1NCBMMTI2IDQ5NCBMMTAzIDUxOSBMMTggNTA5WiIvPjxwYXRoIGQ9Ik0xNDQgNDU3IEwyMjkgNDU4IEwyNTAgNDkzIEwyMjUgNTE4IEwxNDYgNTEyWiIvPjxwYXRoIGQ9Ik0yNjkgNDU3IEwzNTUgNDU4IEwzNzEgNDk0IEwzNDkgNTE3IEwyNjggNTEwWiIvPjxwYXRoIGQ9Ik0zODkgNDU0IEw0NzkgNDUzIEw0OTUgNDg4IEw0NzEgNTE1IEwzOTAgNTA4WiIvPjxwYXRoIGQ9Ik01MTAgNDUwIEw2MDAgNDUwIEw2MTkgNDg2IEw1OTMgNTEwIEw1MTIgNTA1WiIvPjxwYXRoIGQ9Ik02MzMgNDQ3IEw3MjIgNDQ1IEw3NDMgNDgxIEw3MTYgNTA2IEw2MzQgNTAyWiIvPjxwYXRoIGQ9Ik03NTQgNDQzIEw4NDMgNDQyIEw4NjQgNDc3IEw4MzggNTAyIEw3NTcgNDk2WiIvPjxwYXRoIGQ9Ik04NzUgNDQwIEw5NjYgNDM4IEw5ODggNDczIEw5NjIgNTAwIEw4NzcgNDk1WiIvPgo8L2c+CjwhLS0gZm9saWFnZSBhbmQgZmxvd2VycyByZXN0cmljdGVkIHRvIHRoZSBzaWRlIGJvcmRlcnMgLS0+CjxnPgogPHVzZSBocmVmPSIjbGVhZkNsdXN0ZXIiIHRyYW5zZm9ybT0idHJhbnNsYXRlKDEyIDM2OSkgc2NhbGUoMS4yMikiLz48dXNlIGhyZWY9IiNsZWFmQ2x1c3RlciIgdHJhbnNmb3JtPSJ0cmFuc2xhdGUoNTggMzU3KSBzY2FsZSgxLjE1KSIvPjx1c2UgaHJlZj0iI2xlYWZDbHVzdGVyIiB0cmFuc2Zvcm09InRyYW5zbGF0ZSg5MTggMzY3KSBzY2FsZSgxLjIpIi8+PHVzZSBocmVmPSIjbGVhZkNsdXN0ZXIiIHRyYW5zZm9ybT0idHJhbnNsYXRlKDk2NiAzMzgpIHNjYWxlKDEuMDUpIi8+CiA8ZyB0cmFuc2Zvcm09InRyYW5zbGF0ZSg0MiAzOTgpIj48ZWxsaXBzZSBjeT0iMzMiIHJ4PSI1MSIgcnk9IjEwIiBmaWxsPSIjNTQzYzJiIiBvcGFjaXR5PSIuMjQiLz48cGF0aCBkPSJNLTI5IDAgTC0yMiA1MCBRMCA2MiAyMiA1MCBMMjkgMFoiIGZpbGw9InVybCgjcG90KSIgc3Ryb2tlPSIjOGQ1NDM3IiBzdHJva2Utd2lkdGg9IjIiLz48ZWxsaXBzZSBjeT0iMCIgcng9IjMwIiByeT0iOCIgZmlsbD0idXJsKCNwb3RyaW0pIi8+PGVsbGlwc2UgY3k9IjAiIHJ4PSIyNCIgcnk9IjUiIGZpbGw9IiM0ZTcwMzkiLz48dXNlIGhyZWY9IiNsZWFmQ2x1c3RlciIgdHJhbnNmb3JtPSJ0cmFuc2xhdGUoLTQgLTE0KSBzY2FsZSguODUpIi8+PHVzZSBocmVmPSIjZmxvd2VyUGluayIgdHJhbnNmb3JtPSJ0cmFuc2xhdGUoLTEwIC0yMSkgc2NhbGUoLjg1KSIvPjx1c2UgaHJlZj0iI2Zsb3dlckNyZWFtIiB0cmFuc2Zvcm09InRyYW5zbGF0ZSgyMiAtMTMpIHNjYWxlKC42NSkiLz48dXNlIGhyZWY9IiNmbG93ZXJQaW5rIiB0cmFuc2Zvcm09InRyYW5zbGF0ZSg1IC0zMSkgc2NhbGUoLjYpIi8+PC9nPgogPGcgdHJhbnNmb3JtPSJ0cmFuc2xhdGUoMTExIDM2NSkgc2NhbGUoLjc2KSI+PGVsbGlwc2UgY3k9IjQwIiByeD0iNDMiIHJ5PSI5IiBmaWxsPSIjNTQzYzJiIiBvcGFjaXR5PSIuMjIiLz48cGF0aCBkPSJNLTI4IDAgTC0yMSA1MiBRMCA2MiAyMSA1MiBMMjggMFoiIGZpbGw9InVybCgjcG90KSIgc3Ryb2tlPSIjOGQ1NDM3IiBzdHJva2Utd2lkdGg9IjIiLz48ZWxsaXBzZSBjeT0iMCIgcng9IjI5IiByeT0iOCIgZmlsbD0idXJsKCNwb3RyaW0pIi8+PGVsbGlwc2UgY3k9IjAiIHJ4PSIyMyIgcnk9IjUiIGZpbGw9IiM0YzcxM2IiLz48dXNlIGhyZWY9IiNsZWFmQ2x1c3RlciIgdHJhbnNmb3JtPSJ0cmFuc2xhdGUoLTUgLTE2KSBzY2FsZSguODQpIi8+PHVzZSBocmVmPSIjZmxvd2VyQ3JlYW0iIHRyYW5zZm9ybT0idHJhbnNsYXRlKC05IC0yNCkgc2NhbGUoLjg1KSIvPjx1c2UgaHJlZj0iI2Zsb3dlclBpbmsiIHRyYW5zZm9ybT0idHJhbnNsYXRlKDE2IC0xNCkgc2NhbGUoLjc4KSIvPjwvZz4KIDxnIHRyYW5zZm9ybT0idHJhbnNsYXRlKDkxOCA0MDUpIj48ZWxsaXBzZSBjeT0iMzIiIHJ4PSI0OSIgcnk9IjkiIGZpbGw9IiM1NDNjMmIiIG9wYWNpdHk9Ii4yMiIvPjxwYXRoIGQ9Ik0tMjcgMCBMLTIxIDQ3IFEwIDU4IDIxIDQ3IEwyNyAwWiIgZmlsbD0idXJsKCNwb3QpIiBzdHJva2U9IiM4ZDU0MzciIHN0cm9rZS13aWR0aD0iMiIvPjxlbGxpcHNlIGN5PSIwIiByeD0iMjgiIHJ5PSI4IiBmaWxsPSJ1cmwoI3BvdHJpbSkiLz48ZWxsaXBzZSBjeT0iMCIgcng9IjIyIiByeT0iNSIgZmlsbD0iIzRlNzAzOSIvPjx1c2UgaHJlZj0iI2xlYWZDbHVzdGVyIiB0cmFuc2Zvcm09InRyYW5zbGF0ZSgtNSAtMTQpIHNjYWxlKC44KSIvPjx1c2UgaHJlZj0iI2Zsb3dlclBpbmsiIHRyYW5zZm9ybT0idHJhbnNsYXRlKC0xMSAtMjApIHNjYWxlKC44KSIvPjx1c2UgaHJlZj0iI2Zsb3dlckNyZWFtIiB0cmFuc2Zvcm09InRyYW5zbGF0ZSgxNiAtMTMpIHNjYWxlKC43KSIvPjwvZz4KIDxnIHRyYW5zZm9ybT0idHJhbnNsYXRlKDk3NiAzNjYpIHNjYWxlKC44KSI+PGVsbGlwc2UgY3k9IjM5IiByeD0iNDAiIHJ5PSI4IiBmaWxsPSIjNTQzYzJiIiBvcGFjaXR5PSIuMiIvPjxwYXRoIGQ9Ik0tMjYgMCBMLTIwIDQ4IFEwIDU4IDIwIDQ4IEwyNiAwWiIgZmlsbD0idXJsKCNwb3QpIiBzdHJva2U9IiM4ZDU0MzciIHN0cm9rZS13aWR0aD0iMiIvPjxlbGxpcHNlIGN5PSIwIiByeD0iMjciIHJ5PSI3IiBmaWxsPSJ1cmwoI3BvdHJpbSkiLz48ZWxsaXBzZSBjeT0iMCIgcng9IjIxIiByeT0iNSIgZmlsbD0iIzRjNzEzYiIvPjx1c2UgaHJlZj0iI2xlYWZDbHVzdGVyIiB0cmFuc2Zvcm09InRyYW5zbGF0ZSgwIC0xNikgc2NhbGUoLjgpIi8+PHVzZSBocmVmPSIjZmxvd2VyQ3JlYW0iIHRyYW5zZm9ybT0idHJhbnNsYXRlKC0xMSAtMjEpIHNjYWxlKC43KSIvPjx1c2UgaHJlZj0iI2Zsb3dlclBpbmsiIHRyYW5zZm9ybT0idHJhbnNsYXRlKDE1IC0xNikgc2NhbGUoLjc1KSIvPjwvZz4KPC9nPgo8IS0tIHN1YnRsZSB3YXJtIGhpZ2hsaWdodHMgYW5kIGdyb3VuZCBzaGFkb3dpbmcgLS0+CjxlbGxpcHNlIGN4PSI0ODAiIGN5PSIzNzIiIHJ4PSIzNzUiIHJ5PSI1NCIgZmlsbD0iI2ZmZjFjNiIgb3BhY2l0eT0iLjEyIi8+CjxnIGZpbGw9IiNmZmY0Y2YiIG9wYWNpdHk9Ii40OCI+PGNpcmNsZSBjeD0iMTgzIiBjeT0iNDAxIiByPSIzIi8+PGNpcmNsZSBjeD0iNzE2IiBjeT0iMzg3IiByPSIyLjUiLz48Y2lyY2xlIGN4PSI4MTgiIGN5PSI0NjQiIHI9IjIiLz48Y2lyY2xlIGN4PSIyODIiIGN5PSI1MDkiIHI9IjIuNSIvPjxjaXJjbGUgY3g9IjYwMiIgY3k9IjUzMCIgcj0iMiIvPjwvZz4KPHJlY3Qgd2lkdGg9Ijk2MCIgaGVpZ2h0PSI3MjAiIGZpbGw9IiNmNGRlYjEiIG9wYWNpdHk9Ii4wNiIvPgo8L3N2Zz4=");
+    background-position: center center;
+    background-size: cover;
+    background-repeat: no-repeat;
+    box-shadow: 0 8px 22px rgba(92, 78, 47, .24), inset 0 -2px 0 rgba(255,255,255,.24);
+  }
+  #grass {
+    background: linear-gradient(180deg, rgba(178, 207, 133, 0) 0%, rgba(160, 195, 112, .13) 36%, rgba(99, 145, 72, .3) 100%);
+  }
+  .cloud {
+    background: linear-gradient(180deg, rgba(255,255,252,.98), rgba(244,249,238,.92));
+    box-shadow: 0 4px 10px rgba(89, 111, 90, .13), inset 0 1px 0 rgba(255,255,255,.95);
+  }
+  #sun {
+    background: radial-gradient(circle at 34% 27%, #fffde8 0%, #ffe9a0 38%, #ffc858 72%, #efa344 100%);
+    box-shadow: 0 0 0 5px rgba(255, 229, 139, .12), 0 0 24px rgba(255, 210, 106, .56);
+  }
+
+
+  /* ============ 第二轮场景布局与材质精修 ============ */
+  #topArea.singleMode {
+    background-position: center 48%;
+  }
+
+  #topArea.battleMode {
+    background-position: center 50%;
+  }
+
+  #topArea::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    z-index: 1;
+    pointer-events: none;
+    background:
+      radial-gradient(ellipse at 50% 38%, rgba(255, 248, 223, 0) 38%, rgba(102, 111, 67, .11) 100%),
+      linear-gradient(180deg, rgba(255, 249, 229, .06) 0%, rgba(255, 242, 209, .02) 48%, rgba(103, 76, 43, .08) 100%);
+  }
+
+  #topArea #grass {
+    background: linear-gradient(180deg, rgba(145, 180, 104, 0) 0%, rgba(145, 180, 104, .12) 48%, rgba(103, 143, 76, .26) 100%);
+  }
+
+  #topArea.battleMode #grass {
+    background: linear-gradient(180deg, rgba(145, 180, 104, 0) 0%, rgba(145, 180, 104, .08) 55%, rgba(103, 143, 76, .2) 100%);
+  }
+
+  #bigHome {
+    border: 1px solid rgba(133, 86, 42, .42);
+    border-radius: 48% / 44%;
+    background:
+      repeating-linear-gradient(0deg, rgba(255, 240, 204, .22) 0 2px, rgba(121, 76, 37, .13) 2px 3.5px, transparent 3.5px 7px),
+      repeating-radial-gradient(ellipse at 50% 50%, #e9c99a 0 3px, #bc8d55 3px 5px, #d7ad77 5px 7px, #f0d3a5 7px 9px);
+    box-shadow: 0 10px 20px rgba(82, 54, 27, .29), 0 2px 0 rgba(255, 244, 214, .72), inset 0 3px 0 rgba(255, 244, 213, .86), inset 0 -8px 12px rgba(93, 56, 26, .24);
+  }
+
+  #bigHomeInner {
+    inset: 14%;
+    border-radius: 50% / 45%;
+    background: radial-gradient(ellipse at 42% 28%, #fffdf4 0%, #fff5dd 37%, #f1dfbb 72%, #d7b47f 100%);
+    box-shadow: inset 0 8px 13px rgba(131, 86, 42, .23), inset 0 -5px 8px rgba(255, 255, 255, .68), 0 0 0 2px rgba(255, 239, 202, .75);
+  }
+
+  #bigHomeCushion {
+    inset: 22%;
+    background: radial-gradient(ellipse at 35% 28%, rgba(255,255,255,.68) 0%, rgba(255,255,255,.18) 32%, transparent 58%), radial-gradient(ellipse at 66% 75%, rgba(166,119,66,.2) 0%, transparent 62%);
+  }
+
+  #bigHomeLabel {
+    top: 5%;
+    font-size: 10px;
+    color: #77502a;
+    text-shadow: 0 1px 0 #fff9e8, 0 0 5px rgba(255, 248, 224, .8);
+  }
+
+  .miniHome {
+    width: calc(100% - 14px);
+    align-self: center;
+    height: 120px;
+    flex: 0 0 120px;
+    margin-bottom: 7px;
+    border: 1px solid rgba(128, 80, 38, .5);
+    border-radius: 50% / 44%;
+    background:
+      repeating-linear-gradient(0deg, rgba(255, 240, 204, .22) 0 2px, rgba(121, 76, 37, .14) 2px 3.5px, transparent 3.5px 7px),
+      repeating-radial-gradient(ellipse at 50% 50%, #e9c99a 0 3px, #bc8d55 3px 5px, #d7ad77 5px 7px, #f0d3a5 7px 9px);
+    box-shadow: 0 8px 14px rgba(78, 50, 26, .28), 0 2px 0 rgba(255, 245, 217, .8), inset 0 3px 0 rgba(255, 246, 218, .86), inset 0 -7px 11px rgba(92, 57, 29, .24);
+  }
+
+  .miniHomeInner {
+    inset: 14%;
+    border-radius: 50% / 45%;
+    background: radial-gradient(ellipse at 42% 28%, #fffdf4 0%, #fff5dd 38%, #f1dfbb 73%, #d7b47f 100%);
+    box-shadow: inset 0 7px 12px rgba(131, 86, 42, .22), inset 0 -5px 8px rgba(255,255,255,.64), 0 0 0 2px rgba(255, 239, 202, .78);
+  }
+
+  .miniHomeCushion {
+    inset: 22%;
+    background: radial-gradient(ellipse at 35% 28%, rgba(255,255,255,.68) 0%, rgba(255,255,255,.18) 32%, transparent 58%), radial-gradient(ellipse at 66% 75%, rgba(166,119,66,.2) 0%, transparent 62%);
+  }
+
+  .miniHomeLabel {
+    top: -16px;
+    left: 50%;
+    right: auto;
+    width: max-content;
+    transform: translateX(-50%);
+    padding: 1px 8px 2px;
+    border: 1px solid rgba(220, 180, 119, .92);
+    border-radius: 999px;
+    background: linear-gradient(180deg, #fffdf5, #ffefd5);
+    box-shadow: 0 2px 0 rgba(174, 121, 60, .18), inset 0 1px 0 rgba(255,255,255,.96);
+    font-size: 9px;
+    color: #76502a;
+    text-shadow: 0 1px 0 #fff9e8, 0 0 4px rgba(255, 248, 224, .8);
+    white-space: nowrap;
+  }
+
+  .miniHomeCats {
+    inset: 18% 10% 14% 10%;
+  }
+
+  #battleLeftCol {
+    top: 62px;
+    right: calc(50% + var(--battle-half-pool, 70px) + 6px);
+  }
+
+  #battleRightCol {
+    top: 62px;
+    left: calc(50% + var(--battle-half-pool, 70px) + 6px);
+  }
+
+  #battleLeftCol > .miniTrough {
+    width: calc(100% + var(--battle-trough-overlap, 76px));
+  }
+
+  #battleRightCol > .miniTrough {
+    width: calc(100% + var(--battle-trough-overlap, 76px));
+    margin-left: calc(-1 * var(--battle-trough-overlap, 76px));
+  }
+
+  #battlePool {
+    overflow: visible;
+    background: linear-gradient(145deg, rgba(255, 253, 244, .72), rgba(247, 232, 202, .54));
+    border: 1.5px dashed rgba(255, 249, 225, .98);
+    border-radius: 20px;
+    box-shadow: inset 0 2px 8px rgba(121, 96, 58, .12), 0 5px 12px rgba(76, 76, 47, .1), 0 0 0 1px rgba(148, 111, 66, .12);
+    backdrop-filter: blur(1.5px);
+  }
+
+  #battlePoolLabel {
+    top: -22px;
+    padding: 3px 10px 4px;
+    border-radius: 999px;
+    border: 1px solid #e5bd7b;
+    box-shadow: 0 2px 0 rgba(174, 121, 60, .2), 0 3px 7px rgba(97, 70, 37, .12), inset 0 1px 0 rgba(255,255,255,.96);
+  }
+
+  .cat-feeder {
+    filter: drop-shadow(0 7px 8px rgba(79, 54, 29, .25));
+  }
+
+  .cat-feeder .feeder-body {
+    border-radius: 14px 14px 12px 12px;
+    background: linear-gradient(100deg, #c9a77c 0%, #f1e1c7 12%, #fffaf0 30%, #ead6b8 63%, #c7a174 100%);
+    border: 1.5px solid rgba(167, 123, 72, .72);
+    box-shadow: inset 0 2px 0 rgba(255,255,255,.98), inset 2px 0 5px rgba(255,255,255,.3), inset 0 -7px 12px rgba(111, 72, 34, .2), 0 5px 9px rgba(85, 55, 27, .2);
+  }
+
+  .cat-feeder .feeder-body::before {
+    top: 0;
+    left: 1px;
+    right: 1px;
+    height: 15px;
+    border-radius: 12px 12px 5px 5px;
+    background: linear-gradient(180deg, rgba(255,255,255,.94) 0%, rgba(255,246,223,.68) 48%, rgba(185,143,86,.18) 100%);
+    box-shadow: inset 0 1px 0 rgba(255,255,255,.98), 0 1px 0 rgba(153, 108, 58, .18);
+  }
+
+  .cat-feeder .feeder-body::after {
+    content: "";
+    position: absolute;
+    top: 19px;
+    left: 7px;
+    bottom: 18px;
+    width: 7px;
+    border-radius: 999px;
+    background: linear-gradient(90deg, rgba(255,255,255,.05), rgba(255,255,255,.46), rgba(255,255,255,.03));
+    pointer-events: none;
+  }
+
+  .cat-feeder .feeder-spout {
+    border: 2px solid rgba(227, 194, 145, .86);
+    box-shadow: inset 0 3px 6px rgba(0,0,0,.68), 0 1px 0 rgba(255,255,255,.76), 0 0 0 1px rgba(116, 77, 38, .16);
+  }
+
+  .cat-feeder .feeder-light {
+    border: 1px solid rgba(70, 137, 45, .56);
+    box-shadow: 0 0 8px rgba(126,217,87,.72), inset 0 1px 1px rgba(255,255,255,.92), inset 0 -1px 1px rgba(47,116,25,.3);
+  }
+
+  #trough {
+    border: 1px solid rgba(142, 91, 39, .55);
+    background: linear-gradient(180deg, #f4ddb6 0%, #d9b17a 38%, #bd8a4e 74%, #976539 100%);
+    box-shadow: 0 7px 13px rgba(83, 53, 27, .28), inset 0 2px 0 rgba(255,255,255,.82), inset 0 -3px 0 rgba(100, 61, 28, .28);
+  }
+
+  #troughInner, .miniTroughInner {
+    border: 1px solid rgba(255, 222, 164, .32);
+    background: linear-gradient(180deg, #503b29 0%, #392719 50%, #24170d 100%);
+    box-shadow: inset 0 3px 7px rgba(0,0,0,.42), inset 0 1px 0 rgba(255,255,255,.12);
+  }
+
+  .miniTrough {
+    border: 1px solid rgba(142, 91, 39, .58);
+    background: linear-gradient(180deg, #f4ddb6 0%, #d9b17a 38%, #bd8a4e 74%, #976539 100%);
+    box-shadow: 0 5px 10px rgba(83, 53, 27, .24), inset 0 2px 0 rgba(255,255,255,.75), inset 0 -2px 0 rgba(100, 61, 28, .24);
+  }
+
+  .miniTroughCells .trough-cell .bowl {
+    background: radial-gradient(circle at 36% 25%, #fffefa 0%, #faf6eb 38%, #e3d7bf 74%, #b9a487 100%);
+    box-shadow: inset 0 -2px 3px rgba(116,88,51,.2), inset 0 2px 3px rgba(255,255,255,.98), 0 1px 2px rgba(40,25,13,.34);
+  }
+
+  .miniTroughCells .trough-cell .bowl::before {
+    background: radial-gradient(circle at 48% 38%, #5c462f 0%, #342418 70%, #20140a 100%);
+  }
+
+  .miniTroughCells .trough-cell .bowl.filled {
+    box-shadow: inset 0 -2px 3px rgba(116,88,51,.18), inset 0 2px 3px rgba(255,255,255,.98), 0 0 0 1px rgba(255,207,102,.9), 0 0 5px rgba(255,196,78,.38);
+  }
+
 </style>
 </head>
 <body>
@@ -1982,34 +2536,47 @@
     const lId = "l" + Math.random().toString(36).slice(2, 8);
     const rId = "r" + Math.random().toString(36).slice(2, 8);
     const defs = `<defs>
-      <radialGradient id="${bId}" cx="40%" cy="30%" r="70%">
-        <stop offset="0%" stop-color="${body}"/><stop offset="100%" stop-color="${dark}"/>
+      <radialGradient id="${bId}" cx="33%" cy="22%" r="83%">
+        <stop offset="0%" stop-color="#fff9eb" stop-opacity=".78"/><stop offset="22%" stop-color="${body}"/><stop offset="66%" stop-color="${body}"/><stop offset="100%" stop-color="${dark}"/>
       </radialGradient>
-      <radialGradient id="${lId}" cx="50%" cy="40%" r="60%">
-        <stop offset="0%" stop-color="#fff"/><stop offset="100%" stop-color="${belly}"/>
+      <radialGradient id="${lId}" cx="35%" cy="24%" r="82%">
+        <stop offset="0%" stop-color="#fffef8"/><stop offset="58%" stop-color="#fff5e3"/><stop offset="100%" stop-color="${belly}"/>
       </radialGradient>
-      <radialGradient id="${rId}" cx="50%" cy="50%" r="50%">
-        <stop offset="0%" stop-color="${blush}" stop-opacity="0.75"/>
+      <radialGradient id="${rId}" cx="50%" cy="50%" r="55%">
+        <stop offset="0%" stop-color="${blush}" stop-opacity="0.82"/>
+        <stop offset="55%" stop-color="${blush}" stop-opacity="0.38"/>
         <stop offset="100%" stop-color="${blush}" stop-opacity="0"/>
       </radialGradient>
+      <linearGradient id="${bId}shine" x1="0" y1="0" x2="1" y2="1"><stop stop-color="#fff" stop-opacity=".42"/><stop offset="1" stop-color="#fff" stop-opacity="0"/></linearGradient>
+      <linearGradient id="${bId}paw" x1="0" y1="0" x2="0" y2="1"><stop stop-color="${body}"/><stop offset="1" stop-color="${dark}"/></linearGradient>
     </defs>`;
 
     if (state === "walking_to_food" || state === "walking_to_home" || state === "eating" || state === "waiting_walk") {
       const tailPath = tailUp ? "M28,58 Q6,54 8,22" : "M28,58 Q10,72 12,86";
       let eyes, mouth, headTilt = 0;
       const eyeCx1 = 84, eyeCx2 = 98, eyeCy = 46;
-      const eyesNormal = `<ellipse cx="${eyeCx1}" cy="${eyeCy}" rx="2.6" ry="3.4" fill="#2a2a2a"/>
-        <ellipse cx="${eyeCx2}" cy="${eyeCy}" rx="2.6" ry="3.4" fill="#2a2a2a"/>
-        <circle cx="${eyeCx1 + 0.8}" cy="${eyeCy - 1}" r="1" fill="#fff"/>
-        <circle cx="${eyeCx2 + 0.8}" cy="${eyeCy - 1}" r="1" fill="#fff"/>`;
-      const eyesHappy = `<path d="M${eyeCx1 - 4},${eyeCy} Q${eyeCx1},${eyeCy - 5} ${eyeCx1 + 4},${eyeCy}" stroke="#2a2a2a" stroke-width="2.2" fill="none" stroke-linecap="round"/>
-        <path d="M${eyeCx2 - 4},${eyeCy} Q${eyeCx2},${eyeCy - 5} ${eyeCx2 + 4},${eyeCy}" stroke="#2a2a2a" stroke-width="2.2" fill="none" stroke-linecap="round"/>`;
-      const eyesSad = `<ellipse cx="${eyeCx1}" cy="${eyeCy+1}" rx="3" ry="3.6" fill="#2a2a2a"/>
-        <ellipse cx="${eyeCx2}" cy="${eyeCy+1}" rx="3" ry="3.6" fill="#2a2a2a"/>
-        <circle cx="${eyeCx1 + 1}" cy="${eyeCy - 0.2}" r="1.3" fill="#fff"/>
-        <circle cx="${eyeCx2 + 1}" cy="${eyeCy - 0.2}" r="1.3" fill="#fff"/>
-        <path d="M${eyeCx1 - 5},${eyeCy - 6} Q${eyeCx1},${eyeCy - 8} ${eyeCx1 + 4},${eyeCy - 6}" stroke="#2a2a2a" stroke-width="1.6" fill="none" stroke-linecap="round"/>
-        <path d="M${eyeCx2 - 4},${eyeCy - 6} Q${eyeCx2},${eyeCy - 8} ${eyeCx2 + 5},${eyeCy - 6}" stroke="#2a2a2a" stroke-width="1.6" fill="none" stroke-linecap="round"/>`;
+      const eyesNormal = `<ellipse cx="${eyeCx1}" cy="${eyeCy}" rx="3.7" ry="4.6" fill="#fff5e8"/>
+        <ellipse cx="${eyeCx2}" cy="${eyeCy}" rx="3.7" ry="4.6" fill="#fff5e8"/>
+        <ellipse cx="${eyeCx1}" cy="${eyeCy}" rx="2.9" ry="3.9" fill="#4b3026"/>
+        <ellipse cx="${eyeCx2}" cy="${eyeCy}" rx="2.9" ry="3.9" fill="#4b3026"/>
+        <ellipse cx="${eyeCx1}" cy="${eyeCy+.3}" rx="1.8" ry="3" fill="#211a18"/>
+        <ellipse cx="${eyeCx2}" cy="${eyeCy+.3}" rx="1.8" ry="3" fill="#211a18"/>
+        <circle cx="${eyeCx1-0.1}" cy="${eyeCy-1.9}" r="1.45" fill="#fff"/>
+        <circle cx="${eyeCx2-0.1}" cy="${eyeCy-1.9}" r="1.45" fill="#fff"/>
+        <circle cx="${eyeCx1+1.4}" cy="${eyeCy+1.4}" r=".62" fill="#d8b887"/>
+        <circle cx="${eyeCx2+1.4}" cy="${eyeCy+1.4}" r=".62" fill="#d8b887"/>`;
+      const eyesHappy = `<path d="M${eyeCx1 - 4.5},${eyeCy+1} Q${eyeCx1},${eyeCy - 5.8} ${eyeCx1 + 4.5},${eyeCy+1}" stroke="#56352a" stroke-width="2.7" fill="none" stroke-linecap="round"/>
+        <path d="M${eyeCx2 - 4.5},${eyeCy+1} Q${eyeCx2},${eyeCy - 5.8} ${eyeCx2 + 4.5},${eyeCy+1}" stroke="#56352a" stroke-width="2.7" fill="none" stroke-linecap="round"/>
+        <path d="M${eyeCx1-2.7},${eyeCy+1} Q${eyeCx1},${eyeCy-1.2} ${eyeCx1+2.7},${eyeCy+1}" stroke="#fff7e8" stroke-width=".9" fill="none" stroke-linecap="round"/>
+        <path d="M${eyeCx2-2.7},${eyeCy+1} Q${eyeCx2},${eyeCy-1.2} ${eyeCx2+2.7},${eyeCy+1}" stroke="#fff7e8" stroke-width=".9" fill="none" stroke-linecap="round"/>`;
+      const eyesSad = `<ellipse cx="${eyeCx1}" cy="${eyeCy+1}" rx="3.9" ry="4.7" fill="#fff4e6"/>
+        <ellipse cx="${eyeCx2}" cy="${eyeCy+1}" rx="3.9" ry="4.7" fill="#fff4e6"/>
+        <ellipse cx="${eyeCx1}" cy="${eyeCy+1}" rx="2.8" ry="3.8" fill="#35251f"/>
+        <ellipse cx="${eyeCx2}" cy="${eyeCy+1}" rx="2.8" ry="3.8" fill="#35251f"/>
+        <circle cx="${eyeCx1 + .8}" cy="${eyeCy - 1}" r="1.35" fill="#fff"/>
+        <circle cx="${eyeCx2 + .8}" cy="${eyeCy - 1}" r="1.35" fill="#fff"/>
+        <path d="M${eyeCx1 - 5},${eyeCy - 6} Q${eyeCx1},${eyeCy - 8} ${eyeCx1 + 4},${eyeCy - 6}" stroke="#56352a" stroke-width="1.7" fill="none" stroke-linecap="round"/>
+        <path d="M${eyeCx2 - 4},${eyeCy - 6} Q${eyeCx2},${eyeCy - 8} ${eyeCx2 + 5},${eyeCy - 6}" stroke="#56352a" stroke-width="1.7" fill="none" stroke-linecap="round"/>`;
       if (state === "eating") {
         eyes = eyesHappy;
         mouth = `<ellipse cx="90" cy="56" rx="3.2" ry="2.4" fill="#d16b7a"/>
@@ -2033,25 +2600,39 @@
           <circle cx="56" cy="80" r="2.2" fill="#8a7355" opacity="0.4"/>`;
       }
       return `<svg viewBox="0 0 120 100" xmlns="http://www.w3.org/2000/svg">${defs}
-        <path d="${tailPath}" stroke="${dark}" stroke-width="7" fill="none" stroke-linecap="round"/>
-        <path d="${tailPath}" stroke="${body}" stroke-width="4" fill="none" stroke-linecap="round" opacity="0.7"/>
-        <rect class="leg leg-fr" x="34" y="72" width="8" height="22" rx="4" fill="${dark}"/>
-        <rect class="leg leg-br" x="66" y="72" width="8" height="22" rx="4" fill="${dark}"/>
-        <ellipse cx="52" cy="62" rx="34" ry="22" fill="url(#${bId})"/>
-        <ellipse cx="52" cy="70" rx="26" ry="13" fill="url(#${lId})"/>
+        <ellipse cx="54" cy="94" rx="36" ry="4.4" fill="#59422e" opacity=".18"/>
+        <path d="${tailPath}" stroke="${dark}" stroke-width="9" fill="none" stroke-linecap="round"/>
+        <path d="${tailPath}" stroke="url(#${bId}paw)" stroke-width="5.5" fill="none" stroke-linecap="round"/>
+        <path d="${tailPath}" stroke="#fff6e6" stroke-width="1.25" fill="none" stroke-linecap="round" opacity=".4"/>
+        <path class="leg leg-br" d="M64 68 C65 73 65 79 65 86 Q65 92 70 92 Q74 92 74 87 L73 71Z" fill="url(#${bId}paw)" stroke="${dark}" stroke-width=".7"/>
+        <path class="leg leg-bl" d="M36 68 C35 74 34 80 34 86 Q34 92 39 92 Q43 92 43 87 L44 71Z" fill="url(#${bId}paw)" stroke="${dark}" stroke-width=".7"/>
+        <path d="M19 57 C19 45 31 40 48 40 C67 40 79 49 82 62 C86 74 74 81 53 82 C32 82 19 73 19 57Z" fill="url(#${bId})" stroke="${dark}" stroke-opacity=".35" stroke-width="1.2"/>
+        <ellipse cx="52" cy="68" rx="25" ry="11.5" fill="url(#${lId})"/>
+        <ellipse cx="45" cy="49" rx="17" ry="7" fill="url(#${bId}shine)" opacity=".55"/>
+        <path d="M31 47 Q35 52 32 57 M43 42 Q47 47 43 51 M57 43 Q61 48 57 52" fill="none" stroke="${dark}" stroke-width="2.2" stroke-linecap="round" opacity=".24"/>
         ${dirties}
-        <rect class="leg leg-fl" x="26" y="72" width="9" height="22" rx="4.5" fill="${body}"/>
-        <rect class="leg leg-bl" x="60" y="72" width="9" height="22" rx="4.5" fill="${body}"/>
+        <path class="leg leg-fr" d="M28 68 C27 74 27 81 27 87 Q27 93 32 93 Q37 93 37 87 L37 70Z" fill="url(#${bId}paw)" stroke="${dark}" stroke-width=".7"/>
+        <path class="leg leg-fl" d="M59 68 C58 75 58 81 58 87 Q58 93 63 93 Q68 93 68 87 L68 70Z" fill="url(#${bId}paw)" stroke="${dark}" stroke-width=".7"/>
+        <ellipse cx="32" cy="90" rx="4.4" ry="2" fill="#fff5e3" opacity=".68"/>
+        <ellipse cx="63" cy="90" rx="4.4" ry="2" fill="#fff5e3" opacity=".68"/>
         <g transform="rotate(${headTilt} 90 46)">
-          <circle cx="90" cy="46" r="22" fill="url(#${bId})"/>
-          <polygon points="76,32 78,12 92,26" fill="${body}"/>
-          <polygon points="80,30 82,18 90,26" fill="${inner}"/>
-          <polygon points="102,26 106,12 112,32" fill="${body}"/>
-          <polygon points="104,26 106,18 110,30" fill="${inner}"/>
-          <ellipse cx="74" cy="52" rx="4.5" ry="3" fill="url(#${rId})"/>
-          <ellipse cx="106" cy="52" rx="4.5" ry="3" fill="url(#${rId})"/>
+          <polygon points="72,35 73,12 91,27" fill="${dark}"/>
+          <polygon points="74,32 77,16 89,27" fill="url(#${bId})"/>
+          <polygon points="73,29 77,18 86,27" fill="${inner}"/>
+          <polygon points="101,27 109,12 115,35" fill="${dark}"/>
+          <polygon points="103,28 108,17 112,32" fill="url(#${bId})"/>
+          <polygon points="105,27 108,20 110,30" fill="${inner}"/>
+          <circle cx="90" cy="46" r="23" fill="url(#${bId})" stroke="${dark}" stroke-opacity=".4" stroke-width="1.15"/>
+          <ellipse cx="79" cy="51" rx="10" ry="7" fill="url(#${lId})" opacity=".92"/>
+          <ellipse cx="101" cy="51" rx="10" ry="7" fill="url(#${lId})" opacity=".92"/>
+          <path d="M82 28 Q85 33 84 36 M90 25 Q92 31 90 34 M98 28 Q100 33 98 36" fill="none" stroke="${dark}" stroke-width="2.1" stroke-linecap="round" opacity=".27"/>
+          <path d="M75 52 L66 50 M75 55 L65 57 M105 52 L114 50 M105 55 L115 57" fill="none" stroke="#6e594c" stroke-width=".9" stroke-linecap="round" opacity=".7"/>
+          <ellipse cx="74" cy="52" rx="7.2" ry="4.8" fill="url(#${rId})"/>
+          <ellipse cx="106" cy="52" rx="7.2" ry="4.8" fill="url(#${rId})"/>
           ${eyes}
-          <polygon points="90,51 88.3,53 91.7,53" fill="#e87e8f"/>
+          <path d="M85.5 40 Q90 37.5 94.5 40" fill="none" stroke="#fff9ee" stroke-width="1.1" stroke-linecap="round" opacity=".58"/>
+          <path d="M85 51 Q90 54.4 95 51" fill="none" stroke="#d9b39b" stroke-width="1.4" stroke-linecap="round" opacity=".7"/>
+          <path d="M90 50 L87.9 52.5 Q90 54.1 92.1 52.5Z" fill="#d97785" stroke="#b85e6d" stroke-width=".55"/>
           ${mouth}
         </g>
       </svg>`;
@@ -2059,34 +2640,47 @@
 
     if (state === "sleeping") {
       return `<svg viewBox="0 0 100 70" xmlns="http://www.w3.org/2000/svg">${defs}
-        <ellipse cx="50" cy="46" rx="34" ry="20" fill="url(#${bId})"/>
-        <ellipse cx="50" cy="52" rx="24" ry="12" fill="url(#${lId})"/>
-        <path d="M20,52 Q12,36 34,32" stroke="${dark}" stroke-width="6" fill="none" stroke-linecap="round"/>
-        <circle cx="68" cy="38" r="18" fill="url(#${bId})"/>
-        <polygon points="58,26 60,12 70,22" fill="${body}"/>
-        <polygon points="61,25 62,16 68,22" fill="${inner}"/>
-        <polygon points="78,22 82,12 86,26" fill="${body}"/>
-        <polygon points="80,22 82,16 84,24" fill="${inner}"/>
-        <path d="M62,42 L70,42" stroke="#2a2a2a" stroke-width="2.2" stroke-linecap="round"/>
-        <path d="M76,42 L84,42" stroke="#2a2a2a" stroke-width="2.2" stroke-linecap="round"/>
-        <ellipse cx="60" cy="46" rx="3" ry="2" fill="url(#${rId})"/>
-        <ellipse cx="86" cy="46" rx="3" ry="2" fill="url(#${rId})"/>
-        <polygon points="72,46 70.5,48 73.5,48" fill="#e87e8f"/>
-        <text x="12" y="20" font-size="14" text-anchor="middle" fill="#5a8fc9" font-weight="900">Z</text>
-        <text x="4" y="10" font-size="10" text-anchor="middle" fill="#5a8fc9" font-weight="900">z</text>
+        <ellipse cx="49" cy="64" rx="34" ry="4" fill="#59422e" opacity=".17"/>
+        <path d="M20 52 Q10 35 32 31" stroke="${dark}" stroke-width="8" fill="none" stroke-linecap="round"/>
+        <path d="M20 52 Q10 35 32 31" stroke="url(#${bId}paw)" stroke-width="4.8" fill="none" stroke-linecap="round"/>
+        <ellipse cx="49" cy="45" rx="35" ry="21" fill="url(#${bId})" stroke="${dark}" stroke-opacity=".36" stroke-width="1.1"/>
+        <ellipse cx="50" cy="51" rx="24" ry="12" fill="url(#${lId})"/>
+        <path d="M28 36 Q34 41 31 46 M43 28 Q48 35 44 39 M57 29 Q61 35 58 39" fill="none" stroke="${dark}" stroke-width="2" stroke-linecap="round" opacity=".22"/>
+        <ellipse cx="41" cy="50" rx="9" ry="5" fill="url(#${lId})"/>
+        <ellipse cx="61" cy="51" rx="8" ry="5" fill="url(#${lId})"/>
+        <path d="M57 29 Q59 20 67 20 Q76 20 81 29" fill="none" stroke="${dark}" stroke-width="1.1" opacity=".28"/>
+        <polygon points="56,30 58,13 72,23" fill="${dark}"/>
+        <polygon points="59,28 61,17 70,24" fill="url(#${bId})"/>
+        <polygon points="62,26 63,19 68,24" fill="${inner}"/>
+        <polygon points="75,24 82,13 85,30" fill="${dark}"/>
+        <polygon points="77,25 82,17 82,28" fill="url(#${bId})"/>
+        <polygon points="79,24 82,19 81,27" fill="${inner}"/>
+        <circle cx="69" cy="38" r="18" fill="url(#${bId})" stroke="${dark}" stroke-opacity=".35" stroke-width="1.1"/>
+        <ellipse cx="63" cy="45" rx="6.5" ry="4.5" fill="url(#${lId})"/><ellipse cx="76" cy="45" rx="6.5" ry="4.5" fill="url(#${lId})"/>
+        <path d="M61 40 Q65 43 68 40 M73 40 Q77 43 80 40" stroke="#4a3026" stroke-width="1.9" fill="none" stroke-linecap="round"/>
+        <ellipse cx="59" cy="46" rx="4.2" ry="2.7" fill="url(#${rId})"/><ellipse cx="80" cy="46" rx="4.2" ry="2.7" fill="url(#${rId})"/>
+        <path d="M67 45 L69 47 L71 45 Q69 44 67 45Z" fill="#d97785"/>
+        <path d="M69 47 Q66 50 64 48 M69 47 Q72 50 74 48" fill="none" stroke="#765044" stroke-width="1.1" stroke-linecap="round"/>
+        <text x="13" y="20" font-size="14" text-anchor="middle" fill="#779cae" font-weight="900">Z</text>
+        <text x="4" y="10" font-size="10" text-anchor="middle" fill="#779cae" font-weight="900">z</text>
       </svg>`;
     }
 
     // 坐姿
     let eyes, mouth, extras = "";
-    const eyesHappy2 = `<path d="M35,44 Q40,37 45,44" stroke="#2a2a2a" stroke-width="2.6" fill="none" stroke-linecap="round"/>
-      <path d="M55,44 Q60,37 65,44" stroke="#2a2a2a" stroke-width="2.6" fill="none" stroke-linecap="round"/>`;
-    const eyesSleepy2 = `<path d="M35,44 Q40,48 45,44" stroke="#2a2a2a" stroke-width="2.2" fill="none" stroke-linecap="round"/>
-      <path d="M55,44 Q60,48 65,44" stroke="#2a2a2a" stroke-width="2.2" fill="none" stroke-linecap="round"/>`;
-    const eyesBig2 = `<ellipse cx="40" cy="43" rx="4" ry="5" fill="#2a2a2a"/>
-      <ellipse cx="60" cy="43" rx="4" ry="5" fill="#2a2a2a"/>
-      <circle cx="41.4" cy="41.2" r="1.6" fill="#fff"/>
-      <circle cx="61.4" cy="41.2" r="1.6" fill="#fff"/>`;
+    const eyesHappy2 = `<path d="M34.5,44 Q40,36 45.5,44" stroke="#56352a" stroke-width="2.8" fill="none" stroke-linecap="round"/>
+      <path d="M54.5,44 Q60,36 65.5,44" stroke="#56352a" stroke-width="2.8" fill="none" stroke-linecap="round"/>
+      <path d="M37,42 Q40,39 43,42 M57,42 Q60,39 63,42" stroke="#fff6e8" stroke-width=".9" fill="none" stroke-linecap="round"/>`;
+    const eyesSleepy2 = `<path d="M34.5,44 Q40,49 45.5,44" stroke="#56352a" stroke-width="2.5" fill="none" stroke-linecap="round"/>
+      <path d="M54.5,44 Q60,49 65.5,44" stroke="#56352a" stroke-width="2.5" fill="none" stroke-linecap="round"/>`;
+    const eyesBig2 = `<ellipse cx="40" cy="43" rx="5.2" ry="6.1" fill="#fff6e9"/>
+      <ellipse cx="60" cy="43" rx="5.2" ry="6.1" fill="#fff6e9"/>
+      <ellipse cx="40" cy="43.2" rx="4.05" ry="5.2" fill="#513328"/>
+      <ellipse cx="60" cy="43.2" rx="4.05" ry="5.2" fill="#513328"/>
+      <ellipse cx="40" cy="43.4" rx="2.8" ry="4.1" fill="#211918"/>
+      <ellipse cx="60" cy="43.4" rx="2.8" ry="4.1" fill="#211918"/>
+      <circle cx="41.2" cy="40.7" r="1.8" fill="#fff"/><circle cx="61.2" cy="40.7" r="1.8" fill="#fff"/>
+      <circle cx="38.4" cy="45.5" r=".85" fill="#e9d0a4"/><circle cx="58.4" cy="45.5" r=".85" fill="#e9d0a4"/>`;
     switch (state) {
       case "waiting":
         eyes = eyesBig2;
@@ -2107,9 +2701,9 @@
       case "happy":
         eyes = eyesHappy2;
         mouth = `<path d="M42,54 Q50,61 58,54" stroke="#2a2a2a" stroke-width="2.2" fill="none" stroke-linecap="round"/>`;
-        extras = `<text x="76" y="24" font-size="16" text-anchor="middle" fill="#e87e8f" font-weight="900">♥</text>
-          <text x="20" y="30" font-size="12" text-anchor="middle" fill="#ffd54f">✦</text>
-          <text x="84" y="46" font-size="10" text-anchor="middle" fill="#ffd54f" opacity="0.85">✦</text>`;
+        extras = `<path d="M76 17 C72 12 66 15 68 20 C69 24 76 28 76 28 C76 28 83 24 84 20 C86 15 80 12 76 17Z" fill="#e87e8f" stroke="#c55f78" stroke-width=".8"/>
+          <path d="M20 22 L22 28 L28 30 L22 32 L20 38 L18 32 L12 30 L18 28Z" fill="#ffd76a" stroke="#e4a83e" stroke-width=".8" stroke-linejoin="round"/>
+          <path d="M84 39 L85.5 43 L89.5 44.5 L85.5 46 L84 50 L82.5 46 L78.5 44.5 L82.5 43Z" fill="#fff0a2" stroke="#e4b34a" stroke-width=".7" stroke-linejoin="round" opacity=".9"/>`;
         break;
       default:
         eyes = eyesBig2;
@@ -2125,22 +2719,31 @@
     }
     const tailSit = tailUp ? "M28,80 Q10,76 14,58" : "M28,80 Q14,88 10,96";
     return `<svg viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">${defs}
-      <path d="${tailSit}" stroke="${dark}" stroke-width="7" fill="none" stroke-linecap="round"/>
-      <path d="${tailSit}" stroke="${body}" stroke-width="4" fill="none" stroke-linecap="round" opacity="0.7"/>
-      <ellipse cx="50" cy="80" rx="24" ry="17" fill="url(#${bId})"/>
-      <ellipse cx="50" cy="84" rx="16" ry="11" fill="url(#${lId})"/>
+      <ellipse cx="50" cy="96" rx="29" ry="3.5" fill="#59422e" opacity=".16"/>
+      <path d="${tailSit}" stroke="${dark}" stroke-width="8.5" fill="none" stroke-linecap="round"/>
+      <path d="${tailSit}" stroke="url(#${bId}paw)" stroke-width="5.2" fill="none" stroke-linecap="round"/>
+      <path d="${tailSit}" stroke="#fff6e6" stroke-width="1.2" fill="none" stroke-linecap="round" opacity=".4"/>
+      <ellipse cx="50" cy="80" rx="25" ry="18" fill="url(#${bId})" stroke="${dark}" stroke-opacity=".32" stroke-width="1.1"/>
+      <ellipse cx="50" cy="84" rx="17" ry="11.5" fill="url(#${lId})"/>
+      <path d="M34 68 Q38 73 35 78 M46 64 Q50 70 47 74 M59 65 Q62 70 59 74" fill="none" stroke="${dark}" stroke-width="2" stroke-linecap="round" opacity=".22"/>
       ${dirties}
-      <ellipse cx="38" cy="90" rx="7" ry="4" fill="${body}"/>
-      <ellipse cx="62" cy="90" rx="7" ry="4" fill="${body}"/>
-      <polygon points="28,30 33,12 45,26" fill="${body}"/>
-      <polygon points="72,30 67,12 55,26" fill="${body}"/>
-      <polygon points="32,28 35,17 43,26" fill="${inner}"/>
-      <polygon points="68,28 65,17 57,26" fill="${inner}"/>
-      <circle cx="50" cy="42" r="25" fill="url(#${bId})"/>
-      <ellipse cx="34" cy="50" rx="5" ry="3.5" fill="url(#${rId})"/>
-      <ellipse cx="66" cy="50" rx="5" ry="3.5" fill="url(#${rId})"/>
+      <ellipse cx="38" cy="90" rx="8" ry="4.4" fill="url(#${bId}paw)" stroke="${dark}" stroke-width=".5"/>
+      <ellipse cx="62" cy="90" rx="8" ry="4.4" fill="url(#${bId}paw)" stroke="${dark}" stroke-width=".5"/>
+      <path d="M34 90 L37 91 M39 90 L42 91 M58 90 L61 91 M63 90 L66 91" stroke="#fff3dc" stroke-width=".8" stroke-linecap="round" opacity=".62"/>
+      <polygon points="25,33 28,11 44,27" fill="${dark}"/>
+      <polygon points="28,31 31,16 42,27" fill="url(#${bId})"/>
+      <polygon points="30,29 32,18 40,27" fill="${inner}"/>
+      <polygon points="75,27 72,11 57,27" fill="${dark}"/>
+      <polygon points="72,29 69,16 59,27" fill="url(#${bId})"/>
+      <polygon points="70,27 68,18 61,27" fill="${inner}"/>
+      <circle cx="50" cy="42" r="26" fill="url(#${bId})" stroke="${dark}" stroke-opacity=".4" stroke-width="1.2"/>
+      <ellipse cx="33" cy="50" rx="8" ry="5.5" fill="url(#${rId})"/><ellipse cx="67" cy="50" rx="8" ry="5.5" fill="url(#${rId})"/>
+      <ellipse cx="40" cy="52" rx="10" ry="6.5" fill="url(#${lId})" opacity=".92"/><ellipse cx="60" cy="52" rx="10" ry="6.5" fill="url(#${lId})" opacity=".92"/>
+      <path d="M40 24 Q43 29 41 32 M50 21 Q53 27 50 31 M59 24 Q62 29 59 32" fill="none" stroke="${dark}" stroke-width="2.3" stroke-linecap="round" opacity=".27"/>
+      <path d="M34 53 L25 51 M34 56 L25 58 M66 53 L75 51 M66 56 L75 58" fill="none" stroke="#715b4c" stroke-width=".9" stroke-linecap="round" opacity=".7"/>
       ${eyes}
-      <polygon points="50,48 48,50.5 52,50.5" fill="#e87e8f"/>
+      <path d="M46 39 Q50 36 54 39" stroke="#fff8eb" stroke-width="1.15" fill="none" stroke-linecap="round" opacity=".6"/>
+      <path d="M47.5 49 L50 51.4 L52.5 49 Q50 47.7 47.5 49Z" fill="#d97785" stroke="#b85e6d" stroke-width=".55"/>
       ${mouth}
       ${extras}
     </svg>`;
@@ -2158,33 +2761,40 @@
     POS.W = W; POS.H = H;
     const trough = document.getElementById('trough');
     const bigHome = document.getElementById('bigHome');
-    const troughLeft = 44, troughRight = W - 106;
+    const troughLeft = Math.max(36, Math.round(W * 0.085));
+    const troughRight = W - Math.max(94, Math.round(W * 0.204));
     const troughWidth = Math.max(180, troughRight - troughLeft);
     trough.style.left = troughLeft + "px";
     trough.style.bottom = "42px";
     trough.style.width = troughWidth + "px";
-    const homeW = 91, homeLeft = W - 100, homeTop = 130;
-    const maxHomeH = H - homeTop - 24;
-    const homeH = Math.max(140, Math.min(maxHomeH, (H - 130) * 0.78));
+
+    const homeW = Math.min(148, Math.max(108, Math.round(W * 0.285)));
+    const homeLeft = W - homeW - 8;
+    const homeTop = Math.max(90, Math.min(128, Math.round(H * 0.29)));
+    const troughTopY = H - 42 - 54;
+    const wantedHomeH = Math.min(156, Math.max(92, Math.round(H * 0.35)));
+    const availableHomeH = Math.max(72, troughTopY - homeTop - 14);
+    const homeH = Math.min(wantedHomeH, availableHomeH);
     bigHome.style.left = homeLeft + "px";
     bigHome.style.top = homeTop + "px";
     bigHome.style.width = homeW + "px";
     bigHome.style.height = homeH + "px";
     POS.home = { x: homeLeft, y: homeTop, w: homeW, h: homeH };
+
     POS.eating = [];
     const catW = 84;
-    const troughTopY = H - 42 - 54;
     const eatY = troughTopY - 60;
-    // 6 个进食位，和 6 个碗 1:1 对齐
     for (let i = 0; i < 6; i++) {
       const cx = troughLeft + (i + 0.5) * (troughWidth / 6);
       POS.eating.push({ x: cx - catW / 2, y: eatY });
     }
+
     POS.waiting = [];
     const catH = 50;
     const waitBottomLimit = eatY - 34;
-    const waitLeft = 72, waitRight = W - 106;
-    const waitWidth = Math.max(120, waitRight - waitLeft);
+    const waitLeft = Math.max(58, Math.round(W * 0.138));
+    const waitRight = Math.max(waitLeft + 150, homeLeft - 14);
+    const waitWidth = Math.max(150, waitRight - waitLeft);
     let cols = Math.max(3, Math.min(5, Math.floor(waitWidth / 50) + 1));
     let rows = 2;
     const cellH = 42;
@@ -2562,15 +3172,21 @@
   function computeBattlePositions() {
     const W = topArea.clientWidth, H = topArea.clientHeight;
 
-    // ============ 中栏等待区（缩短到红框范围） ============
+    // 纯布局计算：中间等待区随场景宽度缩放，避免挤压两侧猫窝。
     BATTLE_POS.pool = [];
-    const poolWidth = 140;
+    const poolWidth = Math.min(140, Math.max(112, Math.round(W * 0.27)));
     const poolLeft = (W - poolWidth) / 2;
     const poolTop = 66;
-    const poolH = Math.max(120, (H - poolTop - 12) * 0.52);
+    const poolH = Math.max(140, Math.min(184, Math.round((H - poolTop - 18) * 0.48)));
+    const poolEl = document.getElementById('battlePool');
+    if (poolEl) {
+      poolEl.style.width = poolWidth + "px";
+      poolEl.style.top = poolTop + "px";
+      poolEl.style.height = poolH + "px";
+    }
     const catW = 68, catH = 60;
     const cols = 2;
-    const rows = 3;   // 固定 3 行 × 2 列 = 6 个位
+    const rows = 3;
     for (let r = 0; r < rows; r++) {
       for (let c = 0; c < cols; c++) {
         BATTLE_POS.pool.push({
@@ -2580,15 +3196,21 @@
       }
     }
 
-    // ============ 左右栏：猫窝保持原宽，喂食盆延伸到中栏中心 ============
+    // 两侧区域对称；食槽向中心延伸，但不会覆盖中间等待区本体。
     const leftColX = 6;
     const gapToPool = 6;
     const leftColW = (W - poolWidth) / 2 - gapToPool - 6;
     const rightColX = W - leftColW - 6;
+    const troughOverlap = poolWidth / 2 + gapToPool;
+    const battleLayoutEl = document.getElementById('battleLayout');
+    if (battleLayoutEl) {
+      battleLayoutEl.style.setProperty('--battle-trough-overlap', troughOverlap + 'px');
+      battleLayoutEl.style.setProperty('--battle-half-pool', (poolWidth / 2) + 'px');
+    }
 
-    const colTop = 58;
+    const colTop = 62;
     const colBottom = H - 8;
-    const HOME_H = 88;
+    const HOME_H = 120;
     const TROUGH_H = 46;
     const MACHINE_H = 68;
     const STOCK_H = 24;
@@ -2597,27 +3219,26 @@
     const stockTop = colBottom - STOCK_H;
     const machineTop = stockTop - MACHINE_H;
     const troughTop = machineTop - TROUGH_H;
+    const homeInsetX = Math.min(7, Math.max(4, Math.round(leftColW * 0.04)));
+    const homeWidth = Math.max(72, leftColW - homeInsetX * 2);
 
-    BATTLE_POS.myHome = { x: leftColX, y: homeTop, w: leftColW, h: HOME_H };
-    BATTLE_POS.oppHome = { x: rightColX, y: homeTop, w: leftColW, h: HOME_H };
+    BATTLE_POS.myHome = { x: leftColX + homeInsetX, y: homeTop, w: homeWidth, h: HOME_H };
+    BATTLE_POS.oppHome = { x: rightColX + homeInsetX, y: homeTop, w: homeWidth, h: HOME_H };
 
-    // 喂食盆实际宽度 = 左右栏宽 + 中栏一半（和 CSS 对齐）
-    const eatAreaW = leftColW + 76;
+    const eatAreaW = leftColW + troughOverlap;
     const eatY = troughTop - catH + 10;
     const eatCount = 6;
     BATTLE_POS.myEat = [];
     BATTLE_POS.oppEat = [];
     for (let i = 0; i < eatCount; i++) {
       const t = (i + 0.5) / eatCount;
-      // 我的：从左栏左边到中栏中心
       BATTLE_POS.myEat.push({
         x: leftColX + eatAreaW * t - catW / 2,
         y: eatY,
         z: i
       });
-      // 对手：从中栏中心到右栏右边（镜像）
       BATTLE_POS.oppEat.push({
-        x: (rightColX - 76) + eatAreaW * t - catW / 2,
+        x: (rightColX - troughOverlap) + eatAreaW * t - catW / 2,
         y: eatY,
         z: i
       });
@@ -2625,6 +3246,7 @@
 
     positionLeftColumnForBattle();
   }
+
   function positionLeftColumnForBattle() {
     const gameRect = gameRoot.getBoundingClientRect();
     const boardRect = boardArea.getBoundingClientRect();
