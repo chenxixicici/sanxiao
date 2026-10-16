@@ -101,7 +101,8 @@ setInterval(() => {
 
 // ============ 配置 ============
 const CONFIG = {
-  boardSize: 8,
+  boardRows: 7,
+  boardCols: 8,
   tileTypes: ['paw', 'fish', 'yarn', 'cookie', 'milk'],
   scoreTable: { 3: 20, 4: 30, 5: 40 },
   score6Base: 40, score6Extra: 8,
@@ -118,7 +119,7 @@ const CONFIG = {
   },
   maxCatsPerPlayer: 6,
   poolSize: 10,
-  totalCatCap: 32
+  totalCatCap: 64
 };
 
 // ============ 核心规则 ============
@@ -129,12 +130,12 @@ function swap(b, r1, c1, r2, c2) {
   const t = b[r1][c1]; b[r1][c1] = b[r2][c2]; b[r2][c2] = t;
 }
 function findMatches(b) {
-  const groups = []; const size = CONFIG.boardSize;
-  for (let r = 0; r < size; r++) {
+  const groups = []; const rows = CONFIG.boardRows, cols = CONFIG.boardCols;
+  for (let r = 0; r < rows; r++) {
     let c = 0;
-    while (c < size) {
+    while (c < cols) {
       const t = b[r][c]; let len = 1;
-      while (c + len < size && b[r][c + len] === t) len++;
+      while (c + len < cols && b[r][c + len] === t) len++;
       if (len >= 3) {
         const cells = [];
         for (let i = 0; i < len; i++) cells.push([r, c + i]);
@@ -143,11 +144,11 @@ function findMatches(b) {
       c += len;
     }
   }
-  for (let c = 0; c < size; c++) {
+  for (let c = 0; c < cols; c++) {
     let r = 0;
-    while (r < size) {
+    while (r < rows) {
       const t = b[r][c]; let len = 1;
-      while (r + len < size && b[r + len][c] === t) len++;
+      while (r + len < rows && b[r + len][c] === t) len++;
       if (len >= 3) {
         const cells = [];
         for (let i = 0; i < len; i++) cells.push([r + i, c]);
@@ -159,16 +160,16 @@ function findMatches(b) {
   return groups;
 }
 function hasPossibleMove(b) {
-  const size = CONFIG.boardSize;
-  for (let r = 0; r < size; r++) {
-    for (let c = 0; c < size; c++) {
-      if (c < size - 1) {
+  const rows = CONFIG.boardRows, cols = CONFIG.boardCols;
+  for (let r = 0; r < rows; r++) {
+    for (let c = 0; c < cols; c++) {
+      if (c < cols - 1) {
         swap(b, r, c, r, c + 1);
         const ok = findMatches(b).length > 0;
         swap(b, r, c, r, c + 1);
         if (ok) return true;
       }
-      if (r < size - 1) {
+      if (r < rows - 1) {
         swap(b, r, c, r + 1, c);
         const ok = findMatches(b).length > 0;
         swap(b, r, c, r + 1, c);
@@ -180,10 +181,10 @@ function hasPossibleMove(b) {
 }
 function generateBoard() {
   for (let attempt = 0; attempt < 200; attempt++) {
-    const b = Array.from({ length: CONFIG.boardSize }, () =>
-      Array(CONFIG.boardSize).fill(null));
-    for (let r = 0; r < CONFIG.boardSize; r++) {
-      for (let c = 0; c < CONFIG.boardSize; c++) {
+    const b = Array.from({ length: CONFIG.boardRows }, () =>
+      Array(CONFIG.boardCols).fill(null));
+    for (let r = 0; r < CONFIG.boardRows; r++) {
+      for (let c = 0; c < CONFIG.boardCols; c++) {
         const forbid = new Set();
         if (c >= 2 && b[r][c - 1] === b[r][c - 2]) forbid.add(b[r][c - 1]);
         if (r >= 2 && b[r - 1][c] === b[r - 2][c]) forbid.add(b[r - 1][c]);
@@ -193,14 +194,14 @@ function generateBoard() {
     }
     if (hasPossibleMove(b)) return b;
   }
-  return Array.from({ length: CONFIG.boardSize }, () =>
-    Array.from({ length: CONFIG.boardSize }, () => randomTile()));
+  return Array.from({ length: CONFIG.boardRows }, () =>
+    Array.from({ length: CONFIG.boardCols }, () => randomTile()));
 }
 function applyGravity(board) {
-  const size = CONFIG.boardSize;
-  for (let c = 0; c < size; c++) {
-    let write = size - 1;
-    for (let r = size - 1; r >= 0; r--) {
+  const rows = CONFIG.boardRows, cols = CONFIG.boardCols;
+  for (let c = 0; c < cols; c++) {
+    let write = rows - 1;
+    for (let r = rows - 1; r >= 0; r--) {
       if (board[r][c] !== null) {
         board[write][c] = board[r][c];
         if (write !== r) board[r][c] = null;
@@ -296,16 +297,16 @@ class BattleRoom {
   }
 
   botMove(bot) {
-    const size = CONFIG.boardSize;
+    const rows = CONFIG.boardRows, cols = CONFIG.boardCols;
     const moves = [];
-    for (let r = 0; r < size; r++) {
-      for (let c = 0; c < size; c++) {
-        if (c < size - 1) {
+    for (let r = 0; r < rows; r++) {
+      for (let c = 0; c < cols; c++) {
+        if (c < cols - 1) {
           swap(bot.board, r, c, r, c + 1);
           if (findMatches(bot.board).length > 0) moves.push([r, c, r, c + 1]);
           swap(bot.board, r, c, r, c + 1);
         }
-        if (r < size - 1) {
+        if (r < rows - 1) {
           swap(bot.board, r, c, r + 1, c);
           if (findMatches(bot.board).length > 0) moves.push([r, c, r + 1, c]);
           swap(bot.board, r, c, r + 1, c);
@@ -321,6 +322,12 @@ class BattleRoom {
     const p = this.players.find(x => x.id === playerId);
     if (!p) return;
     if (this.ended || !this.started) {
+      p.send({ type: 'event', kind: 'invalid' });
+      return;
+    }
+    if (![r1, c1, r2, c2].every(Number.isInteger) ||
+        r1 < 0 || r1 >= CONFIG.boardRows || r2 < 0 || r2 >= CONFIG.boardRows ||
+        c1 < 0 || c1 >= CONFIG.boardCols || c2 < 0 || c2 >= CONFIG.boardCols) {
       p.send({ type: 'event', kind: 'invalid' });
       return;
     }
@@ -392,6 +399,9 @@ class BattleRoom {
       const elapsed = now - cat.stateStart;
       let nextState = null;
       switch (cat.state) {
+        case 'entering':
+          if (elapsed >= 680) nextState = 'waiting';
+          break;
         case 'walking_to_food':
           if (elapsed >= CONFIG.catPhases.walkingToFood) nextState = 'eating';
           break;
@@ -447,27 +457,21 @@ class BattleRoom {
         this.broadcast({ type: 'cat_event', kind: 'state', catId: cat.id, state: nextState });
       }
     }
-    const now2 = Date.now();
-    this.cats = this.cats.filter(c => {
-      if (c.state === 'sleeping' && now2 - c.stateStart > 8000) return false;
-      return true;
-    });
-    if (this.cats.length > CONFIG.totalCatCap) {
-      this.cats = this.cats.slice(-CONFIG.totalCatCap);
-    }
+    // sleeping cats are intentionally retained for the entire round.
+    // totalCatCap only stops additional spawns; never evict cats that have returned home.
   }
 
   // 往等待区补一只中立猫（不扣粮）
   trySpawnWaitingCat() {
     if (this.ended || !this.started) return;
-    const waitingCats = this.cats.filter(c => !c.ownerId && c.state === 'waiting');
+    const waitingCats = this.cats.filter(c => !c.ownerId && (c.state === 'entering' || c.state === 'waiting'));
     if (waitingCats.length >= CONFIG.poolSize) return;
     if (this.cats.length >= CONFIG.totalCatCap) return;
 
     const cat = {
       id: this.catIdSeq++,
       ownerId: null,
-      state: 'waiting',
+      state: 'entering',
       stateStart: Date.now(),
       paletteIdx: Math.floor(Math.random() * 5),
       slot: waitingCats.length,
